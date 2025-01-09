@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import LandingPage from "../views/MainPages/LandingPage/index.vue";
 import HomePage from "../views/MainPages/HomePage/index.vue";
+import GalleryPage from "../views/MainPages/GalleryPage/index.vue";
+import BoardPage from "../views/MainPages/BoardPage/index.vue";
+import PricingPage from "../views/MainPages/PricingPage/index.vue";
 import PresentationView from "../views/Presentation/PresentationView.vue";
 import AboutView from "../views/LandingPages/AboutUs/AboutView.vue";
 import ContactView from "../views/LandingPages/ContactUs/ContactView.vue";
@@ -38,6 +41,21 @@ const router = createRouter({
       path: "/home",
       name: "home",
       component: HomePage,
+    },
+    {
+      path: "/gallery",
+      name: "gallery",
+      component: GalleryPage
+    },
+    {
+      path: "/pricing",
+      name: "pricing",
+      component: PricingPage
+    },
+    {
+      path: "/board",
+      name: "board",
+      component: BoardPage
     },
     {
       path: "/presentation",
