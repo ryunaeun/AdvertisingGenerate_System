@@ -1,4 +1,6 @@
 <template>
+  <div>
+    <Header />
     <div class="landing-page">
       <div class="container py-5">
         <h1 class="text-center mb-4">Landing Page</h1>
@@ -16,11 +18,16 @@
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: "LandingPage"
+  </div>
+</template>
+
+<script>
+import Header from './components/Header.vue'
+
+export default {
+  name: "LandingPage",
+  components: {
+    Header
   }
-  </script>
-  
+}
+</script>
