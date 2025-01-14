@@ -70,6 +70,7 @@
   </template>
   
   <script>
+  import axios from "axios";
   export default {
     name: 'LoginPage',
     data() {
@@ -87,6 +88,7 @@
     }
   }
   </script>
+  
   
   <style scoped>
   .login-container {
