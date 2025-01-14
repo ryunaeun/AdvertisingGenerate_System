@@ -5,6 +5,8 @@ import GalleryPage from "../views/MainPages/GalleryPage/index.vue";
 import BoardPage from "../views/MainPages/BoardPage/index.vue";
 import PricingPage from "../views/MainPages/PricingPage/index.vue";
 import LoginPage from "../views/MainPages/LoginPage/index.vue";
+import RegisterPage from "../views/MainPages/RegisterPage/index.vue";
+import AdminPage from "../views/MainPages/AdminPage/index.vue";
 import PresentationView from "../views/Presentation/PresentationView.vue";
 import AboutView from "../views/LandingPages/AboutUs/AboutView.vue";
 import ContactView from "../views/LandingPages/ContactUs/ContactView.vue";
@@ -62,6 +64,16 @@ const router = createRouter({
       path: "/login",
       name: "login",
       component: LoginPage
+    },
+    {
+      path: "/register",
+      name: "register",
+      component: RegisterPage
+    },
+    {
+      path: "/admin",
+      name: "admin",
+      component: AdminPage
     },
     {
       path: "/presentation",

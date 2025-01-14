@@ -14,6 +14,9 @@
             <router-link to="/presentation" class="btn bg-gradient-primary">
               예제 페이지 보기
             </router-link>
+            <router-link to="/admin" class="btn bg-gradient-primary">
+              관리자 페이지 보기
+            </router-link>
           </div>
         </div>
       </div>
