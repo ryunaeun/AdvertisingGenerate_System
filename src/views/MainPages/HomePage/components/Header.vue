@@ -16,10 +16,10 @@
         </router-link>
         <div class="dropdown">
           <div class="dropdown-trigger" @click="toggleDropdown">
-            <span class="nav-item">
+            <router-link to="/board" class="nav-item" :class="{ 'active': $route.path.includes('/board') }">
               <span>게시판</span>
               <span class="material-icons-round" :class="{ 'rotate': isDropdownOpen }">expand_more</span>
-            </span>
+            </router-link>
           </div>
 
           <div class="dropdown-menu show" v-if="isDropdownOpen">
@@ -35,7 +35,6 @@
     </nav>
   </header>
 </template>
-
 
 <script>
 export default {
