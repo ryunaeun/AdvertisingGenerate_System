@@ -8,6 +8,7 @@ const router = useRouter();
 
 onMounted(async () => {
   const refreshToken = localStorage.getItem("refreshToken");
+  console.log("App.vue: RefreshToken 확인:", refreshToken);
 
   if (refreshToken) {
     try {
@@ -15,16 +16,12 @@ onMounted(async () => {
       const response = await apiClient.post("/refresh-token", { refreshToken });
       const newAccessToken = response.data.accessToken;
 
-      // Access Token 저장
       sessionStorage.setItem("accessToken", newAccessToken);
 
       console.log("자동 로그인 성공, 사용자 정보 확인 중...");
-
-      // 현재 사용자 정보 확인
       const userResponse = await apiClient.get("/current-user");
       const userRole = userResponse.data.role;
 
-      // 사용자 역할에 따라 라우팅
       if (userRole === "ROLE_ADMIN") {
         router.push("/admin");
       } else {
@@ -33,13 +30,12 @@ onMounted(async () => {
     } catch (error) {
       console.error("Access Token 갱신 실패:", error);
 
-      // Refresh Token 제거 및 로그인 페이지로 이동
       localStorage.removeItem("refreshToken");
       sessionStorage.removeItem("accessToken");
-      router.push("/login"); // 실패 시 /login으로 이동
+      router.push("/login");
     }
   } else {
-    console.log("Refresh Token 없음, 로그인 필요");
+    console.warn("Refresh Token 없음, 로그인 필요");
     router.push("/login");
   }
 });

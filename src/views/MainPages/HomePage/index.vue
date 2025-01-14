@@ -1,42 +1,56 @@
-<!-- src/views/MainPages/HomePage/index.vue -->
 <template>
-    <div class="home-page">
-      <Header />
-      <div class="container py-5">
-        <h1 class="text-center mb-4">Welcome to Home Page</h1>
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">메인 홈페이지</h5>
-            <p class="card-text">이곳은 로그인 후 이용가능한 홈페이지입니다.</p>
-            <router-link to="/" class="btn bg-gradient-info">
-              랜딩 페이지로 돌아가기
-            </router-link>
-            <router-link to="/presentation" class="btn bg-gradient-primary">
-              예제 페이지 보기
-            </router-link>
-            <router-link to="/admin" class="btn bg-gradient-primary">
-              관리자 페이지 보기
-            </router-link>
-          </div>
+  <div class="home-page">
+    <Header />
+    <div class="container py-5">
+      <h1 class="text-center mb-4">Welcome to Home Page</h1>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">메인 홈페이지</h5>
+          <p class="card-text">이곳은 로그인 후 이용가능한 홈페이지입니다.</p>
+          <router-link to="/" class="btn bg-gradient-info">
+            랜딩 페이지로 돌아가기
+          </router-link>
+          <router-link to="/presentation" class="btn bg-gradient-primary">
+            예제 페이지 보기
+          </router-link>
+          <router-link to="/admin" class="btn bg-gradient-primary">
+            관리자 페이지 보기
+          </router-link>
+          <button @click="logout" class="btn bg-gradient-danger mt-3">로그아웃</button>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
-  import Header from './components/Header.vue'
-  
-  export default {
-    name: "HomePage",
-    components: {
-      Header
+  </div>
+</template>
+
+<script>
+import Header from './components/Header.vue';
+import apiClient from "@/api/axiosClient";
+
+export default {
+  name: "HomePage",
+  components: {
+    Header
+  },
+  methods: {
+    async logout() {
+      try {
+        await apiClient.post("/logout");
+        sessionStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        alert("로그아웃 성공");
+        this.$router.push("/login");
+      } catch (error) {
+        console.error("로그아웃 실패:", error);
+        alert("로그아웃 중 문제가 발생했습니다.");
+      }
     }
   }
-  </script>
-  
-  <style scoped>
-  .home-page {
-    padding-top: 70px;
-  }
-  </style>
-  
+};
+</script>
+
+<style scoped>
+.home-page {
+  padding-top: 70px;
+}
+</style>

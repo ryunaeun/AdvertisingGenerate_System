@@ -209,27 +209,24 @@ router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!accessToken && refreshToken) {
       try {
-        // Refresh Token으로 Access Token 갱신
         const response = await axios.post("http://localhost:8080/api/refresh-token", { refreshToken });
         const newAccessToken = response.data.accessToken;
 
         sessionStorage.setItem("accessToken", newAccessToken);
         console.log("Access Token 갱신 성공");
 
-        // 현재 사용자 정보 확인
         const userResponse = await axios.get("http://localhost:8080/api/current-user", {
           headers: { Authorization: `Bearer ${newAccessToken}` },
         });
         const userRole = userResponse.data.role;
 
-        // 역할에 따라 페이지 이동
         if (userRole === "ROLE_ADMIN" && to.name !== "admin") {
           return next({ name: "admin" });
         } else if (userRole !== "ROLE_ADMIN" && to.name !== "home") {
           return next({ name: "home" });
         }
 
-        return next(); // 원래 요청된 경로로 이동
+        return next();
       } catch (error) {
         console.error("Access Token 갱신 실패:", error);
         localStorage.removeItem("refreshToken");
@@ -243,7 +240,7 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  next(); // 인증이 필요 없는 경로는 그대로 이동
+  next();
 });
 
 

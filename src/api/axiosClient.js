@@ -29,13 +29,12 @@ apiClient.interceptors.response.use(
           const newAccessToken = response.data.accessToken;
   
           sessionStorage.setItem("accessToken", newAccessToken);
-  
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-          return axios(originalRequest); // 요청 재시도
+          return axios(originalRequest); // 실패한 요청 재시도
         } catch (refreshError) {
           console.error("Refresh Token 갱신 실패:", refreshError);
   
-          // Refresh Token 삭제 및 로그인 페이지로 이동
+          // Refresh Token 제거 및 로그인 페이지로 이동
           localStorage.removeItem("refreshToken");
           sessionStorage.removeItem("accessToken");
           window.location.href = "/login";
@@ -46,5 +45,6 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
   );
+  
 
 export default apiClient;
