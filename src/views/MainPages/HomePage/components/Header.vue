@@ -15,18 +15,18 @@
           <span>요금제</span>
         </router-link>
         <div class="dropdown">
-          <div class="dropdown-trigger" @click.prevent="toggleDropdown">
+          <div class="dropdown-trigger" @click="toggleDropdown">
             <router-link to="/board" class="nav-item" :class="{ 'active': $route.path.includes('/board') }">
               <span>게시판</span>
               <span class="material-icons-round" :class="{ 'rotate': isDropdownOpen }">expand_more</span>
             </router-link>
           </div>
 
-        <div class="dropdown-menu" v-if="isDropdownOpen">
-          <router-link to="/board/notice" class="dropdown-item">공지사항</router-link>
-          <router-link to="/board/faq" class="dropdown-item">FAQ</router-link>
-          <router-link to="/board/inquiry" class="dropdown-item">문의하기</router-link>
-        </div>
+          <div class="dropdown-menu show" v-if="isDropdownOpen">
+            <span class="dropdown-item" @click="scrollToSection('notice-section')">공지사항</span>
+            <span class="dropdown-item" @click="scrollToSection('faq-section')">FAQ</span>
+            <span class="dropdown-item" @click="scrollToSection('chatbot-section')">문의하기</span>
+          </div>
         </div>
       </div>
       <div class="my-page">
@@ -46,19 +46,30 @@ export default {
   },
   methods: {
     toggleDropdown() {
-      this.isDropdownOpen = !this.isDropdownOpen
+      this.isDropdownOpen = !this.isDropdownOpen;
     },
     closeDropdown(e) {
       if (!e.target.closest('.dropdown')) {
-        this.isDropdownOpen = false
+        this.isDropdownOpen = false;
       }
+    },
+    // Method to scroll to the specified section
+    scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+      this.isDropdownOpen = false; // Close the dropdown after selection
     }
   },
   mounted() {
-    document.addEventListener('click', this.closeDropdown)
+    document.addEventListener('click', this.closeDropdown);
   },
   beforeUnmount() {
-    document.removeEventListener('click', this.closeDropdown)
+    document.removeEventListener('click', this.closeDropdown);
   }
 }
 </script>

@@ -5,7 +5,7 @@
         <div class="row">
           <div class="col-12">
             <!-- 공지사항 카드 -->
-            <div class="card mb-4">
+            <div class="card mb-4" id="notice-section">
                 <div class="card-header pb-0">
                     <nav aria-label="breadcrumb">
                     <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0">
@@ -44,7 +44,7 @@
             </div>
   
             <!-- FAQ 카드 -->
-            <div class="card">
+            <div class="card" id="faq-section">
                 <div class="card-header pb-0">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0">
@@ -89,7 +89,7 @@
             </div>
   
             <!-- 챗봇 섹션 -->
-            <div class="card mt-4">
+            <div class="card mt-4" id="chatbot-section">
                 <div class="card-header pb-0">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0">
