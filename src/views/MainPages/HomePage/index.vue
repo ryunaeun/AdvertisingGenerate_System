@@ -1,4 +1,3 @@
-<!-- src/views/MainPages/HomePage/index.vue -->
 <template>
   <div class="home-page">
     <Header />
