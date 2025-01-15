@@ -1,4 +1,3 @@
-
 <script setup>
 import apiClient from "@/api/axiosClient";
 import { onMounted } from "vue";

@@ -45,7 +45,7 @@ const router = createRouter({
       path: "/home",
       name: "home",
       component: HomePage,
-      meta: { requiresAuth: true }, // 인증이 필요한 경로 표시 
+      //meta: { requiresAuth: true }, // 인증이 필요한 경로 표시 
     },
     {
       path: "/gallery",
@@ -76,7 +76,7 @@ const router = createRouter({
       path: "/admin",
       name: "admin",
       component: AdminPage,
-      meta: { requiresAuth: true, requiresRole: "ROLE_ADMIN" }, // 관리자 권한 필요
+      //meta: { requiresAuth: true, requiresRole: "ROLE_ADMIN" }, // 관리자 권한 필요
     },
     {
       path: "/presentation",

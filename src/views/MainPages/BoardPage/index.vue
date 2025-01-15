@@ -88,55 +88,50 @@
               </div>
             </div>
   
-            <!-- 챗봇 섹션 -->
-            <div class="card mt-4" id="chatbot-section">
-                <div class="card-header pb-0">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0">
-                            <li class="breadcrumb-item">
-                            <router-link to="/home" class="text-dark">
-                                <i class="material-icons-round">home</i>
-                            </router-link>
-                        </li>
-                            <li class="breadcrumb-item">
-                                <router-link to="/board" class="text-dark">게시판</router-link>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">문의사항</li>
-                        </ol>
-                    </nav>
+            <!-- 1:1 문의하기 섹션 -->
+          <div class="card mt-4" id="inquiry-section">
+            <div class="card-header pb-0">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0">
+                  <li class="breadcrumb-item">
+                    <router-link to="/home" class="text-dark">
+                      <i class="material-icons-round">home</i>
+                    </router-link>
+                  </li>
+                  <li class="breadcrumb-item">
+                    <router-link to="/board" class="text-dark">게시판</router-link>
+                  </li>
+                  <li class="breadcrumb-item active" aria-current="page">1:1 문의하기</li>
+                </ol>
+              </nav>
+            </div>
+            <div class="card-body">
+              <form @submit.prevent="submitInquiry">
+                <div class="input-group input-group-static mb-4">
+                  <label>제목</label>
+                  <input type="text" class="form-control" v-model="inquiry.title" placeholder="ex) 제목">
                 </div>
-              <div class="card-body">
-                <div class="chat-container">
-                  <div class="chat-messages" ref="chatMessages">
-                    <div v-for="(message, index) in messages" :key="index" 
-                         :class="['message', message.sender === 'user' ? 'user-message' : 'bot-message']">
-                      <div class="message-content">
-                        {{ message.text }}
-                      </div>
-                      <div class="message-time">
-                        {{ message.time }}
-                      </div>
-                    </div>
-                  </div>
-                  <div class="chat-input">
-                    <div class="input-group">
-                      <input 
-                        type="text" 
-                        class="form-control"
-                        v-model="newMessage"
-                        @keyup.enter="sendMessage"
-                        placeholder="메시지를 입력하세요..."
-                      >
-                      <button 
-                        class="btn custom-button mb-0"
-                        @click="sendMessage"
-                      >
-                        전송
-                      </button>
-                    </div>
-                  </div>
+
+                <div class="input-group input-group-static mb-4">
+                  <label>문의내용</label>
+                  <textarea class="form-control" rows="4" v-model="inquiry.content"></textarea>
                 </div>
-              </div>
+
+                <div class="input-group input-group-static mb-4">
+                  <label>이메일 정보</label>
+                  <input type="email" class="form-control" v-model="inquiry.email" placeholder="ex) michael@creative-tim.com">
+                  <button type="button" class="btn bg-gradient-light ms-2" @click="addEmail">
+                    <i class="material-icons">add</i> 이메일 추가
+                  </button>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                  <button type="submit" class="btn bg-gradient-success">
+                    문의하기
+                  </button>
+                </div>
+              </form>
+            </div>
             </div>
           </div>
         </div>
@@ -155,6 +150,11 @@
     },
     data() {
       return {
+        inquiry: {
+        title: '',
+        content: '',
+        email: ''
+      },
         boardItems: [
           {
             id: 1,
@@ -206,35 +206,15 @@
   },
 
   methods: {
-    async sendMessage() {
-      if (!this.newMessage.trim()) return;
-
-      // 사용자 메시지 추가
-      this.messages.push({
-        text: this.newMessage,
-        sender: 'user',
-        time: new Date().toLocaleTimeString()
-      });
-
-      const userMessage = this.newMessage;
-      this.newMessage = '';
-
-      // 챗봇 응답 처리 (여기에 실제 ChatGPT API 호출 로직 추가 필요)
-      setTimeout(() => {
-        this.messages.push({
-          text: '죄송합니다. 현재 챗봇 서비스 준비 중입니다.',
-          sender: 'bot',
-          time: new Date().toLocaleTimeString()
-        });
-      }, 1000);
-
-      // 스크롤을 최신 메시지로 이동
-      this.$nextTick(() => {
-        const chatMessages = this.$refs.chatMessages;
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      });
+    submitInquiry() {
+      // 문의하기 제출 로직 구현
+      console.log('문의 제출:', this.inquiry)
+    },
+    addEmail() {
+      // 이메일 추가 로직 구현
     }
-    }
+  }
+  
   }
 
 </script>
@@ -274,71 +254,50 @@
     box-shadow: none;
     border-color: rgba(0, 0, 0, 0.125);
   }
-  .chat-container {
-  height: 400px;
-  display: flex;
-  flex-direction: column;
+  .input-group-static {
+  position: relative;
 }
 
-.chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.message {
-  max-width: 70%;
-  padding: 0.8rem 1rem;
-  border-radius: 1rem;
+.input-group-static label {
+  color: #344767;
+  font-size: 0.875rem;
+  font-weight: 500;
   margin-bottom: 0.5rem;
 }
 
-.user-message {
-  align-self: flex-end;
-  background-color: #7b809a;
-  color: white;
+.form-control {
+  border: 1px solid #d2d6da;
+  padding: 0.75rem;
+  line-height: 1.4;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  background-color: #fff;
 }
 
-.bot-message {
-  align-self: flex-start;
-  background-color: #f8f9fa;
+.form-control:focus {
+  border-color: #5CB494;
+  box-shadow: 0 0 0 2px rgba(92, 180, 148, 0.25);
+}
+
+textarea.form-control {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.btn {
+  text-transform: none;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+}
+
+.bg-gradient-success {
+  background-image: linear-gradient(310deg, #5CB494 0%, #4a9077 100%);
+  color: #fff;
+}
+
+.bg-gradient-light {
+  background-image: linear-gradient(310deg, #e9ecef 0%, #dee2e6 100%);
   color: #344767;
-}
-
-.message-content {
-  margin-bottom: 0.3rem;
-}
-
-.message-time {
-  font-size: 0.7rem;
-  opacity: 0.7;
-  text-align: right;
-}
-
-.chat-input {
-  padding: 1rem;
-  border-top: 1px solid #e9ecef;
-}
-
-.input-group .form-control {
-  border-right: none;
-}
-
-.input-group .btn {
-  margin: 0;
-  border-radius: 0 0.5rem 0.5rem 0;
-}
-
-.custom-button {
-  background-color: #5CB494;
-  color: white;
-}
-
-.custom-button:hover {
-  background-color: #4a9077;
 }
 
   </style>
