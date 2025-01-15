@@ -157,101 +157,101 @@ export default {
       isPrivacyModalOpen: false,
     };
   },
-  methods: {
-    register() {
-      if (this.password !== this.confirmPassword) {
-        alert("비밀번호가 일치하지 않습니다.");
-        return;
-      }
+  // methods: {
+  //   register() {
+  //     if (this.password !== this.confirmPassword) {
+  //       alert("비밀번호가 일치하지 않습니다.");
+  //       return;
+  //     }
 
-      axios
-        .post("http://localhost:8080/api/register", {
-          username: this.username,
-          email: this.email,
-          password: this.password,
-        })
-        .then((response) => {
-          alert(response.data);
-          this.$router.push("/login");
-        })
-        .catch((error) => {
-          console.error("회원가입 실패:", error);
-          alert("회원가입 중 오류가 발생했습니다.");
-        });
-    },
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.selectedFile = file;
-        this.selectedFileName = file.name;
+  //     axios
+  //       .post("http://localhost:8080/api/register", {
+  //         username: this.username,
+  //         email: this.email,
+  //         password: this.password,
+  //       })
+  //       .then((response) => {
+  //         alert(response.data);
+  //         this.$router.push("/login");
+  //       })
+  //       .catch((error) => {
+  //         console.error("회원가입 실패:", error);
+  //         alert("회원가입 중 오류가 발생했습니다.");
+  //       });
+  //   },
+  //   handleFileUpload(event) {
+  //     const file = event.target.files[0];
+  //     if (file) {
+  //       this.selectedFile = file;
+  //       this.selectedFileName = file.name;
 
-        const maxSize = 10 * 1024 * 1024; // 10MB 제한
-        if (file.size > maxSize) {
-          alert("파일 크기는 10MB를 초과할 수 없습니다.");
-          this.resetFileInput();
-          return;
-        }
+  //       const maxSize = 10 * 1024 * 1024; // 10MB 제한
+  //       if (file.size > maxSize) {
+  //         alert("파일 크기는 10MB를 초과할 수 없습니다.");
+  //         this.resetFileInput();
+  //         return;
+  //       }
 
-        const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
-        if (!allowedTypes.includes(file.type)) {
-          alert("PDF, JPG, PNG 파일만 업로드 가능합니다.");
-          this.resetFileInput();
-          return;
-        }
-      }
-    },
-    resetFileInput() {
-      this.selectedFile = null;
-      this.selectedFileName = "";
-      this.$refs.fileInput.value = "";
-    },
-    showTermsModal() {
-      this.isTermsModalOpen = true;
-      const modal = document.getElementById("termsModal");
-      modal.classList.add("show");
-      modal.style.display = "block";
-      this.isModalOpen = true;
-      document.body.classList.add("modal-open");
-      const backdrop = document.createElement("div");
-      backdrop.className = "modal-backdrop fade show";
-      document.body.appendChild(backdrop);
-    },
-    closeTermsModal() {
-      this.isTermsModalOpen = false;
-      const modal = document.getElementById("termsModal");
-      modal.classList.remove("show");
-      modal.style.display = "none";
-      this.isModalOpen = false;
-      document.body.classList.remove("modal-open");
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) {
-        backdrop.remove();
-      }
-    },
-    showPrivacyModal() {
-      this.isPrivacyModalOpen = true;
-      const modal = document.getElementById("privacyModal");
-      modal.classList.add("show");
-      modal.style.display = "block";
-      this.isModalOpen = true;
-      document.body.classList.add("modal-open");
-      const backdrop = document.createElement("div");
-      backdrop.className = "modal-backdrop fade show";
-      document.body.appendChild(backdrop);
-    },
-    closePrivacyModal() {
-      this.isPrivacyModalOpen = false;
-      const modal = document.getElementById("privacyModal");
-      modal.classList.remove("show");
-      modal.style.display = "none";
-      this.isModalOpen = false;
-      document.body.classList.remove("modal-open");
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) {
-        backdrop.remove();
-      }
-    },
-  },
+  //       const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
+  //       if (!allowedTypes.includes(file.type)) {
+  //         alert("PDF, JPG, PNG 파일만 업로드 가능합니다.");
+  //         this.resetFileInput();
+  //         return;
+  //       }
+  //     }
+  //   },
+  //   resetFileInput() {
+  //     this.selectedFile = null;
+  //     this.selectedFileName = "";
+  //     this.$refs.fileInput.value = "";
+  //   },
+  //   showTermsModal() {
+  //     this.isTermsModalOpen = true;
+  //     const modal = document.getElementById("termsModal");
+  //     modal.classList.add("show");
+  //     modal.style.display = "block";
+  //     this.isModalOpen = true;
+  //     document.body.classList.add("modal-open");
+  //     const backdrop = document.createElement("div");
+  //     backdrop.className = "modal-backdrop fade show";
+  //     document.body.appendChild(backdrop);
+  //   },
+  //   closeTermsModal() {
+  //     this.isTermsModalOpen = false;
+  //     const modal = document.getElementById("termsModal");
+  //     modal.classList.remove("show");
+  //     modal.style.display = "none";
+  //     this.isModalOpen = false;
+  //     document.body.classList.remove("modal-open");
+  //     const backdrop = document.querySelector(".modal-backdrop");
+  //     if (backdrop) {
+  //       backdrop.remove();
+  //     }
+  //   },
+  //   showPrivacyModal() {
+  //     this.isPrivacyModalOpen = true;
+  //     const modal = document.getElementById("privacyModal");
+  //     modal.classList.add("show");
+  //     modal.style.display = "block";
+  //     this.isModalOpen = true;
+  //     document.body.classList.add("modal-open");
+  //     const backdrop = document.createElement("div");
+  //     backdrop.className = "modal-backdrop fade show";
+  //     document.body.appendChild(backdrop);
+  //   },
+  //   closePrivacyModal() {
+  //     this.isPrivacyModalOpen = false;
+  //     const modal = document.getElementById("privacyModal");
+  //     modal.classList.remove("show");
+  //     modal.style.display = "none";
+  //     this.isModalOpen = false;
+  //     document.body.classList.remove("modal-open");
+  //     const backdrop = document.querySelector(".modal-backdrop");
+  //     if (backdrop) {
+  //       backdrop.remove();
+  //     }
+  //   },
+  // },
 };
 </script>
 
