@@ -63,7 +63,7 @@
 
 <script>
 import { ref } from 'vue';
-import apiClient from "@/api/axiosClient";
+// import apiClient from "@/api/axiosClient";
 import MaterialAvatar from "@/components/MaterialAvatar.vue";
 import MaterialBadge from "@/components/MaterialBadge.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
@@ -105,23 +105,23 @@ export default {
       user.status = user.status === 'active' ? 'inactive' : 'active';
     };
 
-    const logout = async () => {
-      try {
-        await apiClient.post("/logout");
-        sessionStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        router.push({ name: "loginPage" });
-        alert("로그아웃 되었습니다.");
-      } catch (error) {
-        console.error("로그아웃 실패:", error);
-        alert("로그아웃 중 문제가 발생했습니다.");
-      }
-    };
+    // const logout = async () => {
+    //   try {
+    //     await apiClient.post("/logout");
+    //     sessionStorage.removeItem("accessToken");
+    //     localStorage.removeItem("refreshToken");
+    //     router.push({ name: "loginPage" });
+    //     alert("로그아웃 되었습니다.");
+    //   } catch (error) {
+    //     console.error("로그아웃 실패:", error);
+    //     alert("로그아웃 중 문제가 발생했습니다.");
+    //   }
+    // };
 
     return {
       users,
       toggleStatus,
-      logout
+      // logout
     };
   }
 };
