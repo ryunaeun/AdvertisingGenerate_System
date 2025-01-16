@@ -6,6 +6,8 @@ import BoardPage from "../views/MainPages/BoardPage/index.vue";
 import PricingPage from "../views/MainPages/PricingPage/index.vue";
 import RegisterPage from "../views/MainPages/RegisterPage/index.vue";
 import LoginPage from "../views/MainPages/LoginPage/index.vue";
+import RegisterPage from "../views/MainPages/RegisterPage/index.vue";
+import AdminPage from "../views/MainPages/AdminPage/index.vue";
 import PresentationView from "../views/Presentation/PresentationView.vue";
 import AboutView from "../views/LandingPages/AboutUs/AboutView.vue";
 import ContactView from "../views/LandingPages/ContactUs/ContactView.vue";
@@ -31,6 +33,7 @@ import ElProgressBars from "../layouts/sections/elements/progress-bars/ProgressB
 import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
 
+import axios from "axios"
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -43,6 +46,7 @@ const router = createRouter({
       path: "/home",
       name: "home",
       component: HomePage,
+      // meta: { requiresAuth: true }, // 인증이 필요한 경로 표시 
     },
     {
       path: "/gallery",
@@ -70,6 +74,15 @@ const router = createRouter({
       component: RegisterPage
     },
     {
+<<<<<<< HEAD
+=======
+      path: "/admin",
+      name: "admin",
+      component: AdminPage,
+      // meta: { requiresAuth: true, requiresRole: "ROLE_ADMIN" }, // 관리자 권한 필요
+    },
+    {
+>>>>>>> 698865e60ab72469ad9ef3e0c3091a1d8d7e69ec
       path: "/presentation",
       name: "presentation",
       component: PresentationView,
@@ -191,5 +204,48 @@ const router = createRouter({
     },
   ],
 });
+
+
+// router.beforeEach(async (to, from, next) => {
+//   const accessToken = sessionStorage.getItem("accessToken");
+//   const refreshToken = localStorage.getItem("refreshToken");
+
+//   if (to.matched.some((record) => record.meta.requiresAuth)) {
+//     if (!accessToken && refreshToken) {
+//       try {
+//         const response = await axios.post("http://localhost:8080/api/refresh-token", { refreshToken });
+//         const newAccessToken = response.data.accessToken;
+
+//         sessionStorage.setItem("accessToken", newAccessToken);
+//         console.log("Access Token 갱신 성공");
+
+//         const userResponse = await axios.get("http://localhost:8080/api/current-user", {
+//           headers: { Authorization: `Bearer ${newAccessToken}` },
+//         });
+//         const userRole = userResponse.data.role;
+
+//         if (userRole === "ROLE_ADMIN" && to.name !== "admin") {
+//           return next({ name: "admin" });
+//         } else if (userRole !== "ROLE_ADMIN" && to.name !== "home") {
+//           return next({ name: "home" });
+//         }
+
+//         return next();
+//       } catch (error) {
+//         console.error("Access Token 갱신 실패:", error);
+//         localStorage.removeItem("refreshToken");
+//         sessionStorage.removeItem("accessToken");
+//         alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+//         return next({ name: "loginPage" });
+//       }
+//     } else if (!accessToken) {
+//       console.warn("Refresh Token 없음, 로그인 페이지로 이동");
+//       return next({ name: "loginPage" });
+//     }
+//   }
+
+//   next();
+// });
+
 
 export default router;

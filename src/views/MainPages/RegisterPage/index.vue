@@ -1,229 +1,260 @@
 <template>
-    <div class="login-container">
-      <div class="row h-100">
-        <!-- 왼쪽 이미지 섹션 -->
-        <div class="col-md-6 illustration-section">
-          <img src="../../../assets/img/illustrations/login.jpg" alt="Developer Workspace" class="illustration-image">
+  <div class="login-container">
+    <div class="row h-100">
+      <!-- 왼쪽 이미지 섹션 -->
+      <div class="col-md-6 illustration-section">
+        <img src="../../../assets/img/illustrations/login.jpg" alt="Developer Workspace" class="illustration-image">
+      </div>
+
+      <!-- 오른쪽 회원가입 폼 섹션 -->
+      <div class="col-md-6 login-form-section">
+        <div class="login-form-container">
+          <h2 class="welcome-text">회원 가입</h2>
+          <form @submit.prevent="register" class="login-form">
+            <div class="form-group mb-3">
+              <input 
+                type="text" 
+                class="form-control" 
+                placeholder="이름"
+                v-model="username"
+              >
+            </div>
+            <div class="form-group mb-3">
+              <input 
+                type="email" 
+                class="form-control" 
+                placeholder="이메일 주소"
+                v-model="email"
+              >
+            </div>
+            <div class="form-group mb-3">
+              <input 
+                type="password" 
+                class="form-control" 
+                placeholder="비밀번호"
+                v-model="password"
+              >
+            </div>
+            <div class="form-group mb-3">
+              <input 
+                type="password" 
+                class="form-control" 
+                placeholder="비밀번호 확인"
+                v-model="confirmPassword"
+              >
+            </div>
+            <div class="form-group mb-3">
+              <input 
+                type="text" 
+                class="form-control" 
+                placeholder="회사명"
+                v-model="companyName"
+              >
+            </div>
+            <div class="form-group mb-3">
+              <input 
+                type="text" 
+                class="form-control" 
+                placeholder="사업자등록번호"
+                v-model="businessNumber"
+              >
+            </div>
+            <div class="form-group mb-3 d-flex align-items-center register">
+              <input 
+                type="text" 
+                class="form-control me-2" 
+                :placeholder="selectedFileName || '사업자 등록증 파일 업로드'" 
+                readonly
+              >
+              <input 
+                type="file" 
+                ref="fileInput" 
+                @change="handleFileUpload" 
+                accept=".pdf,.jpg,.jpeg,.png" 
+                style="display: none"
+              >
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary px-3" 
+                @click="$refs.fileInput.click()"
+              >
+                <span>+ 파일 업로드</span>
+              </button>
+            </div>
+            <button type="submit" class="btn btn-success w-100">가입하기</button>
+
+            <div class="mt-3 text-center small">
+              <p class="text-muted">
+                회원가입을 진행하면 ooo의<br>
+                <span @click="showTermsModal" class="fw-bold clickable">이용약관</span> 및 
+                <span @click="showPrivacyModal" class="fw-bold clickable">개인정보처리방침</span>에<br>
+                동의하게 됩니다.
+              </p>
+            </div>
+          </form>
         </div>
-        
-        <!-- 오른쪽 회원가입 폼 섹션 -->
-        <div class="col-md-6 login-form-section">
-          <div class="login-form-container">
-            <h2 class="welcome-text">회원 가입</h2>
-            <form @submit.prevent="handleRegister" class="login-form">
-              <div class="form-group mb-3">
-                <input 
-                  type="email" 
-                  class="form-control" 
-                  placeholder="이메일 주소"
-                  v-model="email"
-                >
-              </div>
-              <div class="form-group mb-3">
-                <input 
-                  type="password" 
-                  class="form-control" 
-                  placeholder="비밀번호"
-                  v-model="password"
-                >
-              </div>
-              <div class="form-group mb-3">
-                <input 
-                  type="password" 
-                  class="form-control" 
-                  placeholder="비밀번호 확인"
-                  v-model="passwordConfirm"
-                >
-              </div>
-              <div class="form-group mb-3">
-                <input 
-                  type="text" 
-                  class="form-control" 
-                  placeholder="회사명"
-                  v-model="companyName"
-                >
-              </div>
-              <div class="form-group mb-3">
-                <input 
-                  type="text" 
-                  class="form-control" 
-                  placeholder="사업자등록번호"
-                  v-model="businessNumber"
-                >
-              </div>
-              <div class="form-group mb-3 d-flex align-items-center register">
-                <input 
-                  type="text" 
-                  class="form-control me-2" 
-                  :placeholder="selectedFileName || '사업자 등록증 파일 업로드'" 
-                  readonly
-                >
-                <input 
-                  type="file" 
-                  ref="fileInput" 
-                  @change="handleFileUpload" 
-                  accept=".pdf,.jpg,.jpeg,.png" 
-                  style="display: none"
-                >
-                <button 
-                  type="button" 
-                  class="btn btn-outline-secondary px-3" 
-                  @click="$refs.fileInput.click()"
-                >
-                  <span>+ 파일 업로드</span>
-                </button>
-              </div>
-              <button type="submit" class="btn btn-success w-100">가입하기</button>
-              
-              <div class="mt-3 text-center small">
-                <p class="text-muted">
-                  회원가입을 진행하면 ooo의<br>
-                  <span @click="showTermsModal" class="fw-bold clickable">이용약관</span> 및 
-                  <span @click="showPrivacyModal" class="fw-bold clickable">개인정보처리방침</span>에<br>
-                  동의하게 됩니다.
-                </p>
-              </div>
-            </form>
+      </div>
+    </div>
+
+    <!-- 이용약관 모달 -->
+    <div class="modal fade" id="termsModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">이용약관</h5>
+            <button type="button" class="btn-close" @click="closeTermsModal"></button>
+          </div>
+          <div class="modal-body">
+            <h6>제1조 (목적)</h6>
+            <p>본 약관은 ooo(이하 "회사")가 제공하는 서비스의 이용조건 및 절차, 회사와 회원 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn custom-confirm-btn" @click="closeTermsModal">확인</button>
           </div>
         </div>
       </div>
-      <div class="modal fade" id="termsModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">이용약관</h5>
-          <button type="button" class="btn-close" @click="closeTermsModal"></button>
-        </div>
-        <div class="modal-body">
-          <h6>제1조 (목적)</h6>
-          <p>본 약관은 ooo(이하 "회사")가 제공하는 서비스의 이용조건 및 절차, 회사와 회원 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
-          
-          <h6>제2조 (용어의 정의)</h6>
-          <p>본 약관에서 사용하는 용어의 정의는 다음과 같습니다...</p>
-        </div>
-        <div class="modal-footer">
-        <button type="button" class="btn custom-confirm-btn" @click="closeTermsModal">확인</button>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- 개인정보처리방침 모달 -->
-  <div class="modal fade" id="privacyModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">개인정보처리방침</h5>
-          <button type="button" class="btn-close" @click="closePrivacyModal"></button>
-        </div>
-        <div class="modal-body">
-          <h6>1. 개인정보의 수집 및 이용 목적</h6>
-          <p>회사는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며...</p>
-          
-          <h6>2. 개인정보의 처리 및 보유기간</h6>
-          <p>회사는 법령에 따른 개인정보 보유·이용기간 또는 정보주체로부터 개인정보를 수집 시에 동의받은 개인정보 보유·이용기간 내에서 개인정보를 처리·보유합니다.</p>
-        </div>
-        <div class="modal-footer">
+    <!-- 개인정보처리방침 모달 -->
+    <div class="modal fade" id="privacyModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">개인정보처리방침</h5>
+            <button type="button" class="btn-close" @click="closePrivacyModal"></button>
+          </div>
+          <div class="modal-body">
+            <h6>1. 개인정보의 수집 및 이용 목적</h6>
+            <p>회사는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며...</p>
+          </div>
+          <div class="modal-footer">
             <button type="button" class="btn custom-confirm-btn" @click="closePrivacyModal">확인</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-    </div>
-  </template>
-  
-  
-  <script>
-    export default {
-  name: 'RegisterPage',
+</template>
+
+<script>
+import axios from "axios";
+
+export default {
+  name: "RegisterPage",
   data() {
     return {
-      email: '',
-      password: '',
-      passwordConfirm: '',
-      companyName: '',
-      businessNumber: '',
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      companyName: "",
+      businessNumber: "",
       businessFile: null,
       selectedFile: null,
-      selectedFileName: '',
+      selectedFileName: "",
       isModalOpen: false,
-    isTermsModalOpen: false,
-    isPrivacyModalOpen: false
-    }
+      isTermsModalOpen: false,
+      isPrivacyModalOpen: false,
+    };
   },
-  methods: {
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.selectedFile = file;
-        this.selectedFileName = file.name;
-        
-        // 파일 크기 체크 (예: 10MB 제한)
-        const maxSize = 10 * 1024 * 1024; // 10MB in bytes
-        if (file.size > maxSize) {
-          alert('파일 크기는 10MB를 초과할 수 없습니다.');
-          this.resetFileInput();
-          return;
-        }
-        
-        // 파일 형식 체크
-        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-        if (!allowedTypes.includes(file.type)) {
-          alert('PDF, JPG, PNG 파일만 업로드 가능합니다.');
-          this.resetFileInput();
-          return;
-        }
-      }
-    },
-    showTermsModal() {
-      this.isTermsModalOpen = true;
-      const modal = document.getElementById('termsModal')
-      modal.classList.add('show')
-      modal.style.display = 'block'
-      this.isModalOpen = true
-      document.body.classList.add('modal-open')
-      const backdrop = document.createElement('div')
-      backdrop.className = 'modal-backdrop fade show'
-      document.body.appendChild(backdrop)
-    },
-    closeTermsModal() {
-      this.isTermsModalOpen = false;
-      const modal = document.getElementById('termsModal')
-      modal.classList.remove('show')
-      modal.style.display = 'none'
-      this.isModalOpen = false
-      document.body.classList.remove('modal-open')
-      const backdrop = document.querySelector('.modal-backdrop')
-      if (backdrop) {
-        backdrop.remove()
-      }
-    },
-    showPrivacyModal() {
-      this.isPrivacyModalOpen = true;
-      const modal = document.getElementById('privacyModal')
-      modal.classList.add('show')
-      modal.style.display = 'block'
-      this.isModalOpen = true
-      document.body.classList.add('modal-open')
-      const backdrop = document.createElement('div')
-      backdrop.className = 'modal-backdrop fade show'
-      document.body.appendChild(backdrop)
-    },
-    closePrivacyModal() {
-      this.isPrivacyModalOpen = false;
-      const modal = document.getElementById('privacyModal')
-      modal.classList.remove('show')
-      modal.style.display = 'none'
-      this.isModalOpen = false
-      document.body.classList.remove('modal-open')
-      const backdrop = document.querySelector('.modal-backdrop')
-      if (backdrop) {
-        backdrop.remove()
-      }
-    }
-  }
-}
-  </script>
+  // methods: {
+  //   register() {
+  //     if (this.password !== this.confirmPassword) {
+  //       alert("비밀번호가 일치하지 않습니다.");
+  //       return;
+  //     }
+
+  //     axios
+  //       .post("http://localhost:8080/api/register", {
+  //         username: this.username,
+  //         email: this.email,
+  //         password: this.password,
+  //       })
+  //       .then((response) => {
+  //         alert(response.data);
+  //         this.$router.push("/login");
+  //       })
+  //       .catch((error) => {
+  //         console.error("회원가입 실패:", error);
+  //         alert("회원가입 중 오류가 발생했습니다.");
+  //       });
+  //   },
+  //   handleFileUpload(event) {
+  //     const file = event.target.files[0];
+  //     if (file) {
+  //       this.selectedFile = file;
+  //       this.selectedFileName = file.name;
+
+  //       const maxSize = 10 * 1024 * 1024; // 10MB 제한
+  //       if (file.size > maxSize) {
+  //         alert("파일 크기는 10MB를 초과할 수 없습니다.");
+  //         this.resetFileInput();
+  //         return;
+  //       }
+
+  //       const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
+  //       if (!allowedTypes.includes(file.type)) {
+  //         alert("PDF, JPG, PNG 파일만 업로드 가능합니다.");
+  //         this.resetFileInput();
+  //         return;
+  //       }
+  //     }
+  //   },
+  //   resetFileInput() {
+  //     this.selectedFile = null;
+  //     this.selectedFileName = "";
+  //     this.$refs.fileInput.value = "";
+  //   },
+  //   showTermsModal() {
+  //     this.isTermsModalOpen = true;
+  //     const modal = document.getElementById("termsModal");
+  //     modal.classList.add("show");
+  //     modal.style.display = "block";
+  //     this.isModalOpen = true;
+  //     document.body.classList.add("modal-open");
+  //     const backdrop = document.createElement("div");
+  //     backdrop.className = "modal-backdrop fade show";
+  //     document.body.appendChild(backdrop);
+  //   },
+  //   closeTermsModal() {
+  //     this.isTermsModalOpen = false;
+  //     const modal = document.getElementById("termsModal");
+  //     modal.classList.remove("show");
+  //     modal.style.display = "none";
+  //     this.isModalOpen = false;
+  //     document.body.classList.remove("modal-open");
+  //     const backdrop = document.querySelector(".modal-backdrop");
+  //     if (backdrop) {
+  //       backdrop.remove();
+  //     }
+  //   },
+  //   showPrivacyModal() {
+  //     this.isPrivacyModalOpen = true;
+  //     const modal = document.getElementById("privacyModal");
+  //     modal.classList.add("show");
+  //     modal.style.display = "block";
+  //     this.isModalOpen = true;
+  //     document.body.classList.add("modal-open");
+  //     const backdrop = document.createElement("div");
+  //     backdrop.className = "modal-backdrop fade show";
+  //     document.body.appendChild(backdrop);
+  //   },
+  //   closePrivacyModal() {
+  //     this.isPrivacyModalOpen = false;
+  //     const modal = document.getElementById("privacyModal");
+  //     modal.classList.remove("show");
+  //     modal.style.display = "none";
+  //     this.isModalOpen = false;
+  //     document.body.classList.remove("modal-open");
+  //     const backdrop = document.querySelector(".modal-backdrop");
+  //     if (backdrop) {
+  //       backdrop.remove();
+  //     }
+  //   },
+  // },
+};
+</script>
+
   
   
   <style scoped>
