@@ -6,7 +6,6 @@ import BoardPage from "../views/MainPages/BoardPage/index.vue";
 import PricingPage from "../views/MainPages/PricingPage/index.vue";
 import RegisterPage from "../views/MainPages/RegisterPage/index.vue";
 import LoginPage from "../views/MainPages/LoginPage/index.vue";
-import RegisterPage from "../views/MainPages/RegisterPage/index.vue";
 import AdminPage from "../views/MainPages/AdminPage/index.vue";
 import PresentationView from "../views/Presentation/PresentationView.vue";
 import AboutView from "../views/LandingPages/AboutUs/AboutView.vue";
@@ -74,15 +73,12 @@ const router = createRouter({
       component: RegisterPage
     },
     {
-<<<<<<< HEAD
-=======
       path: "/admin",
       name: "admin",
       component: AdminPage,
       // meta: { requiresAuth: true, requiresRole: "ROLE_ADMIN" }, // 관리자 권한 필요
     },
     {
->>>>>>> 698865e60ab72469ad9ef3e0c3091a1d8d7e69ec
       path: "/presentation",
       name: "presentation",
       component: PresentationView,
