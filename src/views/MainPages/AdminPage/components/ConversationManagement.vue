@@ -16,43 +16,137 @@
         placeholder="Enter User ID"
         class="input-field"
       />
-      <button class="fetch-btn" @click="fetchMessages">Fetch Messages</button>
+      <button class="fetch-btn" @click="fetchConversations">Fetch Data</button>
     </div>
 
-    <!-- 메시지 리스트 -->
-    <div class="message-list">
-      <div v-for="message in messages" :key="message.id" class="message-item">
-        <div class="user-message" v-if="message.query">
-          <strong>User:</strong> {{ message.query }}
-        </div>
-        <div class="assistant-message" v-if="message.answer">
-          <strong>Assistant:</strong> {{ message.answer }}
-        </div>
-        <div class="message-meta">
-          <small
-            ><strong>Created At:</strong>
-            {{ formatDate(message.created_at) }}</small
+    <!-- 대화 테이블 -->
+    <div class="overflow-x-auto">
+      <table
+        class="conversation-table mt-2 w-full min-w-[440px] border-collapse border-0"
+      >
+        <thead class="system-xs-medium-uppercase text-text-tertiary">
+          <tr>
+            <td
+              class="pl-2 pr-1 w-5 rounded-l-lg bg-background-section-burn whitespace-nowrap"
+            ></td>
+            <td
+              class="pl-3 py-1.5 bg-background-section-burn whitespace-nowrap"
+            >
+              요약
+            </td>
+            <td
+              class="pl-3 py-1.5 bg-background-section-burn whitespace-nowrap"
+            >
+              엔드 유저 또는 계정
+            </td>
+            <td
+              class="pl-3 py-1.5 bg-background-section-burn whitespace-nowrap"
+            >
+              상태
+            </td>
+            <td
+              class="pl-3 py-1.5 bg-background-section-burn whitespace-nowrap"
+            >
+              메시지 수
+            </td>
+            <td
+              class="pl-3 py-1.5 bg-background-section-burn whitespace-nowrap"
+            >
+              업데이트 시간
+            </td>
+            <td
+              class="pl-3 py-1.5 rounded-r-lg bg-background-section-burn whitespace-nowrap"
+            >
+              생성 시간
+            </td>
+          </tr>
+        </thead>
+        <tbody class="text-text-secondary system-sm-regular">
+          <tr
+            v-for="conversation in conversations"
+            :key="conversation.id"
+            class="border-b border-divider-subtle hover:bg-background-default-hover cursor-pointer"
+            @click="openModal(conversation.id)"
           >
-        </div>
-        <div v-if="message.message_files.length" class="attachments">
-          <strong>Attachments:</strong>
-          <ul>
-            <li v-for="file in message.message_files" :key="file.id">
-              <a :href="file.url" target="_blank">{{ file.type }}</a>
-            </li>
-          </ul>
-        </div>
-      </div>
+            <td class="h-4"></td>
+            <td class="p-3 pr-2 w-[160px]" style="max-width: 300px">
+              <div
+                class="text-text-secondary system-sm-regular overflow-hidden text-ellipsis whitespace-nowrap"
+              >
+                {{ conversation.name }}
+              </div>
+            </td>
+            <td class="p-3 pr-2">
+              <div
+                class="text-text-secondary system-sm-regular overflow-hidden text-ellipsis whitespace-nowrap"
+              >
+                {{
+                  conversation.from_end_user_session_id ||
+                  conversation.from_account_name ||
+                  "N/A"
+                }}
+              </div>
+            </td>
+            <td class="p-3 pr-2 w-[160px]" style="max-width: 300px">
+              <div
+                class="inline-flex items-center gap-1 system-xs-semibold-uppercase"
+              >
+                <div
+                  class="w-2 h-2 border border-solid rounded-[3px]"
+                  :class="
+                    conversation.status === 'normal'
+                      ? 'bg-green-500'
+                      : 'bg-red-500'
+                  "
+                ></div>
+                <span>{{ conversation.status }}</span>
+              </div>
+            </td>
+            <td class="p-3 pr-2" style="max-width: 100px">
+              <div
+                class="text-text-secondary system-sm-regular overflow-hidden text-ellipsis whitespace-nowrap"
+              >
+                {{ conversation.message_count }}
+              </div>
+            </td>
+            <td class="w-[160px] p-3 pr-2">
+              {{ formatDate(conversation.updated_at) }}
+            </td>
+            <td class="w-[160px] p-3 pr-2">
+              {{ formatDate(conversation.created_at) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <!-- 더 보기 버튼 -->
-    <button
-      v-if="hasMore"
-      class="load-more-btn"
-      @click="fetchMessages(nextFirstId)"
-    >
+    <button v-if="hasMore" class="load-more-btn" @click="fetchConversations">
       Load More
     </button>
+
+    <!-- 채팅 로그 모달 -->
+    <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
+      <div class="modal-content">
+        <h2 class="text-xl font-semibold mb-4">Chat Logs</h2>
+
+        <!-- 로딩 상태 -->
+        <div v-if="isLoading" class="loading-state">Loading chat logs...</div>
+
+        <!-- 채팅 로그 -->
+        <div v-else>
+          <div v-for="log in chatLogs" :key="log.id" class="chat-log">
+            <p><strong>Query:</strong> {{ log.query }}</p>
+            <p><strong>Answer:</strong> {{ log.answer }}</p>
+            <p><strong>Timestamp:</strong> {{ formatDate(log.created_at) }}</p>
+            <hr />
+          </div>
+        </div>
+
+        <!-- 닫기 버튼 -->
+        <button class="close-btn" @click="closeModal">Close</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -61,57 +155,79 @@ export default {
   name: "ConversationManagement",
   data() {
     return {
-      conversationId: "", // 입력된 대화 ID
-      userId: "", // 입력된 사용자 ID
-      messages: [], // 메시지 리스트
-      limit: 20, // 한 번에 불러올 메시지 수
-      hasMore: false, // 추가 메시지가 있는지 여부
-      nextFirstId: null, // 다음 페이지의 첫 메시지 ID
+      conversationId: "",
+      userId: "",
+      conversations: [],
+      chatLogs: [],
+      hasMore: false,
+      nextPage: 1,
+      limit: 10,
+      isModalOpen: false,
+      isLoading: false,
     };
   },
   methods: {
-    async fetchMessages(firstId = null) {
-      if (!this.conversationId || !this.userId) {
-        alert("Please enter both Conversation ID and User ID.");
-        return;
-      }
+    async fetchConversations() {
+      const apiUrl = `http://121.176.214.36/console/api/apps/f41fe500-6dc6-4b0a-8658-f08cf038b6e9/chat-conversations?page=${this.nextPage}&limit=${this.limit}&sort_by=-created_at&annotation_status=all`;
 
       try {
-        const response = await fetch(
-          `http://121.176.214.36/v1/messages?user=${this.userId}&conversation_id=${this.conversationId}&first_id=${firstId}&limit=${this.limit}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: "Bearer YOUR_API_KEY", // 여기에 API 키 입력
-            },
-          }
-        );
+        const response = await fetch(apiUrl, {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjk1ZmE2MGEtZWFkNS00YWRmLWE0NmItYWYxMjVjZTcwZmQ1IiwiZXhwIjoxNzM4MDQ2MDIxLCJpc3MiOiJTRUxGX0hPU1RFRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.Jt672rKxh0RSjF9w4ezSwSQaVFu3_dkEdGoHPm_QHO4",
+          },
+        });
+        const result = await response.json();
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch messages");
-        }
-
-        const data = await response.json();
-
-        // 메시지 업데이트
-        this.messages = firstId ? [...this.messages, ...data.data] : data.data;
-        this.hasMore = data.has_more;
-        this.nextFirstId =
-          data.data.length > 0 ? data.data[data.data.length - 1].id : null;
+        this.conversations = [...this.conversations, ...result.data];
+        this.hasMore = result.has_more;
+        this.nextPage += 1;
       } catch (error) {
-        console.error("Error fetching messages:", error);
-        alert("Failed to fetch messages. Check the console for more details.");
+        console.error("Error fetching conversations:", error);
+        alert("Failed to fetch conversations. Please try again.");
       }
+    },
+    async fetchChatLogs(conversationId) {
+      const apiUrl = `http://121.176.214.36/console/api/apps/f41fe500-6dc6-4b0a-8658-f08cf038b6e9/chat-messages?conversation_id=${conversationId}&limit=10`;
+
+      this.isLoading = true;
+      try {
+        const response = await fetch(apiUrl, {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjk1ZmE2MGEtZWFkNS00YWRmLWE0NmItYWYxMjVjZTcwZmQ1IiwiZXhwIjoxNzM4MDQ2MDIxLCJpc3MiOiJTRUxGX0hPU1RFRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.Jt672rKxh0RSjF9w4ezSwSQaVFu3_dkEdGoHPm_QHO4",
+          },
+        });
+        const result = await response.json();
+        this.chatLogs = result.data;
+      } catch (error) {
+        console.error("Error fetching chat logs:", error);
+        alert("Failed to fetch chat logs. Please check your network.");
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    openModal(conversationId) {
+      this.chatLogs = [];
+      this.isModalOpen = true;
+      this.fetchChatLogs(conversationId);
+    },
+    closeModal() {
+      this.isModalOpen = false;
     },
     formatDate(timestamp) {
       const date = new Date(timestamp * 1000);
       return date.toLocaleString();
     },
   },
+  mounted() {
+    this.fetchConversations();
+  },
 };
 </script>
 
 <style scoped>
+/* 기본 스타일 */
 .filter-section {
   display: flex;
   gap: 10px;
@@ -138,30 +254,11 @@ export default {
   background: #1976d2;
 }
 
-.message-list {
-  margin-top: 20px;
+.conversation-table {
   background: white;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.message-item {
-  border-bottom: 1px solid #ddd;
-  padding: 10px 0;
-}
-
-.message-item:last-child {
-  border-bottom: none;
-}
-
-.user-message,
-.assistant-message {
-  margin-bottom: 5px;
-}
-
-.attachments {
-  margin-top: 10px;
 }
 
 .load-more-btn {
@@ -176,5 +273,46 @@ export default {
 
 .load-more-btn:hover {
   background: #388e3c;
+}
+
+/* 모달 스타일 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+}
+
+.close-btn {
+  background: #f44336;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.close-btn:hover {
+  background: #d32f2f;
+}
+
+.loading-state {
+  text-align: center;
+  font-size: 16px;
+  color: #999;
 }
 </style>
