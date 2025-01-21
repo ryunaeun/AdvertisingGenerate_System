@@ -25,7 +25,7 @@
           <div class="dropdown-menu show" v-if="isDropdownOpen">
             <span class="dropdown-item" @click="scrollToSection('notice-section')">공지사항</span>
             <span class="dropdown-item" @click="scrollToSection('faq-section')">FAQ</span>
-            <span class="dropdown-item" @click="scrollToSection('chatbot-section')">문의하기</span>
+            <span class="dropdown-item" @click="scrollToSection('inquiry-section')">문의하기</span>
           </div>
         </div>
       </div>
@@ -35,11 +35,18 @@
           <span>MY PAGE</span>
         </button>
       </div>
+      <button class="logout-btn" @click="logout">
+          <span class="material-icons-round">exit_to_app</span>
+          <span>로그아웃</span>
+        </button>
     </nav>
   </header>
 </template>
 
 <script>
+import axios from 'axios';
+import apiClient from "@/api/axiosClient";
+
 export default {
   name: 'Header',
   data() {
@@ -56,7 +63,6 @@ export default {
         this.isDropdownOpen = false;
       }
     },
-    // Method to scroll to the specified section
     scrollToSection(sectionId) {
       const section = document.getElementById(sectionId);
       if (section) {
@@ -65,8 +71,20 @@ export default {
           block: 'start'
         });
       }
-      this.isDropdownOpen = false; // Close the dropdown after selection
-    }
+      this.isDropdownOpen = false;
+    },
+    async logout() {
+      try {
+        await apiClient.post("/logout");
+        sessionStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        alert("로그아웃 성공");
+        this.$router.push("/login");
+      } catch (error) {
+        console.error("로그아웃 실패:", error);
+        alert("로그아웃 중 문제가 발생했습니다.");
+      }
+    },
   },
   mounted() {
     document.addEventListener('click', this.closeDropdown);
@@ -178,7 +196,27 @@ export default {
 
 .my-page {
   margin-left: auto;
-  padding-right: 2rem;
+  padding-right: 1.5rem;
+}
+
+.logout-btn {
+  margin-right: 40px;
+  padding: 8px 16px;
+  background-color: #5CB494;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.logout-btn .material-icons-round {
+  margin-right: 5px;
+}
+
+.logout-btn:hover {
+  background-color: #344767;
 }
 </style>
 

@@ -45,7 +45,7 @@ const router = createRouter({
       path: "/home",
       name: "home",
       component: HomePage,
-      //meta: { requiresAuth: true }, // 인증이 필요한 경로 표시 
+      meta: { requiresAuth: true }, // 인증이 필요한 경로 표시 
     },
     {
       path: "/gallery",
@@ -76,7 +76,7 @@ const router = createRouter({
       path: "/admin",
       name: "admin",
       component: AdminPage,
-      //meta: { requiresAuth: true, requiresRole: "ROLE_ADMIN" }, // 관리자 권한 필요
+      meta: { requiresAuth: true, requiresRole: "ROLE_ADMIN" }, // 관리자 권한 필요
     },
     {
       path: "/presentation",
@@ -202,46 +202,46 @@ const router = createRouter({
 });
 
 
-// router.beforeEach(async (to, from, next) => {
-//   const accessToken = sessionStorage.getItem("accessToken");
-//   const refreshToken = localStorage.getItem("refreshToken");
+router.beforeEach(async (to, from, next) => {
+  const accessToken = sessionStorage.getItem("accessToken");
+  const refreshToken = localStorage.getItem("refreshToken");
 
-//   if (to.matched.some((record) => record.meta.requiresAuth)) {
-//     if (!accessToken && refreshToken) {
-//       try {
-//         const response = await axios.post("http://localhost:8080/api/refresh-token", { refreshToken });
-//         const newAccessToken = response.data.accessToken;
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!accessToken && refreshToken) {
+      try {
+        const response = await axios.post("http://localhost:8080/api/refresh-token", { refreshToken });
+        const newAccessToken = response.data.accessToken;
 
-//         sessionStorage.setItem("accessToken", newAccessToken);
-//         console.log("Access Token 갱신 성공");
+        sessionStorage.setItem("accessToken", newAccessToken);
+        console.log("Access Token 갱신 성공");
 
-//         const userResponse = await axios.get("http://localhost:8080/api/current-user", {
-//           headers: { Authorization: `Bearer ${newAccessToken}` },
-//         });
-//         const userRole = userResponse.data.role;
+        const userResponse = await axios.get("http://localhost:8080/api/current-user", {
+          headers: { Authorization: `Bearer ${newAccessToken}` },
+        });
+        const userRole = userResponse.data.role;
 
-//         if (userRole === "ROLE_ADMIN" && to.name !== "admin") {
-//           return next({ name: "admin" });
-//         } else if (userRole !== "ROLE_ADMIN" && to.name !== "home") {
-//           return next({ name: "home" });
-//         }
+        if (userRole === "ROLE_ADMIN" && to.name !== "admin") {
+          return next({ name: "admin" });
+        } else if (userRole !== "ROLE_ADMIN" && to.name !== "home") {
+          return next({ name: "home" });
+        }
 
-//         return next();
-//       } catch (error) {
-//         console.error("Access Token 갱신 실패:", error);
-//         localStorage.removeItem("refreshToken");
-//         sessionStorage.removeItem("accessToken");
-//         alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-//         return next({ name: "loginPage" });
-//       }
-//     } else if (!accessToken) {
-//       console.warn("Refresh Token 없음, 로그인 페이지로 이동");
-//       return next({ name: "loginPage" });
-//     }
-//   }
+        return next();
+      } catch (error) {
+        console.error("Access Token 갱신 실패:", error);
+        localStorage.removeItem("refreshToken");
+        sessionStorage.removeItem("accessToken");
+        alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+        return next({ name: "loginPage" });
+      }
+    } else if (!accessToken) {
+      console.warn("Refresh Token 없음, 로그인 페이지로 이동");
+      return next({ name: "loginPage" });
+    }
+  }
 
-//   next();
-// });
+  next();
+});
 
 
 export default router;
