@@ -23,6 +23,7 @@
           </div>
 
           <div class="dropdown-menu show" v-if="isDropdownOpen">
+            <span class="dropdown-item" @click="scrollToSection('my-inquiries-section')">내 문의함</span>
             <span class="dropdown-item" @click="scrollToSection('notice-section')">공지사항</span>
             <span class="dropdown-item" @click="scrollToSection('faq-section')">FAQ</span>
             <span class="dropdown-item" @click="scrollToSection('chatbot-section')">문의하기</span>
@@ -30,7 +31,7 @@
         </div>
       </div>
       <div class="my-page">
-        <button class="my-page-btn">
+        <button class="my-page-btn" @click="goToMyPage">
           <span class="material-icons-round">person</span>
           <span>MY PAGE</span>
         </button>
@@ -45,7 +46,7 @@ export default {
   data() {
     return {
       isDropdownOpen: false
-    }
+    };
   },
   methods: {
     toggleDropdown() {
@@ -56,7 +57,6 @@ export default {
         this.isDropdownOpen = false;
       }
     },
-    // Method to scroll to the specified section
     scrollToSection(sectionId) {
       const section = document.getElementById(sectionId);
       if (section) {
@@ -65,7 +65,10 @@ export default {
           block: 'start'
         });
       }
-      this.isDropdownOpen = false; // Close the dropdown after selection
+      this.isDropdownOpen = false;
+    },
+    goToMyPage() {
+      this.$router.push('/mypage'); // 마이페이지로 이동
     }
   },
   mounted() {
@@ -74,7 +77,7 @@ export default {
   beforeUnmount() {
     document.removeEventListener('click', this.closeDropdown);
   }
-}
+};
 </script>
 
 <style scoped>

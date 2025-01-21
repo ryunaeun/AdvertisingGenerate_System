@@ -4,6 +4,94 @@
       <div class="container py-5">
         <div class="row">
           <div class="col-12">
+            <!-- 내 문의함 카드 -->
+            <div class="card mb-4" id="my-inquiries-section">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0">
+                    <li class="breadcrumb-item">
+                      <router-link to="/home" class="text-dark">
+                        <i class="material-icons-round">home</i>
+                      </router-link>
+                    </li>
+                    <li class="breadcrumb-item">
+                      <router-link to="/board" class="text-dark">게시판</router-link>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">내 문의함</li>
+                  </ol>
+                </nav>
+                <button class="btn custom-button" @click="openNewInquiryModal">+ New</button>
+              </div>
+              <div class="card-body px-0 pb-0">
+                <div class="table-responsive">
+                  <table class="table table-flush" id="my-questions-list">
+                    <thead class="thead-light">
+                      <tr>
+                        <th class="text-left text-secondary text-sm font-weight-semibold">번호</th>
+                        <th class="text-left text-secondary text-sm font-weight-semibold">제목</th>
+                        <th class="text-left text-secondary text-sm font-weight-semibold">상태</th>
+                        <th class="text-left text-secondary text-sm font-weight-semibold">날짜</th>
+                        <th class="text-left text-secondary text-sm font-weight-semibold"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="question in myQuestions" :key="question.id">
+                        <td>{{ question.id }}</td>
+                        <td>
+                          <!-- 제목 클릭 시 모달 열기 -->
+                          <a href="#" @click.prevent="viewInquiryDetails(question)">{{ question.title }}</a>
+                        </td>
+                        <td>{{ question.status }}</td>
+                        <td>{{ question.date }}</td>
+                        <td>
+                          <button 
+                            class="btn btn-sm btn-outline-danger" 
+                            @click="deleteQuestion(question.id)"
+                            title="삭제하기">
+                            X
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+
+              <!-- 모달 -->
+              <div v-if="selectedQuestion" class="inquiry-modal-overlay" @click.self="closeInquiryModal">
+                <div class="inquiry-modal-container">
+                  <div class="inquiry-modal-header">
+                    <h5 class="modal-title">문의 상세</h5>
+                    <button type="button" class="btn-close" @click="closeInquiryModal"></button>
+                  </div>
+                  <div class="inquiry-modal-body">
+                    <div class="inquiry-modal-content-section">
+                      <h6>제목</h6>
+                      <p>{{ selectedQuestion.title }}</p>
+                    </div>
+                    <hr />
+                    <div class="inquiry-modal-content-section">
+                      <h6>내용</h6>
+                      <p>{{ selectedQuestion.content }}</p>
+                    </div>
+                    <hr />
+                    <div class="inquiry-modal-content-section">
+                      <h6>작성 날짜</h6>
+                      <p>{{ selectedQuestion.date }}</p>
+                    </div>
+                    <hr />
+                    <div class="inquiry-modal-content-section">
+                      <h6>상태</h6>
+                      <p>{{ selectedQuestion.status }}</p>
+                    </div>
+                  </div>
+                  <div class="inquiry-modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="closeInquiryModal">닫기</button>
+                  </div>
+                </div>
+              </div>
+            </div>
             <!-- 공지사항 카드 -->
             <div class="card mb-4" id="notice-section">
                 <div class="card-header pb-0">
@@ -30,14 +118,14 @@
                       </tr>
                     </thead>
                     <tbody>
-  <tr v-for="(item, index) in boardItems" 
-      :key="index" 
-      :class="{ 'table-alternate': index % 2 === 1 }">
-    <td class="text-sm text-dark">{{ item.id }}</td>
-    <td class="text-sm text-dark">{{ item.title }}</td>
-    <td class="text-sm text-dark">{{ item.date }}</td>
-  </tr>
-</tbody>
+                    <tr v-for="(item, index) in boardItems" 
+                        :key="index" 
+                        :class="{ 'table-alternate': index % 2 === 1 }">
+                      <td class="text-sm text-dark">{{ item.id }}</td>
+                      <td class="text-sm text-dark">{{ item.title }}</td>
+                      <td class="text-sm text-dark">{{ item.date }}</td>
+                    </tr>
+                  </tbody>
                   </table>
                 </div>
               </div>
@@ -137,6 +225,29 @@
                   </div>
                 </div>
               </div>
+              <!-- New Inquiry Modal -->
+              <div v-if="isModalOpen" class="modal-overlay">
+                <div class="modal-container">
+                  <div class="modal-header">
+                    <h5>1:1 문의</h5>
+                    <button class="close-button" @click="closeNewInquiryModal">&times;</button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="form-group">
+                      <label for="inquiry-title">제목</label>
+                      <input type="text" id="inquiry-title" v-model="newInquiry.title" class="form-control" placeholder="제목을 입력해주세요" />
+                    </div>
+                    <div class="form-group">
+                      <label for="inquiry-content">내용</label>
+                      <textarea id="inquiry-content" v-model="newInquiry.content" class="form-control" rows="5" placeholder="내용을 입력해주세요"></textarea>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" @click="closeNewInquiryModal">취소</button>
+                    <button class="btn custom-button" @click="submitNewInquiry">등록</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -155,6 +266,28 @@
     },
     data() {
       return {
+        myQuestions: [
+          {
+            id: 1,
+            title: 'Spring Boot Container 추가배포 중 에러 문의',
+            status: '완료',
+            date: '2024.12.23 16:19',
+            content: 'Spring Boot 애플리케이션을 Docker 컨테이너로 배포하는 과정에서 발생하는 오류에 대한 상세 문의입니다.',
+          },
+          {
+            id: 2,
+            title: 'API 응답 속도 개선 방안',
+            status: '진행 중',
+            date: '2024.12.20 10:45',
+            content: 'API 호출 시 응답 속도가 느려지는 문제에 대한 해결 방안을 요청드립니다.',
+          },
+        ],
+        selectedQuestion: null,
+        newInquiry: {
+            title: '',
+            content: '',
+          },
+        isModalOpen: false,
         boardItems: [
           {
             id: 1,
@@ -206,6 +339,48 @@
   },
 
   methods: {
+    viewInquiryDetails(question) {
+      this.selectedQuestion = question;
+    },
+    // 문의 삭제
+    deleteQuestion(questionId) {
+      if (confirm('정말로 삭제하시겠습니까?')) {
+        this.myQuestions = this.myQuestions.filter((question) => question.id !== questionId);
+        alert('문의가 삭제되었습니다.');
+      }
+    },
+    closeInquiryModal() {
+      this.selectedQuestion = null;
+    },
+    openNewInquiryModal() {
+      this.isModalOpen = true;
+    },
+    closeNewInquiryModal() {
+      this.isModalOpen = false;
+      this.newInquiry = { title: '', content: '' };
+    },
+    submitNewInquiry() {
+      if (!this.newInquiry.title || !this.newInquiry.content) {
+        alert('모든 항목을 입력해주세요.');
+        return;
+      }
+
+      this.myQuestions.push({
+        id: this.myQuestions.length + 1,
+        title: this.newInquiry.title,
+        content: this.newInquiry.content,
+        date: new Date().toLocaleString('ko-KR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }),
+        status: '대기 중',
+      });
+      this.closeNewInquiryModal();
+    },
     async sendMessage() {
       if (!this.newMessage.trim()) return;
 
@@ -340,6 +515,161 @@
 .custom-button:hover {
   background-color: #4a9077;
 }
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
-  </style>
+.modal-container {
+  background: white;
+  width: 500px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  padding: 1rem;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-body {
+  padding: 1rem;
+}
+
+.modal-footer {
+  padding: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  background: #f5f5f5;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.custom-button {
+  background-color: #5CB494;
+  color: white;
+}
+
+.custom-button:hover {
+  background-color: #4a9077;
+}
+
+.btn.active {
+  background-color: #5CB494;
+  color: white;
+}
+/* 모달 배경 */
+.inquiry-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+/* 모달 컨테이너 */
+.inquiry-modal-container {
+  background: #fff;
+  width: 50%; /* 원하는 크기로 조정 가능 */
+  max-width: 800px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 모달 헤더 */
+.inquiry-modal-header {
+  padding: 16px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inquiry-modal-header h5 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.inquiry-modal-header .btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* 모달 본문 */
+.inquiry-modal-body {
+  padding: 16px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.inquiry-modal-content-section h6 {
+  margin: 0;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.inquiry-modal-content-section p {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #ddd;
+  margin: 16px 0;
+}
+
+/* 모달 푸터 */
+.inquiry-modal-footer {
+  padding: 16px;
+  background: #f5f5f5;
+  text-align: right;
+}
+
+/*삭제 버튼튼*/ 
+.btn-outline-danger {
+  color: #ff4d4d;
+  border: 1px solid #ff4d4d;
+  font-size: 0.8rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-outline-danger:hover {
+  background: #ff4d4d;
+  color: #fff;
+}
+</style>
+
   

@@ -7,6 +7,7 @@ import PricingPage from "../views/MainPages/PricingPage/index.vue";
 import RegisterPage from "../views/MainPages/RegisterPage/index.vue";
 import LoginPage from "../views/MainPages/LoginPage/index.vue";
 import AdminPage from "../views/MainPages/AdminPage/index.vue";
+import MyPage from "../views/MainPages/MyPage/index.vue";
 import PresentationView from "../views/Presentation/PresentationView.vue";
 import AboutView from "../views/LandingPages/AboutUs/AboutView.vue";
 import ContactView from "../views/LandingPages/ContactUs/ContactView.vue";
@@ -61,6 +62,11 @@ const router = createRouter({
       path: "/board",
       name: "board",
       component: BoardPage
+    },
+    {
+      path: "/mypage",
+      name: "mypage",
+      component: MyPage
     },
     {
       path: "/login",
