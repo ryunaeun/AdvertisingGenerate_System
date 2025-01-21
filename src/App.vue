@@ -44,3 +44,14 @@ onMounted(async () => {
 <template>
   <router-view />
 </template>
+<style>
+/* Dify Chatbot Styles */
+#dify-chatbot-bubble-button {
+  background-color: #1c64f2 !important;
+}
+
+#dify-chatbot-bubble-window {
+  width: 24rem !important;
+  height: 40rem !important;
+}
+</style>

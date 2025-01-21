@@ -1,60 +1,53 @@
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <h3>User Information - Membership management</h3>
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2 class="brand">Admin Panel</h2>
+      <ul class="menu">
+        <li
+          :class="{ active: selectedMenu === 'Dashboard' }"
+          @click="selectedMenu = 'Dashboard'"
+        >
+          Dashboard
+        </li>
+        <li
+          :class="{ active: selectedMenu === 'User Management' }"
+          @click="selectedMenu = 'User Management'"
+        >
+          User Management
+        </li>
+        <li
+          :class="{ active: selectedMenu === 'Post Management' }"
+          @click="selectedMenu = 'Post Management'"
+        >
+          Post Management
+        </li>
+        <li
+          :class="{ active: selectedMenu === 'Notice Management' }"
+          @click="selectedMenu = 'Notice Management'"
+        >
+          Notice Management
+        </li>
+      </ul>
+    </div>
 
-        <div class="d-flex justify-content-end mb-3">
-          <button class="btn btn-primary me-2" @click="goToUserPage">Go to User Page</button>
-          <button class="btn btn-danger" @click="logout">Logout</button>
+    <!-- Main Content -->
+    <div class="content">
+      <header class="header">
+        <h1>{{ selectedMenu }}</h1>
+      </header>
+      <div class="main-content">
+        <div v-if="selectedMenu === 'Dashboard'">
+          <Dashboard />
         </div>
-
-        <div class="table-responsive">
-          <table class="table align-items-center mb-0">
-            <thead>
-              <tr>
-                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">User</th>
-                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Name</th>
-                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
-                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="user in users" :key="user.id">
-                <td>
-                  <div class="d-flex px-2 py-1">
-                    <div>
-                      <MaterialAvatar :img="user.avatar" size="sm" />
-                    </div>
-                    <div class="d-flex flex-column justify-content-center ms-3">
-                      <h6 class="mb-0 text-sm">{{ user.firstName }}</h6>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <p class="text-sm font-weight-bold mb-0">{{ user.lastName }}</p>
-                </td>
-                <td>
-                  <MaterialBadge 
-                    :color="user.status === 'active' ? 'success' : 'danger'"
-                    :content="user.status"
-                    variant="gradient"
-                  />
-                </td>
-                <td>
-                  <MaterialButton
-                    :color="user.status === 'active' ? 'info' : 'success'"
-                    variant="gradient"
-                    size="sm"
-                    class="mb-0"
-                    @click="toggleStatus(user)"
-                  >
-                    {{ user.status === 'active' ? 'Deactivate' : 'Activate' }}
-                  </MaterialButton>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div v-if="selectedMenu === 'User Management'">
+          <UserManagement />
+        </div>
+        <div v-if="selectedMenu === 'Post Management'">
+          <PostManagement />
+        </div>
+        <div v-if="selectedMenu === 'Notice Management'">
+          <NoticeManagement />
         </div>
       </div>
     </div>
@@ -62,73 +55,95 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-// import apiClient from "@/api/axiosClient";
-import MaterialAvatar from "@/components/MaterialAvatar.vue";
-import MaterialBadge from "@/components/MaterialBadge.vue";
-import MaterialButton from "@/components/MaterialButton.vue";
+import Dashboard from "./components/Dashboard.vue";
+import UserManagement from "./components/UserManagement.vue";
+import PostManagement from "./components/PostManagement.vue";
+import NoticeManagement from "./components/NoticeManagement.vue";
 
 export default {
-  name: 'AdminPage',
-  components: {
-    MaterialAvatar,
-    MaterialBadge,
-    MaterialButton
-  },
-  setup(_, { router }) {
-    const users = ref([
-      {
-        id: 1,
-        firstName: 'Hector Hugo',
-        lastName: 'Garcia',
-        status: 'active',
-        avatar: '/img/team-1.jpg'
-      },
-      {
-        id: 2,
-        firstName: 'Fernanda',
-        lastName: 'Vargas',
-        status: 'active',
-        avatar: '/img/team-2.jpg'
-      },
-      {
-        id: 3,
-        firstName: 'Francisco',
-        lastName: 'Espina',
-        status: 'inactive',
-        avatar: '/img/team-3.jpg'
-      },
-      // 나머지 사용자 데이터 추가
-    ]);
-
-    const toggleStatus = (user) => {
-      user.status = user.status === 'active' ? 'inactive' : 'active';
-    };
-
-    // const logout = async () => {
-    //   try {
-    //     await apiClient.post("/logout");
-    //     sessionStorage.removeItem("accessToken");
-    //     localStorage.removeItem("refreshToken");
-    //     router.push({ name: "loginPage" });
-    //     alert("로그아웃 되었습니다.");
-    //   } catch (error) {
-    //     console.error("로그아웃 실패:", error);
-    //     alert("로그아웃 중 문제가 발생했습니다.");
-    //   }
-    // };
-
+  name: "AdminPage",
+  data() {
     return {
-      users,
-      toggleStatus,
-      // logout
+      selectedMenu: "Dashboard", // 기본 메뉴는 Dashboard
     };
-  }
+  },
+  components: {
+    Dashboard,
+    UserManagement,
+    PostManagement,
+    NoticeManagement, // 공지사항 관리 컴포넌트 추가
+  },
 };
 </script>
 
 <style scoped>
-.table-responsive {
-  margin-top: 20px;
+/* 레이아웃 스타일 */
+.admin-container {
+  display: flex;
+  height: 100vh;
+  background-color: #f4f6f9;
+}
+
+.sidebar {
+  width: 250px;
+  background: #ffffff;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2196f3;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu li {
+  padding: 12px 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  color: #555;
+  margin-bottom: 8px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.menu li:hover {
+  background-color: #e3f2fd;
+  color: #2196f3;
+}
+
+.menu li.active {
+  background-color: #2196f3;
+  color: white;
+  font-weight: bold;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: white;
+  padding: 20px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
 }
 </style>
