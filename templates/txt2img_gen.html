@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Image Generator</title>
+    <link rel="stylesheet" href="/static/css/common_styles.css">
+    <link rel="stylesheet" href="/static/css/txt2img_gen_styles.css">
+</head>
+<body>
+    <div class="main-container">
+        <div class="input-container">
+            <h1>Txt2Img Generator</h1>
+            
+            <div class="form-group">
+                <label for="prompt">Prompt:</label>
+                <textarea id="prompt" name="prompt" placeholder="Enter your prompt here..." rows="6">woman drinking coffee in cafe bright morning</textarea>
+                
+                <div class="negative-prompt-toggle" id="negativePromptToggle">
+                    <span class="chevron">▼</span>
+                    <span>Negative Prompt</span>
+                </div>
+                <div class="negative-prompt-container" id="negativePromptContainer">
+                    <textarea id="negativePrompt" name="negativePrompt" placeholder="Enter negative prompt here..." rows="4"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group resolution-group">
+                
+                <div class="orientation-and-upscale-group">
+                    <div class="radio-settings">
+                        <div class="aspect-ratio-group">
+                            <label class="section-label">Aspect Ratio:</label>
+                            <div class="aspect-ratio-buttons">
+                                <div class="aspect-ratio-row">
+                                    <button type="button" class="aspect-ratio-btn" data-ratio-h="16:9" data-ratio-v="9:16">9:16</button>
+                                    <button type="button" class="aspect-ratio-btn" data-ratio-h="3:2" data-ratio-v="2:3">2:3</button>
+                                    <button type="button" class="aspect-ratio-btn active" data-ratio-h="4:3" data-ratio-v="3:4">3:4</button>
+                                    <button type="button" class="aspect-ratio-btn" data-ratio-h="5:4" data-ratio-v="4:5">4:5</button>
+                                </div>
+                                <div class="aspect-ratio-row">
+                                    <button type="button" class="aspect-ratio-btn" data-ratio-h="1:1" data-ratio-v="1:1">1:1</button>
+                                    <button type="button" class="aspect-ratio-btn" data-ratio-h="custom" data-ratio-v="custom">Custom</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="orientation-group">
+                            <div class="dimension-label">
+                                <label>Resolution:</label>
+                                <span id="currentResolution">960 x 1280 V</span>
+                            </div>
+                            <div class="orientation-buttons">
+                                <button type="button" class="orientation-btn" id="exchangeBtn">Exchange</button>
+                                <button type="button" class="orientation-btn" id="upscaleBtn">Upscale</button>
+                            </div>
+                            <div id="upscaleControls" class="upscale-controls" style="display: none;">
+                                <div class="dimension-group">
+                                    <div class="slider-container">
+                                        <input type="range" id="upscaleSlider" min="1.05" max="4" step="0.05" value="1.25" class="slider">
+                                        <input type="number" id="upscaleInput" value="1.25" min="1.05" max="4.0" step="0.05">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vertical-divider"></div>
+
+                    <div class="dimension-controls">
+                        <div class="dimension-group steps-cfg-group">
+                            <div class="steps-container">
+                                <div class="dimension-label">
+                                    <label for="stepsSlider">Steps:</label>
+                                    <span id="maxSteps" class="max-steps-label">Max: 150</span>
+                                </div>
+                                <div class="slider-container">
+                                    <input type="range" id="stepsSlider" min="5" max="150" step="5" value="35" class="slider">
+                                    <input type="number" id="stepsInput" value="35" min="1" max="150" step="1">
+                                </div>
+                            </div>
+                            <div class="cfg-container">
+                                <div class="dimension-label">
+                                    <label for="cfgSlider">CFG:</label>
+                                    <span id="maxCFG" class="max-steps-label">Max: 15.0</span>
+                                </div>
+                                <div class="slider-container">
+                                    <input type="range" id="cfgSlider" min="0.0" max="15.0" step="0.5" value="8.0" class="slider">
+                                    <input type="number" id="cfgInput" value="8.0" min="0.0" max="15.0" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dimension-group">
+                            <div class="dimension-label">
+                                <label for="widthSlider">Width:</label>
+                                <span id="maxWidth" class="max-steps-label">Max: 2048px</span>
+                            </div>
+                            <div class="slider-container">
+                                <input type="range" id="widthSlider" min="256" max="2048" step="8" value="960" class="slider">
+                                <input type="number" id="widthInput" value="960" min="64" step="8">
+                            </div>
+                        </div>
+
+                        <div class="dimension-group" id="heightGroup">
+                            <div class="dimension-label">
+                                <label for="heightSlider">Height:</label>
+                                <span id="maxHeight" class="max-steps-label">Max: 2048px</span>
+                            </div>
+                            <div class="slider-container">
+                                <input type="range" id="heightSlider" min="256" max="2048" step="8" value="1280" class="slider">
+                                <input type="number" id="heightInput" value="1280" min="64" step="8">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              
+                <div class="seed-group">
+                    <label for="seed">Seed:</label>
+                    <input type="number" id="seed" name="seed" value="1" min="1" max="999999999999999">
+
+                    <div class="radio-group">
+                        <input type="radio" id="random" name="seedType" value="random" checked>
+                        <label for="random">Random</label>
+
+                        <input type="radio" id="fixed" name="seedType" value="fixed">
+                        <label for="fixed">Fixed</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group image-controls-group">
+                <div class="input-row">
+                    <label for="batchSize">Batch Size:</label>
+                    <div class="input-button-wrapper">
+                        <input type="number" id="batchSize" name="batchSize" value="1" min="1" max="4">
+                        <button id="generateBtn" class="generate-button">Generate</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group save-path-group">
+                <div class="path-input-container">
+                    <div class="path-input-group">
+                        <label for="userId">User ID:</label>
+                        <input type="text" id="userId" name="userId" value="KTaivle" placeholder="Enter user ID">
+                    </div>
+                    <span class="path-separator">\</span>
+                    <div class="path-input-group">
+                        <label for="subPath">Save Path:</label>
+                        <input type="text" id="subPath" name="subPath" value="images" placeholder="Enter sub path">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="output-container">
+            <div class="images-grid single" id="imagesGrid">
+                <div class="image-cell">
+                    <div class="loading" id="loading-1"></div>
+                    <img id="outputImage-1" class="output-image" alt="Generated image">
+                    <a id="downloadLink-1" class="download-link" href="#" download>Download Image</a>
+                </div>
+                <div class="image-cell" style="display: none;">
+                    <div class="loading" id="loading-2"></div>
+                    <img id="outputImage-2" class="output-image" alt="Generated image">
+                    <a id="downloadLink-2" class="download-link" href="#" download>Download Image</a>
+                </div>
+                <div class="image-cell" style="display: none;">
+                    <div class="loading" id="loading-3"></div>
+                    <img id="outputImage-3" class="output-image" alt="Generated image">
+                    <a id="downloadLink-3" class="download-link" href="#" download>Download Image</a>
+                </div>
+                <div class="image-cell" style="display: none;">
+                    <div class="loading" id="loading-4"></div>
+                    <img id="outputImage-4" class="output-image" alt="Generated image">
+                    <a id="downloadLink-4" class="download-link" href="#" download>Download Image</a>
+                </div>
+            </div>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+    </div>
+
+    <script src="/static/js/txt2img_gen_settings.js"></script>
+    <script src="/static/js/path_settings.js"></script>
+</body>
+</html>

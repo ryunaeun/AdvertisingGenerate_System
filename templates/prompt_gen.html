@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Generator</title>
+    <link rel="stylesheet" href="/static/css/common_styles.css">
+    <link rel="stylesheet" href="/static/css/video_gen_styles.css">
+    <link rel="stylesheet" href="/static/css/prompt_gen_styles.css">
+    <link rel="stylesheet" href="/static/css/prompt_save_load.css">
+</head>
+<body>
+    <div class="main-container">
+        <div class="prompt-gen-container">
+            <h1>Prompt Generator</h1>
+            <div class="form-group">
+                <div class="settings-update">
+                    <input type="file" id="settingsFile" accept=".xlsx, .xls, .csv" style="display: none;">
+                    <button id="updateSettingsBtn" class="update-settings-btn">
+                        Update Settings
+                    </button>
+                </div>
+                <!-- Target Settings -->
+                <div class="target-settings">
+                    <h2>Target Settings</h2>
+                    
+                    <div class="settings-grid">
+                        <!-- Gender Selection -->
+                        <div class="setting-item">
+                            <label for="targetGender">Target Gender:</label>
+                            <select id="targetGender" class="setting-select">
+                                <option value="">All</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+
+                        <!-- Age Group Selection -->
+                        <div class="setting-item">
+                            <label for="targetAge">Target Age Group:</label>
+                            <select id="targetAge" class="setting-select">
+                                <option value="">All Ages</option>
+                                <option value="teens">Teenagers (10-19)</option>
+                                <option value="twenties">20s</option>
+                                <option value="thirties">30s</option>
+                                <option value="forties">40s</option>
+                                <option value="fifties">50s</option>
+                                <option value="sixties">60s</option>
+                                <option value="seventyPlus">70+</option>
+                            </select>
+                        </div>
+
+                        <!-- Product Category -->
+                        <div class="setting-item">
+                            <label for="productCategory">Product Category:</label>
+                            <select id="productCategory" class="setting-select">
+                                <option value="">Select Category</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="fashion">Fashion</option>
+                                <option value="beauty">Beauty & Health</option>
+                                <option value="food">Food & Beverage</option>
+                                <option value="home">Home & Living</option>
+                                <option value="sports">Sports & Outdoor</option>
+                            </select>
+                        </div>
+
+                        <!-- Season/Event -->
+                        <div class="setting-item">
+                            <label for="seasonEvent">Season/Event:</label>
+                            <select id="seasonEvent" class="setting-select">
+                                <option value="">None</option>
+                                <option value="christmas">Christmas</option>
+                                <option value="newYear">New Year</option>
+                                <option value="summer">Summer Season</option>
+                                <option value="winter">Winter Season</option>
+                                <option value="valentines">Valentine's Day</option>
+                                <option value="backToSchool">Back to School</option>
+                            </select>
+                        </div>
+
+                        <!-- Tone/Mood -->
+                        <div class="setting-item">
+                            <label for="adTone">Advertisement Tone:</label>
+                            <select id="adTone" class="setting-select">
+                                <option value="">Select Tone</option>
+                                <option value="professional">Professional</option>
+                                <option value="casual">Casual & Friendly</option>
+                                <option value="luxury">Luxury & Premium</option>
+                                <option value="funny">Humorous</option>
+                                <option value="emotional">Emotional</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <label for="inputPrompt">Additional Requests:</label>
+                <textarea id="inputPrompt" class="input-prompt" placeholder="Enter your text here..."></textarea>
+                <button id="generatePromptBtn" class="generate-prompt-btn" onclick="generatePrompt()">Generate Prompt</button>
+            </div>
+        </div>
+
+        <div class="preview-container">
+            <div class="image-preview-area">
+                <img class="preview-image" id="preview1" style="display: none;">
+                <img class="preview-image" id="preview2" style="display: none;">
+                <img class="preview-image" id="preview3" style="display: none;">
+                <img class="preview-image" id="preview4" style="display: none;">
+                <div class="loading" id="loadingIndicator"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="generatedPrompt">Generated Prompt:</label>
+                <textarea id="generatedPrompt" placeholder="Generated prompt will appear here..."></textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="prompt-to-video-btn" onclick="goToVideoGeneration()">Prompt to Video</button>
+                <button class="example-image-btn" onclick="generateExampleImages()">Example Images</button>
+            </div>
+            <div class="prompt-actions">
+                <button onclick="savePrompt()">Save Prompt</button>
+                <button onclick="loadPrompt()">Load Prompt</button>
+            </div>
+            <div class="form-group save-path-group">
+                <div class="path-input-container">
+                    <div class="path-input-group">
+                        <label for="userId">User ID:</label>
+                        <input type="text" id="userId" name="userId" value="KTaivle" placeholder="Enter user ID">
+                    </div>
+                    <span class="path-separator">\</span>
+                    <div class="path-input-group">
+                        <label for="subPath">Save Path:</label>
+                        <input type="text" id="subPath" name="subPath" value="examples" placeholder="Enter sub path">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 외부 스크립트 파일 로드 -->
+    <script src="/static/js/prompt_gen_script.js"></script>
+    <script src="/static/js/path_settings.js"></script>
+    <script src="/static/js/prompt_utils.js"></script>
+    <script src="/static/js/target_settings_handler.js"></script>
+</body>
+</html>

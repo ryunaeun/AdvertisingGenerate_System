@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hunyuan Video Generator</title>
+    <link rel="stylesheet" href="/static/css/common_styles.css">
+    <link rel="stylesheet" href="/static/css/video_gen_styles.css">
+    <link rel="stylesheet" href="/static/css/prompt_save_load.css">
+</head>
+<body>
+    <div class="main-container">
+        <div class="input-container">
+            <h1>Text to Video Generator</h1>
+            
+            <div class="form-group">
+                <label for="prompt">Prompt:</label>
+                <textarea id="prompt" name="prompt" placeholder="Enter your prompt here..." rows="6">man drinking coffee in cafe bright morning</textarea>
+                <div class="prompt-actions">
+                    <button onclick="savePrompt()">Save Prompt</button>
+                    <button onclick="loadPrompt()">Load Prompt</button>
+                    <button onclick="transferToPromptGen()">Back to Prompt</button>
+                </div>
+            </div>
+
+            <div class="form-group resolution-group">
+                <h3>Video Resolution and Frame Settings</h3>
+                
+                <div class="orientation-and-upscale-group">
+                    <div class="radio-settings">
+                        <div class="aspect-ratio-group">
+                            <label class="section-label">Aspect Ratio:</label>
+                            <div class="aspect-ratio-buttons">
+                                <button type="button" class="aspect-ratio-btn active" data-ratio="16:9">16:9</button>
+                                <button type="button" class="aspect-ratio-btn" data-ratio="4:3">4:3</button>
+                                <button type="button" class="aspect-ratio-btn" data-ratio="1:1">1:1</button>
+                            </div>
+                        </div>
+
+                        <div class="orientation-group">
+                            <label class="section-label">Orientation:</label>
+                            <div class="orientation-buttons">
+                                <button type="button" class="orientation-btn active" data-orientation="horizontal">Horizontal</button>
+                                <button type="button" class="orientation-btn" data-orientation="vertical">Vertical</button>
+                            </div>
+                            <input type="hidden" id="orientationInput" name="orientation" value="horizontal">
+                        </div>
+                      
+                        <div class="upscale-settings">
+                            <label class="section-label">Enable Upscaling:</label>
+                            <div class="upscale-info" id="upscaleInfo">
+                                <button type="button" class="upscale-btn" id="enableUpscale" data-enabled="false">OFF</button>
+                                <span id="targetResolution">-</span>
+                            </div>
+                        </div>
+                    </div>
+                  <div class="vertical-divider"></div>
+
+                    <div class="dimension-controls">
+                        <div class="dimension-group">
+                            <div class="dimension-label">
+                                <label for="widthSlider">Size:</label>
+                                <span id="maxWidth">Max: 960px</span>
+                            </div>
+                            <div class="slider-container">
+                                <input type="range" id="widthSlider" min="64" max="960" step="16" value="848" class="slider">
+                                <input type="number" id="widthInput" value="848" min="64" step="16">
+                            </div>
+                        </div>
+                        
+                        <div class="dimension-group" id="heightGroup">
+                            <div class="dimension-label">
+                                <label for="heightSlider">Height:</label>
+                                <span id="maxHeight">Max: 544px</span>
+                            </div>
+                            <div class="slider-container">
+                                <input type="range" id="heightSlider" min="64" max="544" step="16" value="480" class="slider">
+                                <input type="number" id="heightInput" value="480" min="64" step="16">
+                            </div>
+                        </div>
+                      
+                        <div class="dimension-group frame-length-group">
+                           <div class="dimension-label">
+                               <label for="frameLengthSlider">Frame Length:</label>
+                               <span id="maxFrameLength">Max: 129</span>
+                           </div>
+                           <div class="slider-container">
+                               <input type="range" id="frameLengthSlider" min="1" max="129" step="4" value="73" class="slider">
+                               <input type="number" id="frameLengthInput" value="73" min="1" max="129">
+                           </div>
+                        </div>                      
+                    </div>
+                </div>
+              
+                <div class="seed-group">
+                    <label for="seed">Seed:</label>
+                    <input type="number" id="seed" name="seed" value="1" min="1" max="999999999999999">
+
+                    <div class="radio-group">
+                        <input type="radio" id="random" name="seedType" value="random" checked>
+                        <label for="random">Random</label>
+
+                        <input type="radio" id="fixed" name="seedType" value="fixed">
+                        <label for="fixed">Fixed</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group video-controls-group">
+                <div class="input-row">
+                    <label for="videoCount">Batch Size:</label>
+                    <div class="input-button-wrapper">
+                        <select id="videoCount" name="videoCount">
+                            <option value="1" selected>1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                        <button id="generateBtn" onclick="generateVideos()">Generate Videos</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group save-path-group">
+                <div class="path-input-container">
+                    <div class="path-input-group">
+                        <label for="userId">User ID:</label>
+                        <input type="text" id="userId" name="userId" value="KTaivle" placeholder="Enter user ID">
+                    </div>
+                    <span class="path-separator">\</span>
+                    <div class="path-input-group">
+                        <label for="subPath">Save Path:</label>
+                        <input type="text" id="subPath" name="subPath" value="videos" placeholder="Enter sub path">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="output-container">
+            <div class="videos-grid single" id="videosGrid">
+                <div class="video-cell">
+                    <div class="loading" id="loading-1"></div>
+                    <video id="outputVideo-1" class="output-video" controls autoplay loop muted>
+                        Your browser does not support the video tag.
+                    </video>
+                    <a id="downloadLink-1" class="download-link" href="#" download>Download Video</a>
+                </div>
+                <div class="video-cell" style="display: none;">
+                    <div class="loading" id="loading-2"></div>
+                    <video id="outputVideo-2" class="output-video" controls autoplay loop muted>
+                        Your browser does not support the video tag.
+                    </video>
+                    <a id="downloadLink-2" class="download-link" href="#" download>Download Video</a>
+                </div>
+                <div class="video-cell" style="display: none;">
+                    <div class="loading" id="loading-3"></div>
+                    <video id="outputVideo-3" class="output-video" controls autoplay loop muted>
+                        Your browser does not support the video tag.
+                    </video>
+                    <a id="downloadLink-3" class="download-link" href="#" download>Download Video</a>
+                </div>
+                <div class="video-cell" style="display: none;">
+                    <div class="loading" id="loading-4"></div>
+                    <video id="outputVideo-4" class="output-video" controls autoplay loop muted>
+                        Your browser does not support the video tag.
+                    </video>
+                    <a id="downloadLink-4" class="download-link" href="#" download>Download Video</a>
+                </div>
+            </div>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+    </div>
+
+    <script src="/static/js/video_gen_settings.js"></script>
+    <script src="/static/js/path_settings.js"></script>
+    <script src="/static/js/prompt_utils.js"></script>
+    <script>
+        const promptInput = document.getElementById('prompt');
+        const seedInput = document.getElementById('seed');
+        const generateBtn = document.getElementById('generateBtn');
+        const errorMessage = document.getElementById('errorMessage');
+
+        function updateVideoGrid(count) {
+            const grid = document.getElementById('videosGrid');
+            const orientation = getOrientation();
+
+            grid.className = 'videos-grid';
+
+            if (count === 1) {
+                grid.classList.add('single');
+            } else if (count === 2) {
+                grid.classList.add(orientation === 'landscape' ? 'horizontal-split' : 'vertical-split');
+            } else {
+                grid.classList.add('grid-four');
+            }
+
+            for (let i = 1; i <= 4; i++) {
+                const cell = document.querySelector(`.video-cell:nth-child(${i})`);
+                if (i <= count) {
+                    cell.style.display = 'flex';
+                    const video = document.getElementById(`outputVideo-${i}`);
+                    const loading = document.getElementById(`loading-${i}`);
+                    const download = document.getElementById(`downloadLink-${i}`);
+
+                    video.style.display = 'none';
+                    loading.style.display = 'none';
+                    download.style.display = 'none';
+                } else {
+                    cell.style.display = 'none';
+                }
+            }
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        function clearError() {
+            errorMessage.style.display = 'none';
+        }
+
+        async function generateVideos() {
+            clearError();
+            const videoCount = parseInt(document.getElementById('videoCount').value);
+            const prompt = promptInput.value.trim();
+
+            if (!prompt) {
+                showError('Please enter a prompt');
+                return;
+            }
+
+            updateVideoGrid(videoCount);
+            generateBtn.disabled = true;
+
+            try {
+                for (let i = 1; i <= videoCount; i++) {
+                    try {
+                        await generateSingleVideo(i);
+                    } catch (error) {
+                        console.error(`Error generating video ${i}:`, error);
+                        showError(`Error generating video ${i}: ${error.message}`);
+                        continue;
+                    }
+                }
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                generateBtn.disabled = false;
+            }
+        }
+                                               
+        function transferToPromptGen() {
+            const promptText = document.getElementById('prompt').value;
+            if (promptText.trim()) {
+                sessionStorage.setItem('transferredPrompt', promptText);
+            }
+            window.location.href = '/prompt_gen';
+        }
+                                               
+        async function generateSingleVideo(index) {
+            const loading = document.getElementById(`loading-${index}`);
+            loading.style.display = 'block';
+
+            const useRandomSeed = document.getElementById('random').checked;
+            const seed = useRandomSeed ? null : parseInt(seedInput.value);
+
+            if (!useRandomSeed && (isNaN(seed) || seed < 1 || seed > 999999999999999)) {
+                throw new Error('Please enter a valid seed number between 1 and 999999999999999');
+            }
+
+            try {
+                const requestData = {
+                    prompt: promptInput.value.trim(),
+                    useRandomSeed: useRandomSeed,
+                    seed: seed,
+                    frameLength: parseInt(frameLengthInput.value),
+                    width: parseInt(widthInput.value),
+                    height: parseInt(heightInput.value),
+                    enableUpscale: document.getElementById('enableUpscale').checked
+                };
+
+                const data = await generateWithPath('/generate', requestData);
+                const userId = document.getElementById('userId').value.trim();
+
+                seedInput.value = data.seed;
+
+                const video = document.getElementById(`outputVideo-${index}`);
+                const download = document.getElementById(`downloadLink-${index}`);
+
+                const filePath = `/output/${userId}/${data.folder}/${data.filename}`;
+                console.log(`Loading file ${index} from:`, filePath);
+
+                await new Promise((resolve, reject) => {
+                    video.onloadeddata = () => resolve();
+                    video.onerror = () => reject(new Error('Failed to load video'));
+
+                    video.src = filePath;
+                    video.style.display = 'block';
+                    video.load();
+                });
+
+                download.href = filePath;
+                download.download = data.filename;
+                download.style.display = 'block';
+                download.textContent = `Download ${data.filename}`;
+
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+            } catch (error) {
+                throw new Error(`Error generating video ${index}: ${error.message}`);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        document.getElementById('videoCount').addEventListener('change', function() {
+            updateVideoGrid(parseInt(this.value));
+        });
+
+        promptInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateVideos();
+            }
+        });
+
+        window.addEventListener('load', function() {
+            const transferredPrompt = sessionStorage.getItem('videoPrompt');
+            if (transferredPrompt) {
+                document.getElementById('prompt').value = transferredPrompt;
+                sessionStorage.removeItem('videoPrompt');
+            }
+            
+            updateVideoGrid(1);
+            initializePath();
+        });
+    </script>
+</body>
+</html>

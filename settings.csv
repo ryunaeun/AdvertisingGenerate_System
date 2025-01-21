@@ -1,0 +1,32 @@
+category,value,label
+gender,allGender,All
+gender,male,Male
+gender,female,Female
+ageGroup,allAge,All Ages
+ageGroup,teens,Teenagers (10-19)
+ageGroup,twenties,20s
+ageGroup,thirties,30s
+ageGroup,forties,40s
+ageGroup,fifties,50s
+ageGroup,sixties,60s
+ageGroup,seventyPlus,70+
+productCategory,,Select Category
+productCategory,electronics,Electronics
+productCategory,fashion,Fashion
+productCategory,beauty,Beauty & Health
+productCategory,food,Food & Beverage
+productCategory,home,Home & Living
+productCategory,sports,Sports & Outdoor
+seasonEvent,,None
+seasonEvent,christmas,Christmas
+seasonEvent,newYear,New Year
+seasonEvent,summer,Summer Season
+seasonEvent,winter,Winter Season
+seasonEvent,valentines,Valentine's Day
+seasonEvent,backToSchool,Back to School
+adTone,,Select Tone
+adTone,professional,Professional
+adTone,casual,Casual & Friendly
+adTone,luxury,Luxury & Premium
+adTone,funny,Humorous
+adTone,emotional,Emotional

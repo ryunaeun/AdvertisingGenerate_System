@@ -1,0 +1,150 @@
+{
+  "targetSettings": {
+    "gender": {
+      "id": "targetGender",
+      "label": "Target Gender",
+      "options": [
+        {
+          "value": "allGender",
+          "label": "All"
+        },
+        {
+          "value": "male",
+          "label": "Male"
+        },
+        {
+          "value": "female",
+          "label": "Female"
+        }
+      ]
+    },
+    "ageGroup": {
+      "id": "targetAge",
+      "label": "Target Age Group",
+      "options": [
+        {
+          "value": "allAge",
+          "label": "All Ages"
+        },
+        {
+          "value": "kids",
+          "label": "0~9s"
+        },
+        {
+          "value": "teens",
+          "label": "10s"
+        },
+        {
+          "value": "twenties",
+          "label": "20s"
+        },
+        {
+          "value": "thirties",
+          "label": "30s"
+        },
+        {
+          "value": "forties",
+          "label": "40s"
+        },
+        {
+          "value": "fifties",
+          "label": "50s"
+        },
+        {
+          "value": "sixties",
+          "label": "60s"
+        },
+        {
+          "value": "seventyPlus",
+          "label": "70+"
+        }
+      ]
+    },
+    "productCategory": {
+      "id": "productCategory",
+      "label": "Product Category",
+      "options": [
+        {
+          "value": "electronics",
+          "label": "Electronics"
+        },
+        {
+          "value": "fashion",
+          "label": "Fashion"
+        },
+        {
+          "value": "beauty",
+          "label": "Beauty & Health"
+        },
+        {
+          "value": "food",
+          "label": "Food & Beverage"
+        },
+        {
+          "value": "home",
+          "label": "Home & Living"
+        },
+        {
+          "value": "sports",
+          "label": "Sports & Outdoor"
+        }
+      ]
+    },
+    "seasonEvent": {
+      "id": "seasonEvent",
+      "label": "Season/Event",
+      "options": [
+        {
+          "value": "christmas",
+          "label": "Christmas"
+        },
+        {
+          "value": "newYear",
+          "label": "New Year"
+        },
+        {
+          "value": "summer",
+          "label": "Summer Season"
+        },
+        {
+          "value": "winter",
+          "label": "Winter Season"
+        },
+        {
+          "value": "valentines",
+          "label": "Valentine's Day"
+        },
+        {
+          "value": "backToSchool",
+          "label": "Back to School"
+        }
+      ]
+    },
+    "adTone": {
+      "id": "adTone",
+      "label": "Advertisement Tone",
+      "options": [
+        {
+          "value": "professional",
+          "label": "Professional"
+        },
+        {
+          "value": "casual",
+          "label": "Casual & Friendly"
+        },
+        {
+          "value": "luxury",
+          "label": "Luxury & Premium"
+        },
+        {
+          "value": "funny",
+          "label": "Humorous"
+        },
+        {
+          "value": "emotional",
+          "label": "Emotional"
+        }
+      ]
+    }
+  }
+}
