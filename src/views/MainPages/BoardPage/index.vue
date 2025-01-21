@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
     <div class="board-page">
       <Header />
       <div class="container py-5">
@@ -118,6 +119,41 @@
                       </tr>
                     </thead>
                     <tbody>
+=======
+  <div class="board-page">
+    <Header />
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-12">
+          <!-- 공지사항 카드 -->
+          <div class="card mb-4" id="notice-section">
+            <div class="card-header pb-0">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0">
+                  <li class="breadcrumb-item">
+                    <router-link to="/home" class="text-dark">
+                      <i class="material-icons-round">home</i>
+                    </router-link>
+                  </li>
+                  <li class="breadcrumb-item">
+                    <router-link to="/board" class="text-dark">게시판</router-link>
+                  </li>
+                  <li class="breadcrumb-item active" aria-current="page">공지사항</li>
+                </ol>
+              </nav>
+            </div>
+            <div class="card-body px-0 pb-0">
+              <div class="table-responsive">
+                <table class="table table-flush" id="products-list">
+                  <thead class="thead-light">
+                    <tr>
+                      <th class="text-left text-secondary text-sm font-weight-semibold">번호</th>
+                      <th class="text-left text-secondary text-sm font-weight-semibold">제목</th>
+                      <th class="text-left text-secondary text-sm font-weight-semibold">날짜</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+>>>>>>> 40e8279ec2bb1e2743ba1f5bbf559c018691921a
                     <tr v-for="(item, index) in boardItems" 
                         :key="index" 
                         :class="{ 'table-alternate': index % 2 === 1 }">
@@ -126,13 +162,18 @@
                       <td class="text-sm text-dark">{{ item.date }}</td>
                     </tr>
                   </tbody>
+<<<<<<< HEAD
                   </table>
                 </div>
+=======
+                </table>
+>>>>>>> 40e8279ec2bb1e2743ba1f5bbf559c018691921a
               </div>
             </div>
-  
-            <!-- FAQ 카드 -->
-            <div class="card" id="faq-section">
+          </div>
+
+           <!-- FAQ 카드 -->
+           <div class="card" id="faq-section">
                 <div class="card-header pb-0">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0">
@@ -175,54 +216,80 @@
                 </div>
               </div>
             </div>
-  
-            <!-- 챗봇 섹션 -->
-            <div class="card mt-4" id="chatbot-section">
-                <div class="card-header pb-0">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0">
-                            <li class="breadcrumb-item">
-                            <router-link to="/home" class="text-dark">
-                                <i class="material-icons-round">home</i>
-                            </router-link>
-                        </li>
-                            <li class="breadcrumb-item">
-                                <router-link to="/board" class="text-dark">게시판</router-link>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">문의사항</li>
-                        </ol>
-                    </nav>
-                </div>
-              <div class="card-body">
-                <div class="chat-container">
-                  <div class="chat-messages" ref="chatMessages">
-                    <div v-for="(message, index) in messages" :key="index" 
-                         :class="['message', message.sender === 'user' ? 'user-message' : 'bot-message']">
-                      <div class="message-content">
-                        {{ message.text }}
-                      </div>
-                      <div class="message-time">
-                        {{ message.time }}
-                      </div>
-                    </div>
-                  </div>
-                  <div class="chat-input">
-                    <div class="input-group">
+
+          <!-- 1:1 문의하기 섹션 -->
+          <div class="card md-4" id="inquiry-section">
+            <div class="card-header pb-0">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0">
+                  <li class="breadcrumb-item">
+                    <router-link to="/home" class="text-dark">
+                      <i class="material-icons-round">home</i>
+                    </router-link>
+                  </li>
+                  <li class="breadcrumb-item">
+                    <router-link to="/board" class="text-dark">게시판</router-link>
+                  </li>
+                  <li class="breadcrumb-item active" aria-current="page">1:1 문의하기</li>
+                </ol>
+              </nav>
+            </div>
+            <div class="card-body p-0">
+    <div class="inquiry-container">
+      <div class="illustration-wrapper">
+        <img src="@/assets/img/inquiry.jpg" alt="Inquiry Illustration" class="illustration-image">
+      </div>
+      <div class="form-wrapper">
+        <h2 class="inquiry-title">1 : 1   문의하기</h2>
+                  <form @submit.prevent="submitInquiry">
+                    <div class="form-group">
+                      <label>제목</label>
                       <input 
                         type="text" 
-                        class="form-control"
-                        v-model="newMessage"
-                        @keyup.enter="sendMessage"
-                        placeholder="메시지를 입력하세요..."
+                        class="form-control" 
+                        placeholder="제목을 입력해주세요"
+                        v-model="inquiry.title"
                       >
-                      <button 
-                        class="btn custom-button mb-0"
-                        @click="sendMessage"
-                      >
-                        전송
-                      </button>
                     </div>
-                  </div>
+                    <div class="form-group">
+                      <label>문의내용</label>
+                      <textarea 
+                        class="form-control" 
+                        rows="6"
+                        placeholder="문의내용을 입력해주세요"
+                        v-model="inquiry.content"
+                      ></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label>파일 첨부</label>
+                      <div class="file-upload-group">
+                        <input 
+                          type="text" 
+                          class="form-control" 
+                          placeholder="파일을 선택해주세요" 
+                          readonly
+                          v-model="selectedFileName"
+                        >
+                        <button 
+                          type="button" 
+                          class="btn btn-upload"
+                          @click="$refs.fileInput.click()"
+                        >
+                          <i class="material-icons">add</i>
+                          파일 업로드
+                        </button>
+                        <input 
+                          type="file" 
+                          ref="fileInput" 
+                          @change="handleFileChange" 
+                          style="display: none"
+                        >
+                      </div>
+                    </div>
+                    <button type="submit" class="btn btn-submit">
+                      문의하기
+                    </button>
+                  </form>
                 </div>
               </div>
               <!-- New Inquiry Modal -->
@@ -253,6 +320,7 @@
         </div>
       </div>
     </div>
+<<<<<<< HEAD
   </template>
   
   
@@ -328,17 +396,73 @@
           }
         ],
         messages: [
+=======
+  </div>
+</template>
+
+<script>
+import Header from '../HomePage/components/Header.vue'
+
+export default {
+  name: "BoardPage",
+  components: {
+    Header,
+  },
+  data() {
+    return {
+      inquiry: {
+        title: '',
+        content: '',
+        file: null
+      },
+      selectedFileName: '',
+      boardItems: [
+>>>>>>> 40e8279ec2bb1e2743ba1f5bbf559c018691921a
         {
-          text: '안녕하세요! 무엇을 도와드릴까요?',
-          sender: 'bot',
-          time: new Date().toLocaleTimeString()
+          id: 1,
+          title: '[안내] 메이커스랩 리뉴얼 작업 차질(이미지&소개카드&이미지)',
+          date: '2025.01.07 13:30'
+        },
+        {
+          id: 2,
+          title: '[안내] 메이커스랩 리뉴얼 작업 차질(이미지&소개카드&이미지)',
+          date: '2025.01.07 13:30'
+        },
+        {
+          id: 3,
+          title: '[안내] 메이커스랩 리뉴얼 작업 차질(이미지&소개카드&이미지)',
+          date: '2025.01.07 13:30'
         }
       ],
-      newMessage: ''
+      faqItems: [
+        {
+          question: 'What is a Payment Gateway?',
+          answer: 'A payment gateway is a merchant service that processes credit card payments for ecommerce sites and traditional brick and mortar stores.'
+        },
+        {
+          question: 'Do I need to pay to Instapay even when there is no transaction going on in my business?',
+          answer: 'No, you only pay for actual transactions processed through the gateway.'
+        },
+        {
+          question: 'What platforms does Instapay payment gateway support?',
+          answer: 'Instapay supports multiple platforms including web, mobile, and in-store payment solutions.'
+        },
+        {
+          question: 'Does Instapay provide international payments support?',
+          answer: 'Yes, Instapay supports international payments across multiple currencies.'
+        },
+        {
+          question: 'Is there any setup fee or annual maintainance fee that I need to pay regularly?',
+          answer: 'Please contact our support team for detailed information about fees and charges.'
+        }
+      ]
     }
   },
-
+  created() {
+    this.openedFaq = new Array(this.faqItems.length).fill(false);
+  },
   methods: {
+<<<<<<< HEAD
     viewInquiryDetails(question) {
       this.selectedQuestion = question;
     },
@@ -409,33 +533,58 @@
         chatMessages.scrollTop = chatMessages.scrollHeight;
       });
     }
+=======
+    handleFileChange(event) {
+      const file = event.target.files[0]
+      if (file) {
+        this.inquiry.file = file
+        this.selectedFileName = file.name
+      }
+    },
+    submitInquiry() {
+      console.log('문의 제출:', this.inquiry)
+    },
+    toggleFaq(index) {
+      this.openedFaq = this.openedFaq.map((item, i) => i === index ? !item : false);
+>>>>>>> 40e8279ec2bb1e2743ba1f5bbf559c018691921a
     }
   }
-
+}
 </script>
 
-  
-  <style scoped>
-  .board-page {
+
+<style scoped>
+
+.board-page {
     padding-top: 70px;
     background-color: #f8f9fa;
     min-height: 100vh;
   }
-  
-  .table-flush td {
+
+.card {
+  position: relative;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 20px 27px 0 rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  margin-top: 3rem;
+}
+
+.card-body {
+  padding: 0;
+}
+
+ .table-flush td {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid #e9ecef;
 }
-
     .table-flush thead th {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid #e9ecef;
 }
-
 .table-alternate {
   background-color: #F3FAF7;
 }
-
 .text-secondary {
   color: #67748e !important;
 }
@@ -449,71 +598,103 @@
     box-shadow: none;
     border-color: rgba(0, 0, 0, 0.125);
   }
-  .chat-container {
-  height: 400px;
+
+.inquiry-container {
   display: flex;
-  flex-direction: column;
-}
-
-.chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.message {
-  max-width: 70%;
-  padding: 0.8rem 1rem;
-  border-radius: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-.user-message {
-  align-self: flex-end;
-  background-color: #7b809a;
-  color: white;
-}
-
-.bot-message {
-  align-self: flex-start;
+  align-items: stretch;
+  padding: 6rem;
   background-color: #f8f9fa;
+}
+
+.illustration-wrapper {
+  flex: 1.2;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  margin-left: 30px;
+  margin: 0.5rem;
+}
+
+.illustration-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 15px;
+}
+
+.form-wrapper {
+  flex: 1;
+  padding: 3rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  margin: 3rem;
+  margin-left: -30px;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
   color: #344767;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
 }
 
-.message-content {
-  margin-bottom: 0.3rem;
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d2d6da;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
-.message-time {
-  font-size: 0.7rem;
-  opacity: 0.7;
-  text-align: right;
+.form-control:focus {
+  border-color: #40c4aa;
+  box-shadow: 0 0 0 2px rgba(64, 196, 170, 0.25);
 }
 
-.chat-input {
-  padding: 1rem;
-  border-top: 1px solid #e9ecef;
+.file-upload-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.input-group .form-control {
-  border-right: none;
+.file-upload-group input[type="text"],
+.file-upload-group button {
+  height: 45px;
+  box-sizing: border-box;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  padding: 0.75rem 1rem;
 }
 
-.input-group .btn {
-  margin: 0;
-  border-radius: 0 0.5rem 0.5rem 0;
+.file-upload-group input[type="text"] {
+  flex: 1;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
 }
 
-.custom-button {
-  background-color: #5CB494;
+.btn-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #40c4aa;
   color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-bottom: 0px;
+  transition: background 0.2s ease;
 }
 
-.custom-button:hover {
-  background-color: #4a9077;
+.btn-upload:hover {
+  background: #35a892;
 }
 .modal-overlay {
   position: fixed;
@@ -672,4 +853,72 @@ hr {
 }
 </style>
 
+<<<<<<< HEAD
   
+=======
+.btn-upload i {
+  font-size: 1.2rem;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 0.875rem;
+  background: #40c4aa;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-submit:hover {
+  background: #35a892;
+}
+
+.inquiry-title {
+  color: #344767;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 992px) {
+  .inquiry-container {
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+  
+  .illustration-wrapper {
+    height: 300px;
+  }
+  
+  .form-wrapper {
+    margin: 0;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .file-upload-group {
+    flex-direction: column;
+  }
+  
+  .btn-upload {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .illustration-wrapper {
+    height: 200px;
+  }
+  
+  .inquiry-container {
+    padding: 1rem;
+  }
+}
+
+</style>
+>>>>>>> 40e8279ec2bb1e2743ba1f5bbf559c018691921a
