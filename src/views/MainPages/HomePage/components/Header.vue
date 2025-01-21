@@ -44,8 +44,8 @@
 </template>
 
 <script>
-import axios from 'axios';
-import apiClient from "@/api/axiosClient";
+// import axios from 'axios';
+// import apiClient from "@/api/axiosClient";
 
 export default {
   name: 'Header',
@@ -73,18 +73,18 @@ export default {
       }
       this.isDropdownOpen = false;
     },
-    async logout() {
-      try {
-        await apiClient.post("/logout");
-        sessionStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        alert("로그아웃 성공");
-        this.$router.push("/login");
-      } catch (error) {
-        console.error("로그아웃 실패:", error);
-        alert("로그아웃 중 문제가 발생했습니다.");
-      }
-    },
+    // async logout() {
+    //   try {
+    //     await apiClient.post("/logout");
+    //     sessionStorage.removeItem("accessToken");
+    //     localStorage.removeItem("refreshToken");
+    //     alert("로그아웃 성공");
+    //     this.$router.push("/login");
+    //   } catch (error) {
+    //     console.error("로그아웃 실패:", error);
+    //     alert("로그아웃 중 문제가 발생했습니다.");
+    //   }
+    // },
   },
   mounted() {
     document.addEventListener('click', this.closeDropdown);

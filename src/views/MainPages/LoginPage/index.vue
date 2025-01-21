@@ -392,46 +392,46 @@ export default {
     toggleConfirmPassword() {
       this.showConfirmPassword = !this.showConfirmPassword;
     },
-    async login() {
-      try {
-        const response = await axios.post("http://localhost:8080/api/login", {
-          email: this.email,
-          password: this.password,
-        });
+    // async login() {
+    //   try {
+    //     const response = await axios.post("http://localhost:8080/api/login", {
+    //       email: this.email,
+    //       password: this.password,
+    //     });
 
-        if (this.rememberMe) {
-          localStorage.setItem('savedEmail', this.email);
-        } else {
-          localStorage.removeItem('savedEmail');
-        }
+    //     if (this.rememberMe) {
+    //       localStorage.setItem('savedEmail', this.email);
+    //     } else {
+    //       localStorage.removeItem('savedEmail');
+    //     }
 
-        console.log("로그인 성공:", response.data);
+    //     console.log("로그인 성공:", response.data);
 
-        // Refresh Token과 Access Token 저장
-        sessionStorage.setItem("accessToken", response.data.accessToken);
-        localStorage.setItem("refreshToken", response.data.refreshToken);
+    //     // Refresh Token과 Access Token 저장
+    //     sessionStorage.setItem("accessToken", response.data.accessToken);
+    //     localStorage.setItem("refreshToken", response.data.refreshToken);
 
-        // Refresh Token 저장 확인
-        const storedRefreshToken = localStorage.getItem("refreshToken");
-        if (!storedRefreshToken) {
-          console.error("Refresh Token 저장 실패");
-          throw new Error("Refresh Token 저장에 실패했습니다.");
-        }
+    //     // Refresh Token 저장 확인
+    //     const storedRefreshToken = localStorage.getItem("refreshToken");
+    //     if (!storedRefreshToken) {
+    //       console.error("Refresh Token 저장 실패");
+    //       throw new Error("Refresh Token 저장에 실패했습니다.");
+    //     }
 
-        // 권한에 따라 페이지 이동
-        const payload = JSON.parse(atob(response.data.accessToken.split(".")[1]));
-        const userRole = payload.role;
+    //     // 권한에 따라 페이지 이동
+    //     const payload = JSON.parse(atob(response.data.accessToken.split(".")[1]));
+    //     const userRole = payload.role;
 
-        if (userRole === "ROLE_ADMIN") {
-          this.$router.push("/admin");
-        } else {
-          this.$router.push("/home");
-        }
-      } catch (error) {
-        console.error("로그인 실패:", error);
-        alert("로그인에 실패했습니다. 다시 시도해주세요.");
-      }
-    },
+    //     if (userRole === "ROLE_ADMIN") {
+    //       this.$router.push("/admin");
+    //     } else {
+    //       this.$router.push("/home");
+    //     }
+    //   } catch (error) {
+    //     console.error("로그인 실패:", error);
+    //     alert("로그인에 실패했습니다. 다시 시도해주세요.");
+    //   }
+    // },
     async resendVerificationCode() {
       try {
         const response = await axios.post('/api/auth/resend-verification-code', null, {
