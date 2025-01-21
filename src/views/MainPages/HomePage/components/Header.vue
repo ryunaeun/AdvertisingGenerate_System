@@ -23,6 +23,7 @@
           </div>
 
           <div class="dropdown-menu show" v-if="isDropdownOpen">
+            <span class="dropdown-item" @click="scrollToSection('my-inquiries-section')">내 문의함</span>
             <span class="dropdown-item" @click="scrollToSection('notice-section')">공지사항</span>
             <span class="dropdown-item" @click="scrollToSection('faq-section')">FAQ</span>
             <span class="dropdown-item" @click="scrollToSection('inquiry-section')">문의하기</span>
@@ -30,7 +31,7 @@
         </div>
       </div>
       <div class="my-page">
-        <button class="my-page-btn">
+        <button class="my-page-btn" @click="goToMyPage">
           <span class="material-icons-round">person</span>
           <span>MY PAGE</span>
         </button>
@@ -52,7 +53,7 @@ export default {
   data() {
     return {
       isDropdownOpen: false
-    }
+    };
   },
   methods: {
     toggleDropdown() {
@@ -73,6 +74,7 @@ export default {
       }
       this.isDropdownOpen = false;
     },
+<<<<<<< HEAD
     // async logout() {
     //   try {
     //     await apiClient.post("/logout");
@@ -85,6 +87,24 @@ export default {
     //     alert("로그아웃 중 문제가 발생했습니다.");
     //   }
     // },
+=======
+    
+    goToMyPage() {
+      this.$router.push('/mypage'); // 마이페이지로 이동
+    },
+    async logout() {
+      try {
+        await apiClient.post("/logout");
+        sessionStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        alert("로그아웃 성공");
+        this.$router.push("/login");
+      } catch (error) {
+        console.error("로그아웃 실패:", error);
+        alert("로그아웃 중 문제가 발생했습니다.");
+      }
+    },
+>>>>>>> 3e77773e6cf3e13f296bd604b60fdc4aecf51794
   },
   mounted() {
     document.addEventListener('click', this.closeDropdown);
@@ -92,7 +112,7 @@ export default {
   beforeUnmount() {
     document.removeEventListener('click', this.closeDropdown);
   }
-}
+};
 </script>
 
 <style scoped>
