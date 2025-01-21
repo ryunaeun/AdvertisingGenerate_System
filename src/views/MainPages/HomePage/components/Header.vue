@@ -74,11 +74,10 @@ export default {
       }
       this.isDropdownOpen = false;
     },
-<<<<<<< HEAD
+    
     goToMyPage() {
       this.$router.push('/mypage'); // 마이페이지로 이동
-    }
-=======
+    },
     async logout() {
       try {
         await apiClient.post("/logout");
@@ -91,7 +90,6 @@ export default {
         alert("로그아웃 중 문제가 발생했습니다.");
       }
     },
->>>>>>> 40e8279ec2bb1e2743ba1f5bbf559c018691921a
   },
   mounted() {
     document.addEventListener('click', this.closeDropdown);
