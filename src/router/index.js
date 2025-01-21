@@ -8,6 +8,7 @@ import RegisterPage from "../views/MainPages/RegisterPage/index.vue";
 import LoginPage from "../views/MainPages/LoginPage/index.vue";
 import AdminPage from "../views/MainPages/AdminPage/index.vue";
 import MyPage from "../views/MainPages/MyPage/index.vue";
+import AnalysisPage from "../views/MainPages/AnalysisPage/index.vue";
 import PresentationView from "../views/Presentation/PresentationView.vue";
 import AboutView from "../views/LandingPages/AboutUs/AboutView.vue";
 import ContactView from "../views/LandingPages/ContactUs/ContactView.vue";
@@ -33,7 +34,7 @@ import ElProgressBars from "../layouts/sections/elements/progress-bars/ProgressB
 import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
 
-import axios from "axios"
+import axios from "axios";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -46,43 +47,48 @@ const router = createRouter({
       path: "/home",
       name: "home",
       component: HomePage,
-      //meta: { requiresAuth: true }, // 인증이 필요한 경로 표시 
+      //meta: { requiresAuth: true }, // 인증이 필요한 경로 표시
     },
     {
       path: "/gallery",
       name: "gallery",
-      component: GalleryPage
+      component: GalleryPage,
     },
     {
       path: "/pricing",
       name: "pricing",
-      component: PricingPage
+      component: PricingPage,
     },
     {
       path: "/board",
       name: "board",
-      component: BoardPage
+      component: BoardPage,
     },
     {
       path: "/mypage",
       name: "mypage",
-      component: MyPage
+      component: MyPage,
     },
     {
       path: "/login",
       name: "login",
-      component: LoginPage
+      component: LoginPage,
     },
     {
       path: "/register",
       name: "register",
-      component: RegisterPage
+      component: RegisterPage,
     },
     {
       path: "/admin",
       name: "admin",
       component: AdminPage,
       //meta: { requiresAuth: true, requiresRole: "ROLE_ADMIN" }, // 관리자 권한 필요
+    },
+    {
+      path: "/analysis", // "/analysis" 경로로 이동 시 AnalysisPage 렌더링
+      name: "analysis",
+      component: AnalysisPage,
     },
     {
       path: "/presentation",
@@ -207,7 +213,6 @@ const router = createRouter({
   ],
 });
 
-
 // router.beforeEach(async (to, from, next) => {
 //   const accessToken = sessionStorage.getItem("accessToken");
 //   const refreshToken = localStorage.getItem("refreshToken");
@@ -248,6 +253,5 @@ const router = createRouter({
 
 //   next();
 // });
-
 
 export default router;
