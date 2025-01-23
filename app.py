@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, send_file, render_template
+from flask_cors import CORS  # 추가
 from hunyuan_client import HunyuanVideoClient
 from flux_s_client import FluxImageClient
 from config import load_config
@@ -13,6 +14,7 @@ import csv
 import pandas as pd
 
 app = Flask(__name__)
+CORS(app)  # CORS 허용 설정 추가
 video_client = HunyuanVideoClient()
 image_client = FluxImageClient()
 prompt_generator = PromptGenerator()
@@ -253,6 +255,32 @@ def load_prompts():
         print(f"Error loading prompts: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/load_prompt', methods=['GET'])
+def load_prompt():
+    try:
+        user_id = request.args.get('userId')
+        file_name = request.args.get('fileName')
+
+        if not all([user_id, file_name]):
+            return jsonify({'error': 'Missing required parameters'}), 400
+
+        file_path = os.path.join(OUTPUT_DIR, user_id, 'Prompt', file_name)
+        
+        if not os.path.exists(file_path):
+            return jsonify({'error': 'File not found'}), 404
+
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        return jsonify({
+            'success': True,
+            'content': content
+        })
+
+    except Exception as e:
+        print(f"Error loading prompt: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/update_target_settings', methods=['POST'])
 def update_target_settings():
     try:
@@ -261,12 +289,12 @@ def update_target_settings():
             
         file = request.files['file']
         if file.filename == '':
-            return jsonify({'error': 'No file selected'}), 400
+            return jsonify({'error': '선택된 파일이 없습니다'}), 400
             
         file_ext = os.path.splitext(file.filename)[1].lower()
         
         if file_ext not in ['.xlsx', '.xls', '.csv']:
-            return jsonify({'error': 'Invalid file format. Please upload an Excel or CSV file'}), 400
+            return jsonify({'error': '잘못된 파일 형식입니다. Excel 또는 CSV 파일을 업로드해주세요'}), 400
 
         settings = {"targetSettings": {}}
         
@@ -281,11 +309,11 @@ def update_target_settings():
         
         # 카테고리별 레이블 매핑 정의
         label_mapping = {
-            'gender': 'Target Gender',
-            'ageGroup': 'Target Age Group',
-            'productCategory': 'Product Category',
-            'seasonEvent': 'Season/Event',
-            'adTone': 'Advertisement Tone'
+            'gender': '성별',
+            'ageGroup': '나이',
+            'productCategory': '상품 카테고리',
+            'seasonEvent': '행사 시즌/이벤트',
+            'adTone': '광고 분위기'
         }
 
         if file_ext == '.csv':
@@ -299,7 +327,7 @@ def update_target_settings():
             # 필수 컬럼 확인
             required_columns = ['category', 'value', 'label']
             if not all(col in df.columns for col in required_columns):
-                return jsonify({'error': 'CSV must contain category, value, and label columns'}), 400
+                return jsonify({'error': 'CSV 파일은 반드시 category, value, label 컬럼을 포함해야 합니다'}), 400
             
             # DataFrame을 settings 구조로 변환
             for category in df['category'].unique():

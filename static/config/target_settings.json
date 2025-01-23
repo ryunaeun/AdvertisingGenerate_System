@@ -2,147 +2,159 @@
   "targetSettings": {
     "gender": {
       "id": "targetGender",
-      "label": "Target Gender",
+      "label": "성별",
       "options": [
         {
           "value": "allGender",
-          "label": "All"
+          "label": "전체"
         },
         {
           "value": "male",
-          "label": "Male"
+          "label": "남성"
         },
         {
           "value": "female",
-          "label": "Female"
+          "label": "여성"
         }
       ]
     },
     "ageGroup": {
       "id": "targetAge",
-      "label": "Target Age Group",
+      "label": "나이",
       "options": [
         {
           "value": "allAge",
-          "label": "All Ages"
+          "label": "전체"
         },
         {
           "value": "kids",
-          "label": "0~9s"
+          "label": "키즈 (0-9세)"
         },
         {
           "value": "teens",
-          "label": "10s"
+          "label": "10대"
         },
         {
           "value": "twenties",
-          "label": "20s"
+          "label": "20대"
         },
         {
           "value": "thirties",
-          "label": "30s"
+          "label": "30대"
         },
         {
           "value": "forties",
-          "label": "40s"
+          "label": "40대"
         },
         {
           "value": "fifties",
-          "label": "50s"
+          "label": "50대"
         },
         {
           "value": "sixties",
-          "label": "60s"
+          "label": "60대"
         },
         {
           "value": "seventyPlus",
-          "label": "70+"
+          "label": "70대 이상"
         }
       ]
     },
     "productCategory": {
       "id": "productCategory",
-      "label": "Product Category",
+      "label": "상품 카테고리",
       "options": [
         {
+          "value": "allCategory",
+          "label": "전체 카테고리"
+        },
+        {
           "value": "electronics",
-          "label": "Electronics"
+          "label": "전자제품"
         },
         {
           "value": "fashion",
-          "label": "Fashion"
+          "label": "패션"
         },
         {
           "value": "beauty",
-          "label": "Beauty & Health"
+          "label": "뷰티 & 헬스"
         },
         {
           "value": "food",
-          "label": "Food & Beverage"
+          "label": "식품 & 식자재"
         },
         {
           "value": "home",
-          "label": "Home & Living"
+          "label": "인테리어 & 가구"
         },
         {
           "value": "sports",
-          "label": "Sports & Outdoor"
+          "label": "스포츠 & 아웃도어"
         }
       ]
     },
     "seasonEvent": {
       "id": "seasonEvent",
-      "label": "Season/Event",
+      "label": "행사 시즌/이벤트",
       "options": [
         {
+          "value": "noEventSeason",
+          "label": "이벤트 없음"
+        },
+        {
           "value": "christmas",
-          "label": "Christmas"
+          "label": "크리스마스"
         },
         {
           "value": "newYear",
-          "label": "New Year"
+          "label": "신년맞이"
         },
         {
           "value": "summer",
-          "label": "Summer Season"
+          "label": "여름 행사"
         },
         {
           "value": "winter",
-          "label": "Winter Season"
+          "label": "겨울 행사"
         },
         {
           "value": "valentines",
-          "label": "Valentine's Day"
+          "label": "발렌타인 데이"
         },
         {
           "value": "backToSchool",
-          "label": "Back to School"
+          "label": "신학기 행사"
         }
       ]
     },
     "adTone": {
       "id": "adTone",
-      "label": "Advertisement Tone",
+      "label": "광고 분위기",
       "options": [
         {
+          "value": "normalTone",
+          "label": "일반적"
+        },
+        {
           "value": "professional",
-          "label": "Professional"
+          "label": "전문적"
         },
         {
           "value": "casual",
-          "label": "Casual & Friendly"
+          "label": "캐쥬얼 & 친근하게"
         },
         {
           "value": "luxury",
-          "label": "Luxury & Premium"
+          "label": "럭셔리 & 프리미엄"
         },
         {
           "value": "funny",
-          "label": "Humorous"
+          "label": "유머스럽게"
         },
         {
           "value": "emotional",
-          "label": "Emotional"
+          "label": "감성적으로"
         }
       ]
     }
