@@ -98,17 +98,29 @@ onMounted(() => {
       </section>
 
       <!-- 요금제 미리보기 Section -->
-      <section id="pricing-section"class="page-section pricing-section">
+      <section id="pricing-section" class="page-section pricing-section">
         <div data-aos="fade-up" class="content text-center">
           <h2 class="section-title">요금제 미리보기</h2>
           <div class="pricing-cards">
-            <div class="pricing-card" v-for="plan in pricingPlans" :key="plan.id">
+            <div
+              class="pricing-card"
+              v-for="plan in pricingPlans"
+              :key="plan.id"
+            >
               <h3>{{ plan.name }}</h3>
               <p class="price">{{ plan.price }}</p>
               <ul>
-                <li v-for="feature in plan.features" :key="feature">{{ feature }}</li>
+                <li v-for="feature in plan.features" :key="feature">
+                  {{ feature }}
+                </li>
               </ul>
-              <button class="btn btn-outline-primary">시작하기</button>
+              <!-- 버튼 클래스명 변경 -->
+              <button
+                class="action-button action-button-outline-primary"
+                @click="navigateToPricing"
+              >
+                시작하기
+              </button>
             </div>
           </div>
         </div>
@@ -173,6 +185,10 @@ export default {
     },
     goToLogin() {
       this.$router.push('/login'); // 로그인 페이지로 이동
+    },
+    navigateToPricing() {
+      this.$router.push('/pricing'); // Vue Router 사용 시
+      // 또는 location.href = '/pricing'; // Vue Router를 사용하지 않을 경우
     }
   },
   data() {
@@ -211,20 +227,21 @@ export default {
       pricingPlans: [
         {
           id: 1,
-          name: "Basic",
-          price: "₩10,000/월",
+          name: "Basic Plan",
+          price: "$399/월",
           features: ["기본 광고 제작", "제한된 분석"],
         },
         {
           id: 2,
-          name: "Premium",
-          price: "₩30,000/월",
+          name: "Enterprise Plan",
+          price: "영업팀 문의",
           features: ["모든 기능 사용 가능", "우선 지원"],
         },
       ],
       galleryImages: [
-        { id: 1, url: "/path/to/image1.jpg", alt: "Gallery Image 1" },
-        { id: 2, url: "/path/to/image2.jpg", alt: "Gallery Image 2" },
+        { id: 1, url: "/video/example1.gif", alt: "Gallery Image 1" },
+        { id: 2, url: "/video/example2.gif", alt: "Gallery Image 2" },
+        { id: 3, url: "/video/example3.gif", alt: "Gallery Image 3" },
       ],
       team: [
         {
@@ -498,4 +515,102 @@ export default {
   opacity: 1;
   transform: scale(1);
 }
+
+.pricing-section {
+  padding: 60px 20px;
+  background-color: #f9f9f9;
+}
+
+.pricing-cards {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.pricing-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 280px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.pricing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.pricing-card h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.pricing-card .price {
+  font-size: 1.25rem;
+  color: #5CB494;
+  margin-bottom: 15px;
+}
+
+.pricing-card ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.pricing-card ul li {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 5px 0;
+}
+
+/* 기존 btn -> action-button 으로 변경 */
+.action-button {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #5CB494;
+  border: 2px solid #5CB494;
+  border-radius: 5px;
+  background-color: transparent;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.action-button:hover {
+  background-color: #5CB494;
+  color: #fff;
+}
+
+.gallery-container {
+  display: flex; /* 아이템을 가로로 정렬 */
+  flex-wrap: wrap; /* 아이템이 화면에 맞게 줄바꿈되도록 설정 */
+  justify-content: center; /* 아이템들을 중앙 정렬 */
+  gap: 30px; /* 아이템 간격 조정 */
+  padding: 20px;
+}
+
+.gallery-item {
+  width: 25%; /* 각 아이템의 고정 너비 설정 */
+  height: 25%; /* 각 아이템의 고정 높이 설정 */
+  overflow: hidden; /* 이미지가 넘어가지 않도록 설정 */
+  border-radius: 8px; /* 아이템에 부드러운 모서리 추가 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 추가 */
+  transition: transform 0.3s, box-shadow 0.3s; /* 호버 효과 */
+}
+
+.gallery-item img {
+  width: 100%; /* 이미지가 부모 요소에 맞게 조정 */
+  height: 100%; /* 이미지가 부모 요소 높이에 맞게 조정 */
+  object-fit: cover; /* 이미지가 비율을 유지하며 영역에 맞게 조정 */
+}
+
+.gallery-item:hover {
+  transform: scale(1.05); /* 호버 시 확대 효과 */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15); /* 호버 시 그림자 강조 */
+}
+
 </style>
