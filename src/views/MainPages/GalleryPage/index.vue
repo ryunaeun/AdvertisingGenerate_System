@@ -79,7 +79,40 @@
           </div>
         </div>
       </div>
-
+      <!-- 공유 모달 -->
+      <div v-if="isShareModalOpen" class="share-modal-overlay" @click.self="closeShareModal">
+        <div class="share-modal">
+          <h4>공유하기</h4>
+          <div class="social-icons">
+            <button class="social-btn" @click="shareVia('kakao')">
+              <img src="../../../assets/img/logos/login/kakao.png" alt="KakaoTalk" />
+            </button>
+            <button class="social-btn" @click="shareVia('naver')">
+              <img src="../../../assets/img/logos/login/naver.png" alt="Naver Mail" />
+            </button>
+            <button class="social-btn" @click="shareVia('gmail')">
+              <img src="../../../assets/img/logos/login/google.png" alt="Gmail" />
+            </button>
+            <button class="social-btn" @click="shareVia('Facebook')">
+              <img src="../../../assets/img/logos/login/facebook.png" alt="Facebook" />
+            </button>
+          </div>
+          <div class="copy-url">
+            <input
+              type="text"
+              class="form-control"
+              readonly
+              :value="currentShareUrl"
+            />
+            <button class="btn btn-primary" @click="copyToClipboard">
+              URL 복사
+            </button>
+          </div>
+          <button class="btn btn-secondary mt-3" @click="closeShareModal">
+            닫기
+          </button>
+        </div>
+      </div>
       <!-- Gallery Grid -->
       <div class="row">
         <div
@@ -153,6 +186,8 @@ export default {
   },
   data() {
     return {
+      isShareModalOpen: false, // 공유 모달 상태
+      currentShareUrl: "", // 공유할 URL
       searchQuery: "",
       dateSortOrder: "desc", // 초기 정렬 순서: 최신순
       sizeSortOrder: null, // 초기 크기 정렬 순서: 정렬안함
@@ -162,31 +197,31 @@ export default {
       galleryItems: [
         {
           title: "Soccer",
-          image: "https://via.placeholder.com/300x200.png?text=Soccer",
+          image: "/images/Profile.png",
           createdAt: "2025.01.09 10:20:17",
           duration: "0:10"
         },
         {
           title: "Baseball",
-          image: "https://via.placeholder.com/300x200.png?text=Baseball",
+          image: "/images/Profile.png",
           createdAt: "2025.01.08 14:35:00",
           duration: "0:09"
         },
         {
           title: "Tennis",
-          image: "https://via.placeholder.com/300x200.png?text=Tennis",
+          image: "/images/Profile.png",
           createdAt: "2025.01.07 09:15:30",
           duration: "0:13"
         },
         {
           title: "Running",
-          image: "https://via.placeholder.com/300x200.png?text=Running",
+          image: "/images/Profile.png",
           createdAt: "2025.01.06 18:45:10",
           duration: "0:07"
         },
         {
           title: "Basketball",
-          image: "https://via.placeholder.com/300x200.png?text=Basketball",
+          image: "/images/Profile.png",
           createdAt: "2025.01.05 12:10:05",
           duration: "0:18"
         },
@@ -283,6 +318,25 @@ export default {
     },
     handleCheckPrompt(title) {
       alert(`${title}의 프롬프트를 확인합니다.`);
+    },
+    // 공유 모달 열기
+    handleShare(url) {
+      this.currentShareUrl = url; // 공유할 URL 설정
+      this.isShareModalOpen = true; // 모달 열기
+    },
+    // 공유 모달 닫기
+    closeShareModal() {
+      this.isShareModalOpen = false; // 모달 닫기
+    },
+    // URL 복사
+    copyToClipboard() {
+      navigator.clipboard.writeText(this.currentShareUrl).then(() => {
+        alert("URL이 복사되었습니다!");
+      });
+    },
+    // 소셜 미디어 공유 (임시)
+    shareVia(platform) {
+      alert(`${platform}로 공유하기 기능은 현재 준비 중입니다.`);
     },
   },
 };
@@ -563,6 +617,110 @@ export default {
 
 .social-icons a:hover {
   color: #000;
+}
+
+/* 모달 배경 스타일 */
+.share-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050; /* 높은 z-index 값 설정 */
+}
+
+/* 모달 콘텐츠 스타일 */
+.share-modal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
+  z-index: 1060; /* 모달 자체의 z-index */
+  position: relative; /* 독립적인 레이어로 설정 */
+}
+
+/* 소셜 아이콘 컨테이너 */
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+/* 소셜 아이콘 버튼 스타일 초기화 */
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* 기본 여백 제거 */
+  background: none; /* 배경 제거 */
+  border: none; /* 테두리 제거 */
+  cursor: pointer; /* 커서 포인터 */
+}
+
+.social-btn img {
+  width: 25px;
+  height: 25px;
+  display: block; /* inline-block의 여백 문제 제거 */
+}
+
+/* URL 복사 영역 스타일 */
+.copy-url {
+  display: flex;
+  flex-direction: row; /* 가로로 정렬 */
+  gap: 10px; /* 입력칸과 버튼 사이 간격 */
+  align-items: center; /* 수평으로 정렬 */
+}
+
+/* URL 입력칸 스타일 */
+.copy-url input {
+  border: none; /* 테두리 제거 */
+  border-bottom: 1px solid #ddd; /* 밑줄만 표시 */
+  border-radius: 0; /* 둥근 모서리 제거 */
+  padding: 5px 10px; /* 좌우 여백 추가 */
+  height: 36px; /* 입력칸 높이 */
+  font-size: 14px; /* 글자 크기 */
+  line-height: normal; /* 텍스트 정렬 */
+  outline: none; /* 클릭 시 기본 테두리 제거 */
+  flex-grow: 1; /* 입력칸이 가능한 공간을 차지하도록 설정 */
+}
+
+/* URL 입력칸 포커스 시 스타일 */
+.copy-url input:focus {
+  border-bottom: 1px solid #40a681; /* 포커스 시 밑줄 색 변경 */
+}
+
+/* URL 복사 버튼 스타일 */
+.copy-url button {
+  font-size: 14px;
+  background-color: #40a681;
+  border: none; /* 테두리 제거 */
+  color: white;
+  padding: 0 12px; /* 좌우 여백 조정 */
+  height: 36px; /* 버튼 높이 */
+  line-height: 36px; /* 버튼 텍스트의 세로 정렬 */
+  border-radius: 4px; /* 버튼의 모서리 둥글게 */
+  cursor: pointer; /* 클릭 가능한 커서 */
+  outline: none; /* 포커스 테두리 제거 */
+  box-shadow: none; /* 그림자 제거 */
+  white-space: nowrap; /* 텍스트가 잘리지 않도록 설정 */
+  flex-shrink: 0; /* 버튼 크기 축소 방지 */
+}
+
+.copy-url button:hover {
+  background-color: #368e70; /* 버튼 호버 시 색상 변경 */
+}
+
+.copy-url button:focus {
+  outline: none; /* 포커스 상태에서도 테두리 제거 */
+  box-shadow: none; /* 포커스 시 그림자 제거 */
 }
 
 </style>

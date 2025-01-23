@@ -75,14 +75,25 @@ onMounted(() => {
         </div>
       </section>
 
-      <!-- AI 기능 설명 Section -->
       <section id="ai-feature-section" class="page-section ai-feature-section">
-        <div data-aos="fade-up" class="content text-center">
-          <h2 class="section-title">AI가 광고를 바꾸는 방법</h2>
-          <p class="section-text">
-            딥러닝과 자연어 처리 기술로 광고 제작을 자동화하고, 
-            사용자 행동 분석을 기반으로 맞춤형 캠페인을 추천합니다.
+        <div class="content">
+          <h2 data-aos="fade-up" class="section-title">AI가 광고를 바꾸는 방법</h2>
+          <p data-aos="fade-up" class="section-text">
+            딥러닝과 자연어 처리 기술로 광고 제작을 자동화하고, 사용자 행동 분석을 기반으로 맞춤형 캠페인을 추천합니다.
           </p>
+
+          <!-- Image and Text Layout -->
+          <div class="feature-container">
+            <div v-for="(feature, index) in ai_features" :key="index" data-aos="fade-up" class="feature-item" :class="{ 'reverse': index % 2 !== 0 }">
+              <div class="feature-image">
+                <img :src="feature.image" :alt="feature.alt" />
+              </div>
+              <div class="feature-text">
+                <h3>{{ feature.title }}</h3>
+                <p>{{ feature.description }}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -166,6 +177,32 @@ export default {
   },
   data() {
     return {
+      ai_features: [
+        {
+          image: '/images/ai_feature1.png',
+          alt: 'Feature 1',
+          title: '원하는 광고 타겟과 스토리를 간편하게',
+          description: '원하는 광고 노출층을 키워드로 간편하게 선택합니다. 선택된 키워드를 바탕으로 광고의 스토리를 AI로 작성해줍니다.',
+        },
+        {
+          image: '/images/ai_feature2.png',
+          alt: 'Feature 2',
+          title: '만들고 싶은 광고 스타일을 미리',
+          description: '광고의 초안을 썸네일로 확인해보세요. 추천 이미지 중 마음에 드시는 썸네일로 영상 제작을 시작합니다.',
+        },
+        {
+          image: '/images/ai_feature3.png',
+          alt: 'Feature 3',
+          title: '내 스타일대로 광고 수정',
+          description: 'AI로 만들어진 광고 스토리에 나만의 스토리를 추가해보세요.',
+        },
+        {
+          image: '/images/ai_feature4.png',
+          alt: 'Feature 4',
+          title: '광고 제작',
+          description: 'AI가 당신의 스토리로 광고를 만들어 드립니다.',
+        },
+      ],
       videoUrl: '/video/service_mp4.mp4',
       features: [
         { id: 1, title: "효율적인 광고 제작", description: "최소 시간으로 최대 효과를 얻으세요." },
@@ -332,7 +369,62 @@ export default {
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
+.ai-feature-section {
+  padding: 4rem 2rem;
+  background-color: #f9f9f9;
+  min-height: 250vh; /* 섹션 높이를 늘려줍니다. */
+}
 
+.section-title {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.section-text {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.feature-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 2rem; /* 내용 간 간격 추가 */
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.feature-item.reverse {
+  flex-direction: row-reverse;
+}
+
+.feature-image img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.feature-text {
+  max-width: 600px;
+}
+
+.feature-text h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.feature-text p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #555;
+}
 
 .team-container {
   display: flex;

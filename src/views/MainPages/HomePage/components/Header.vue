@@ -74,7 +74,6 @@ export default {
       }
       this.isDropdownOpen = false;
     },
-<<<<<<< HEAD
     // async logout() {
     //   try {
     //     await apiClient.post("/logout");
@@ -87,24 +86,6 @@ export default {
     //     alert("로그아웃 중 문제가 발생했습니다.");
     //   }
     // },
-=======
-    
-    goToMyPage() {
-      this.$router.push('/mypage'); // 마이페이지로 이동
-    },
-    async logout() {
-      try {
-        await apiClient.post("/logout");
-        sessionStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        alert("로그아웃 성공");
-        this.$router.push("/login");
-      } catch (error) {
-        console.error("로그아웃 실패:", error);
-        alert("로그아웃 중 문제가 발생했습니다.");
-      }
-    },
->>>>>>> 3e77773e6cf3e13f296bd604b60fdc4aecf51794
   },
   mounted() {
     document.addEventListener('click', this.closeDropdown);

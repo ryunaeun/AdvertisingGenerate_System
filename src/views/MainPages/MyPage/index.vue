@@ -13,13 +13,13 @@
         <button 
           class="tab-item" 
           :class="{ active: activeTab === 'basic' }" 
-          @click="activeTab = 'basic'">
+          @click="scrollToSection('basic-info')">
           기본 정보
         </button>
         <button 
           class="tab-item" 
-          :class="{ active: activeTab === 'payment' }" 
-          @click="activeTab = 'payment'">
+          :class="{ active: activeTab === 'subscription-info' }" 
+          @click="scrollToSection('subscription-info')">
           결제 정보
         </button>
       </nav>
@@ -28,7 +28,7 @@
       <hr class="divider" />
       
       <!-- 콘텐츠 -->
-      <section v-if="activeTab === 'basic'" class="tab-content basic-info">
+      <section id="basic-info" class="tab-content basic-info">
         <div class="info-card">
           <!-- 사용자 정보 섹션 -->
           <div class="info-text">
@@ -228,6 +228,42 @@
         </div>
       </div>
     </div>
+    <!-- 현재 구독 정보 -->
+    <section id="subscription-info" class="subscription-info custom-card">
+      <h3>현재 구독 중인 요금제</h3>
+      <div class="custom-card-content">
+        <div class="subscription-details">
+          <h4>무료 체험</h4>
+          <p>잔여 무료 체험 기간: <strong>2025. 1. 31까지</strong></p>
+        </div>
+        <div class="cta">
+          <p>더 많은 기능이 필요하신가요?<br />지금 바로 구독하고 모든 기능을 사용해보세요!</p>
+          <router-link to="/pricing" class="custom-button">
+            요금제 보러 가기
+          </router-link>
+        </div>
+      </div>
+    </section>
+
+    <!-- 기본 결제 수단 -->
+    <section id="paymentSection" class="payment-method custom-card">
+      <h3>기본 결제 수단</h3>
+      <div class="custom-card-content">
+        <p2>결제 수단을 등록해 주세요.</p2>
+        <div class ='cta'>
+          <p>한 번만 등록해 놓으면 쉽게 사용 가능합니다.</p>
+          <button class="custom-button">결제 수단 등록하기</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 최근 청구 항목 -->
+    <section id="recentBillingSection" class="recent-billing custom-card">
+      <h3>최근 청구 항목</h3>
+      <div class="custom-card-content">
+        <p>최근 청구 항목이 없습니다.</p>
+      </div>
+    </section>
   </template>
   
   <script>
@@ -384,6 +420,13 @@ export default {
         this.closeBusinessNumberEditDialog();
       } else {
         alert("새 등록 번호를 입력해주세요.");
+      }
+    },
+    scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+        this.activeTab = sectionId === "basic-info" ? "basic" : "subscription-info";
       }
     },
   },
@@ -1045,13 +1088,108 @@ export default {
 }
 
 .dialog-buttons button:first-child {
-  background: #4caf50;
+  background: #5CB494;
   color: white;
 }
 
 .dialog-buttons button:last-child {
   background: #ddd;
   color: #333;
+}
+.payment-info-page {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.custom-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.custom-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.subscription-details {
+  max-width: 60%;
+}
+
+.credit-info {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.credit-info span:first-child {
+  margin-right: 10px;
+}
+
+.credit-remaining {
+  font-weight: bold;
+}
+
+.cta {
+  text-align: right;
+}
+
+.custom-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.custom-button:hover {
+  background: #0056b3;
+}
+
+.tab-button {
+  background: transparent;
+  border: none;
+  color: #007bff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.tab-button--active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+h4 {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+p {
+  font-size: 10px;
+  margin: 5px 0;
+  line-height: 1.5;
+  color: #555;
+}
+
+.recent-billing p,
+.payment-method p {
+  margin-top: 10px;
+}
+
+.recent-billing {
+  text-align: center;
 }
   </style>
   
