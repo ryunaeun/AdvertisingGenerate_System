@@ -1,4 +1,4 @@
-<!-- <script setup>
+<script setup>
 import apiClient from "@/api/axiosClient";
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
@@ -56,7 +56,7 @@ onMounted(async () => {
   }
 });
 
-</script> -->
+</script>
 
 <template>
   <router-view />

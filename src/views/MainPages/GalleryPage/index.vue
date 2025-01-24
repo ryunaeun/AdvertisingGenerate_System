@@ -712,6 +712,7 @@ export default {
   box-shadow: none; /* 그림자 제거 */
   white-space: nowrap; /* 텍스트가 잘리지 않도록 설정 */
   flex-shrink: 0; /* 버튼 크기 축소 방지 */
+  margin-bottom: 0px;
 }
 
 .copy-url button:hover {

@@ -300,7 +300,7 @@ export default {
         formData.append('businessFile', this.selectedFile);
       }
 
-      axios.post("http://localhost:8080/api/register-full", formData, {
+      axios.post("http://52.79.227.50:8080/api/register-full", formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -392,7 +392,7 @@ export default {
         return;
       }
       
-      axios.get(`http://localhost:8080/api/check-username?username=${this.username}`)
+      axios.get(`http://52.79.227.50:8080/api/check-username?username=${this.username}`)
         .then(response => {
           if (response.data.isDuplicate) {
             this.isUsernameValid = false;
@@ -412,7 +412,7 @@ export default {
         alert("유효한 이메일 주소를 입력해주세요.");
         return;
       }
-      axios.post("http://localhost:8080/api/send-verification-code", {
+      axios.post("http://52.79.227.50:8080/api/send-verification-code", {
         email: this.email,
         username: this.username
       })
@@ -435,7 +435,7 @@ export default {
         return;
       }
 
-      axios.post("http://localhost:8080/api/register", {
+      axios.post("http://52.79.227.50:8080/api/register", {
         email: this.email,
         verificationCode: this.verificationCode
       })

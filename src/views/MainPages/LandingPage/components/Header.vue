@@ -1,8 +1,8 @@
 <template>
   <nav class="navbar navbar-expand-lg position-sticky z-index-sticky top-0">
     <div class="container px-0">
-      <router-link class="navbar-brand font-weight-bolder ms-sm-3" to="/">
-        Material Kit 2 PRO
+      <router-link class="navbar-brand" to="/">
+        <img src="../../../../assets/img/logos/garo-logo.png" alt="AdVi Logo" height="45">
       </router-link>
       <div class="collapse navbar-collapse" id="navigation">
         <ul class="navbar-nav me-auto">

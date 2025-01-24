@@ -1,9 +1,9 @@
 <template>
   <header class="header">
     <nav class="navbar">
-      <div class="logo">
-        <router-link to="/home">Material Kit 2 PRO</router-link>
-      </div>
+      <router-link class="navbar-brand" to="/home">
+        <img src="../../../../assets/img/logos/garo-logo.png" alt="AdVi Logo" height="50">
+      </router-link>
       <div class="nav-items">
         <router-link to="/home" class="nav-item" :class="{ 'active': $route.path.includes('/home') }">
           <span>새로 만들기</span>
@@ -45,8 +45,8 @@
 </template>
 
 <script>
-// import axios from 'axios';
-// import apiClient from "@/api/axiosClient";
+import axios from 'axios';
+import apiClient from "@/api/axiosClient";
 
 export default {
   name: 'Header',
@@ -74,18 +74,18 @@ export default {
       }
       this.isDropdownOpen = false;
     },
-    // async logout() {
-    //   try {
-    //     await apiClient.post("/logout");
-    //     sessionStorage.removeItem("accessToken");
-    //     localStorage.removeItem("refreshToken");
-    //     alert("로그아웃 성공");
-    //     this.$router.push("/login");
-    //   } catch (error) {
-    //     console.error("로그아웃 실패:", error);
-    //     alert("로그아웃 중 문제가 발생했습니다.");
-    //   }
-    // },
+    async logout() {
+      try {
+        await apiClient.post("/logout");
+        sessionStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        alert("로그아웃 성공");
+        this.$router.push("/login");
+      } catch (error) {
+        console.error("로그아웃 실패:", error);
+        alert("로그아웃 중 문제가 발생했습니다.");
+      }
+    },
     
     goToMyPage() {
       this.$router.push('/mypage'); // 마이페이지로 이동
@@ -234,6 +234,28 @@ export default {
 
 .logout-btn:hover {
   background-color: #344767;
+}
+
+.navbar-brand{
+  padding-left: 50px;
+}
+
+.navbar {
+  height: 80px; /* 헤더의 높이를 고정값으로 설정 */
+  padding: 0; /* 패딩 제거 */
+}
+
+.logo-image {
+  height: 70px; /* 로고 이미지의 최대 높이 설정 */
+  width: auto; /* 가로 비율 자동 조정 */
+  object-fit: contain; /* 이미지 비율 유지 */
+}
+
+.navbar-brand {
+  padding-left: 50px;
+  display: flex;
+  align-items: center;
+  height: 100%; /* 부모 요소의 높이에 맞춤 */
 }
 </style>
 
