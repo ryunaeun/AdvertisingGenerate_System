@@ -1,1 +1,0 @@
-# AdvertisingGenerate_System
