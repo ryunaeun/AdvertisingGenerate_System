@@ -37,6 +37,9 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime billingDate = LocalDateTime.now(); // 기본값으로 가입일과 동일
 
+    @Column(nullable = true)
+    private LocalDateTime nowAt; //최근 접속 시간,로그인시 변경됨
+
     @Column(nullable = false)
     private String role = "USER"; // 기본 역할은 일반 사용자(USER)
 
@@ -65,10 +68,21 @@ public class User {
     @Column(nullable = true)
     private LocalDateTime verificationCodeIssuedAt; // 인증 코드 발행 시간
 
-    // secretKey 생성 메서드
+    // 엔티티가 처음 저장될 때 기본값 설정
     @PrePersist
-    public void generateSecretKey() {
+    public void onPrePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.billingDate = createdAt; // billingDate는 기본적으로 createdAt과 동일
         this.secretKey = java.util.UUID.randomUUID().toString();
     }
+
+    // 엔티티가 업데이트 될 때 호출 (billing이 변경되는 경우 처리)
+    @PreUpdate
+    public void onPreUpdate() {
+        if ("CREDIT".equals(this.billing)) {
+            this.billingDate = LocalDateTime.now(); // billing이 CREDIT으로 변경되는 시간을 기록
+        }
+    }
+
 }
 

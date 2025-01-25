@@ -13,6 +13,8 @@ import java.util.Date;
 public class JwtUtil {
 
     private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private static final long REFRESH_TOKEN_VALIDITY = 7 * 24 * 3600 * 1000; // 7일
+
 
     // Access Token 생성
     public String generateToken(String email, String role) {
@@ -27,10 +29,11 @@ public class JwtUtil {
 
     // Refresh Token 생성
     public String generateRefreshToken(String email) {
+        Date now = new Date();
         return Jwts.builder()
                 .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 7 * 24 * 3600000)) // 7일 유효
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_VALIDITY))
                 .signWith(SECRET_KEY)
                 .compact();
     }
@@ -93,4 +96,6 @@ public class JwtUtil {
             return true; // 토큰 파싱 실패 시 만료된 것으로 처리
         }
     }
+
+
 }

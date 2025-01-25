@@ -36,7 +36,13 @@ public class UserService {
 
         // 인증 코드 생성 및 저장
         String verificationCode = generateVerificationCode();
-        verificationCodeStorage.put(email, new TempUserData(userPost.getUsername(), verificationCode, LocalDateTime.now()));
+        // TempUserData로 임시 저장소에 저장
+        TempUserData tempUserData = new TempUserData(
+                userPost.getUsername(),
+                verificationCode,
+                LocalDateTime.now()
+        );
+        verificationCodeStorage.put(email, tempUserData);
 
         // 이메일 전송
         emailService.sendVerificationEmail(email, verificationCode);
@@ -44,30 +50,35 @@ public class UserService {
 
     // ** 인증 코드 재전송 **
     public void resendVerificationCode(String email) {
+        // Temporary Storage에서 인증 코드 확인
         TempUserData tempUserData = verificationCodeStorage.get(email);
 
         if (tempUserData == null) {
-            throw new IllegalArgumentException("등록되지 않은 이메일입니다. 인증 코드 요청을 먼저 실행하세요.");
+            throw new IllegalArgumentException("인증 코드 요청 이력이 없습니다. 등록되지 않은 이메일입니다.");
         }
 
         // 인증 코드 재생성
-        String verificationCode = generateVerificationCode();
-        tempUserData.setVerificationCode(verificationCode);
-        tempUserData.setIssuedAt(LocalDateTime.now());
+        String newVerificationCode = generateVerificationCode();
+        tempUserData.setVerificationCode(newVerificationCode); // 새 인증 코드 업데이트
+        tempUserData.setIssuedAt(LocalDateTime.now()); // 발행 시간 갱신
 
-        // 이메일 다시 전송
-        emailService.sendVerificationEmail(email, verificationCode);
+        // 다시 저장
+        verificationCodeStorage.put(email, tempUserData);
+
+        // 이메일 전송
+        emailService.sendVerificationEmail(email, newVerificationCode);
     }
 
     // ** 인증 코드 검증 및 사용자 저장 **
     public void saveUserAfterValidation(UserDto.VerificationRequest request) {
         String email = request.getEmail();
+        // TempUserData에서 인증 데이터 가져오기
         TempUserData tempUserData = verificationCodeStorage.get(email);
-
         if (tempUserData == null) {
             throw new IllegalArgumentException("인증 코드 요청 이력이 없습니다.");
         }
 
+        // 인증 코드 검증
         if (!tempUserData.getVerificationCode().equals(request.getVerificationCode())) {
             throw new IllegalArgumentException("인증 코드가 올바르지 않습니다.");
         }
@@ -76,25 +87,12 @@ public class UserService {
             throw new IllegalArgumentException("인증 코드가 만료되었습니다.");
         }
 
-        // 사용자 저장
-        User user = new User(
-                null,
-                tempUserData.username,
-                email,
-                passwordEncoder.encode("TEMPORARY"), // 임시 비밀번호 저장
-                "FREE",
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                "USER",
-                generateSecretKey(),
-                null,
-                null,
-                null,
-                tempUserData.username,
-                null,
-                true,
-                null
-        );
+        // 인증 성공 후 User 엔티티 생성 및 저장
+        User user = new User();
+        user.setUsername(tempUserData.getUsername());
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode("TEMPORARY")); // 임시 비밀번호 설정
+        user.setVerified(true); // ** 이메일 인증 완료 처리 **
         userRepository.save(user);
 
         // 인증 데이터 제거
@@ -154,18 +152,18 @@ public class UserService {
         return true; // 인증 성공
     }
 
-        // ** 비밀번호 재설정 **
-        public void resetPassword(String email, String newPassword) {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 사용자입니다."));
+    // ** 비밀번호 재설정 **
+    public void resetPassword(String email, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 사용자입니다."));
 
-            // 비밀번호 암호화 및 저장
-            user.setPassword(passwordEncoder.encode(newPassword));
-            userRepository.save(user);
+        // 비밀번호 암호화 및 저장
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
 
-            // 인증 데이터 제거
-            resetPasswordStorage.remove(email);
-        }
+        // 인증 데이터 제거
+        resetPasswordStorage.remove(email);
+    }
     // ** 사용자명 중복 확인 **
     public boolean isUsernameDuplicate(String username) {
         return userRepository.existsByUsername(username); // 단순 존재 확인
@@ -213,6 +211,42 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void updateLoginTime(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 현재 시간을 nowAt에 갱신
+        user.setNowAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+
+
+    // ** 이메일 인증 처리 **
+    public void verifyEmail(String email, String code) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+
+        // 인증 코드 및 만료 시간 확인
+        if (!user.getVerificationCode().equals(code)) {
+            throw new IllegalArgumentException("인증 코드가 올바르지 않습니다.");
+        }
+
+        if (user.getVerificationCodeIssuedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
+            throw new IllegalArgumentException("인증 코드가 만료되었습니다.");
+        }
+
+        // 이메일 인증 완료 처리
+        user.setVerified(true);
+        user.setVerificationCode(null); // 인증 코드 제거
+        user.setVerificationCodeIssuedAt(null); // 인증 코드 발행 시간 제거
+
+        userRepository.save(user);
+    }
+
+    public void deleteUserByEmail(String email) {
+        userRepository.findByEmail(email).ifPresent(userRepository::delete);
+    }
 
     // 인증 코드 생성 (6자리 난수)
     private String generateVerificationCode() {

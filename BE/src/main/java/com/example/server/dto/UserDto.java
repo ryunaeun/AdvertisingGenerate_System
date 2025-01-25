@@ -131,6 +131,30 @@ public class UserDto {
         private String businessFilePath;
     }
 
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    // 이메일 인증 데이터 전송
+    public static class EmailVerificationStatus {
+        private String email;
+        private boolean isVerified;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    // 사용자의 전체 업데이트 요청
+    public static class FullUserUpdate {
+        private String username;
+        private String password;
+        private String companyName;
+        private String businessNumber;
+        private String businessFilePath;
+    }
+
+
 
     // 기존 UserPost DTO 확장
     @Getter

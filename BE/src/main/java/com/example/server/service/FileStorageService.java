@@ -52,4 +52,20 @@ public class FileStorageService {
         // 5. 저장된 파일 경로 반환
         return filePath.toString();
     }
+    // 파일 삭제 메서드
+    public void deleteFile(String filePath) {
+        try {
+            File file = new File(filePath);
+            if (file.exists()) {
+                if (file.delete()) {
+                    System.out.println("파일이 성공적으로 삭제되었습니다: " + filePath);
+                } else {
+                    System.out.println("파일 삭제 실패: " + filePath);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("파일 삭제 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

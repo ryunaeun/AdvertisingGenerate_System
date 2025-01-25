@@ -14,17 +14,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -54,9 +55,9 @@ public class UserController {
 
     // ** 회원가입 인증 코드 요청 API **
     @PostMapping("/send-verification-code")
-    public ResponseEntity<?> sendVerificationCode(@RequestBody @Valid UserDto.UserPostWithoutPassword userPostWithoutPassword) {
+    public ResponseEntity<?> sendVerificationCode(@RequestBody @Valid UserDto.UserPostWithoutPassword userPost) {
         try {
-            userService.sendVerificationCode(userPostWithoutPassword);
+            userService.sendVerificationCode(userPost);
             return ResponseEntity.ok("인증 코드가 이메일로 성공적으로 전송되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -85,9 +86,7 @@ public class UserController {
 
     //비밀번호 치는 회원가입 최종버튼
     @PostMapping("/register-full")
-    public ResponseEntity<?> registerFullUser(
-            @ModelAttribute UserDto.FullUserPostWithFile userDto
-    ) {
+    public ResponseEntity<?> registerFullUser(@ModelAttribute UserDto.FullUserPostWithFile userDto) {
         try {
             // 선택적 파일 업로드 경로 처리
             String storedFilePath = userDto.getBusinessFile() != null
@@ -96,7 +95,7 @@ public class UserController {
 
             // 등록 요청한 이메일 확인 후 데이터 갱신
             userService.completeUserRegistration(
-                    userDto.getEmail(), // 이미 이메일로 가입된 유저여야 함
+                    userDto.getEmail(),
                     userDto.getPassword(),
                     userDto.getCompanyName(),
                     userDto.getBusinessNumber(),
@@ -105,8 +104,12 @@ public class UserController {
 
             return ResponseEntity.ok("회원가입이 성공적으로 완료되었습니다.");
         } catch (IllegalArgumentException e) {
+            // 실패 시 해당 이메일로 등록된 사용자 삭제
+            userService.deleteUserByEmail(userDto.getEmail());
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
+            // 실패 시 해당 이메일로 등록된 사용자 삭제
+            userService.deleteUserByEmail(userDto.getEmail());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원가입 처리 중 오류가 발생했습니다.");
         }
     }
@@ -196,6 +199,10 @@ public class UserController {
                 // Refresh Token 저장
                 userService.saveRefreshToken(user.getEmail(), refreshToken);
 
+                //로그인 성공 시, nowAt 필드에 현재 시간 갱신
+                userService.updateLoginTime(user.getEmail());
+
+
                 // 응답 데이터 구성
                 Map<String, String> response = new HashMap<>();
                 response.put("accessToken", accessToken);
@@ -248,28 +255,40 @@ public class UserController {
     public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
         try {
             String refreshToken = request.get("refreshToken");
-            System.out.println("Received refreshToken: " + refreshToken);
+            if (refreshToken == null) {
+                return ResponseEntity.badRequest().body("Refresh Token이 제공되지 않았습니다.");
+            }
 
             if (jwtUtil.isRefreshTokenExpired(refreshToken)) {
-                System.out.println("Refresh token expired");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh Token이 만료되었습니다.");
             }
 
             String email = jwtUtil.extractEmail(refreshToken);
+            if (email == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 Refresh Token입니다.");
+            }
+
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-            if (!jwtUtil.isStoredRefreshTokenValid(refreshToken, user.getRefreshToken())) {
-                System.out.println("Refresh token invalid");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰이 유효하지 않습니다.");
+            if (!refreshToken.equals(user.getRefreshToken())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("저장된 Refresh Token과 일치하지 않습니다.");
             }
 
             String newAccessToken = jwtUtil.generateToken(email, user.getRole());
-            System.out.println("Generated new accessToken: " + newAccessToken);
-            return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+            String newRefreshToken = jwtUtil.generateRefreshToken(email);
+
+            user.setRefreshToken(newRefreshToken);
+            userRepository.save(user);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("accessToken", newAccessToken);
+            response.put("refreshToken", newRefreshToken);
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("토큰 갱신 중 문제가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("토큰 갱신 중 문제가 발생했습니다.");
         }
     }
 
@@ -285,32 +304,223 @@ public class UserController {
         }
     }
 
-    //
-    @GetMapping("/current-user")
-    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+    @Scheduled(fixedRate = 3600000) // 1분마다 실행
+    @Transactional
+    public void removeExpiredRefreshTokens() {
+        Date now = new Date();
+        List<User> users = userRepository.findAll();
+        for (User user : users) {
+            if (user.getRefreshToken() != null && jwtUtil.isRefreshTokenExpired(user.getRefreshToken())) {
+                user.setRefreshToken(null);
+                userRepository.save(user);
+            }
+        }
+    }
+
+    //내 정보 - 기본정보 조회만
+    @GetMapping("/user-info/personal")
+    public ResponseEntity<?> getPersonalUserInfo(Authentication authentication) {
         try {
-            System.out.println("Authentication 객체: " + authentication);
             if (authentication == null || authentication.getName() == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
             }
 
             String email = authentication.getName();
-            System.out.println("인증된 사용자 이메일: " + email);
-
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-            Map<String, String> userInfo = new HashMap<>();
-            userInfo.put("email", user.getEmail());
-            userInfo.put("role", user.getRole());
+            // 개인정보 데이터 반환
+            Map<String, Object> personalInfo = new HashMap<>();
+            personalInfo.put("username", user.getUsername());
+            personalInfo.put("email", user.getEmail());
+            personalInfo.put("createdAt", user.getCreatedAt());
+            personalInfo.put("nowAt", user.getNowAt());
+            personalInfo.put("companyName", user.getCompanyName());
+            personalInfo.put("businessNumber", user.getBusinessNumber());
+            personalInfo.put("businessFilePath", user.getBusinessFilePath());
 
-            return ResponseEntity.ok(userInfo);
+            return ResponseEntity.ok(personalInfo);
         } catch (Exception e) {
-            System.err.println("사용자 정보 조회 중 예외 발생: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사용자 정보 조회 실패");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사용자 개인정보 조회 실패");
         }
     }
+
+    //내 정보 - 기본 정보 - 아이디, 회사명, 사업자 번호 수정
+    @PutMapping("/user-info/update/text")
+    @Transactional
+    public ResponseEntity<?> updateUserTextInfo(
+            @RequestBody(required = false) Map<String, String> request,
+            Authentication authentication
+    ) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        String email = authentication.getName();
+        // 사용자 조회
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 업데이트 가능한 필드 정의
+        Set<String> validFields = Set.of("username", "companyName", "businessNumber");
+
+        // 요청 확인 및 유효성 검증
+        if (request != null && !request.isEmpty()) {
+            for (String key : request.keySet()) {
+                if (!validFields.contains(key)) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 필드: " + key);
+                }
+            }
+
+            // username 필드 유효성 검사 및 업데이트
+            if (request.containsKey("username")) {
+                String username = request.get("username");
+                if (username == null || username.isBlank() || username.length() < 3 || username.length() > 20) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username은 3자 이상 20자 이하로 입력하세요.");
+                }
+                user.setUsername(username);
+            }
+
+            // companyName 필드 업데이트
+            if (request.containsKey("companyName")) {
+                String companyName = request.get("companyName");
+                if (companyName != null) {
+                    user.setCompanyName(companyName);
+                }
+            }
+
+            // businessNumber 필드 업데이트
+            if (request.containsKey("businessNumber")) {
+                String businessNumber = request.get("businessNumber");
+                if (businessNumber != null) {
+                    user.setBusinessNumber(businessNumber);
+                }
+            }
+
+
+            // userRepository.save는 @Transactional로 인해 생략 가능 (변경 감지가 활성화됨)
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("업데이트할 필드가 존재하지 않습니다.");
+        }
+
+        // 처리 완료 후 성공 메시지
+        return ResponseEntity.ok("사용자 정보가 성공적으로 업데이트되었습니다.");
+    }
+
+
+    //내 정보 - 기본 정보 - 사업자 폴더 수정
+    @PutMapping("/user-info/update/file")
+    public ResponseEntity<?> updateUserFileInfo(
+            @RequestParam(required = false) MultipartFile businessFile,
+            Authentication authentication
+    ) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 파일 업로드 처리
+        if (businessFile != null && !businessFile.isEmpty()) {
+            try {
+                // 새 파일 저장
+                String savedFilePath = fileService.saveFile(businessFile);
+
+                // 기존 파일 삭제
+                String currentFilePath = user.getBusinessFilePath();
+                if (currentFilePath != null) {
+                    fileService.deleteFile(currentFilePath);
+                }
+
+                // 새 파일 경로 업데이트
+                user.setBusinessFilePath(savedFilePath);
+
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 처리 중 문제가 발생했습니다.");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("업로드된 파일이 없습니다.");
+        }
+
+        // 저장
+        userRepository.save(user);
+
+        return ResponseEntity.ok("파일이 성공적으로 업데이트되었습니다.");
+    }
+
+    //내 정보 - 결제 정보 조회만
+    @GetMapping("/user-info/payment")
+    public ResponseEntity<?> getPaymentUserInfo(Authentication authentication) {
+        try {
+            if (authentication == null || authentication.getName() == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            }
+
+            String email = authentication.getName();
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+            // 결제 정보 데이터 반환
+            Map<String, Object> paymentInfo = new HashMap<>();
+            paymentInfo.put("billing", user.getBilling());
+            paymentInfo.put("billingDate", user.getBillingDate());
+
+            return ResponseEntity.ok(paymentInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사용자 결제 정보 조회 실패");
+        }
+    }
+
+    @PutMapping("/user-info/update-password")
+    public ResponseEntity<?> updatePassword(
+            @RequestBody Map<String, String> request,
+            Authentication authentication
+    ) {
+        try {
+            // 현재 로그인된 사용자 이메일 가져오기
+            if (authentication == null || authentication.getName() == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            }
+
+            String email = authentication.getName();
+
+            // 요청 데이터에서 새 비밀번호와 확인 비밀번호 가져오기
+            String newPassword = request.get("newPassword");
+            String confirmPassword = request.get("confirmPassword");
+
+            // 입력값 검증
+            if (newPassword == null || confirmPassword == null ||
+                    newPassword.isBlank() || confirmPassword.isBlank()) {
+                return ResponseEntity.badRequest().body("새 비밀번호와 비밀번호 확인을 모두 입력해야 합니다.");
+            }
+
+            if (!newPassword.equals(confirmPassword)) {
+                return ResponseEntity.badRequest().body("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+            }
+
+            // 비밀번호 복잡성 검증 (기존 정규식을 사용할 수 있음)
+            if (!newPassword.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$")) {
+                return ResponseEntity.badRequest().body("비밀번호는 8자 이상, 대문자, 소문자, 숫자, 특수문자를 반드시 포함해야 합니다.");
+            }
+
+            // 비밀번호 변경 서비스 호출
+            userService.resetPassword(email, newPassword);
+
+            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("비밀번호 변경 중 오류가 발생했습니다.");
+        }
+    }
+
+
 
     private final JavaMailSender javaMailSender;
 
@@ -323,22 +533,17 @@ public class UserController {
         javaMailSender.send(message);
     }
 
-    //이메일 인증 처리
+
+    // ** 이메일 인증 처리 API **
     @PostMapping("/verify-email")
     public ResponseEntity<?> verifyEmail(@RequestParam String email, @RequestParam String code) {
-        // 데이터베이스에서 사용자를 이메일로 찾기
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
-        System.out.println("입력된 이메일: " + email);
-        System.out.println("DB 검색 결과: " + user);
-        // 인증 코드가 일치하고 유효 시간 내에 있는지 확인
-        if (user.getVerificationCode().equals(code) &&
-                user.getVerificationCodeIssuedAt().isAfter(LocalDateTime.now().minusMinutes(3))) {
-            user.setVerified(true); // 이메일 인증 완료 처리
-            userRepository.save(user); // 사용자 저장
+        try {
+            userService.verifyEmail(email, code);
             return ResponseEntity.ok("이메일 인증이 성공적으로 완료되었습니다.");
-        } else {
-            return ResponseEntity.badRequest().body("인증 코드가 만료되었거나 잘못되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류가 발생했습니다.");
         }
     }
 
