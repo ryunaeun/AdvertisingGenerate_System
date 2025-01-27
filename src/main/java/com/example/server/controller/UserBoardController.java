@@ -1,4 +1,5 @@
 package com.example.server.controller;
+import com.example.server.dto.BoardDto;
 import com.example.server.model.Board;
 import com.example.server.model.Notice;
 import com.example.server.model.Reply;
@@ -6,13 +7,17 @@ import com.example.server.repository.BoardRepository;
 import com.example.server.repository.ReplyRepository;
 import com.example.server.service.BoardService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +51,7 @@ public class UserBoardController {
      * 게시글 생성
      */
     @PostMapping("/write")
-    public ResponseEntity<?> createBoard(@RequestBody Board board) {
+    public ResponseEntity<?> createBoard(@RequestBody BoardDto.BoardPost request) {
         try {
             // 인증된 사용자 정보 가져오기
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -56,7 +61,9 @@ public class UserBoardController {
 
             // 사용자 이메일 설정 => Board의 userId 필드에 할당
             String userEmail = authentication.getName();
-            board.setUserId(userEmail);
+
+            // 요청 데이터를 엔티티로 변환
+            Board board = request.toEntity(userEmail);
 
             // Board 생성
             Board createdBoard = boardService.createBoard(board);
@@ -67,9 +74,9 @@ public class UserBoardController {
         }
     }
 
+
     @Operation(
-            summary = "문의사항 조회(로그인 후 이용가능)",
-            description = "내가 쓴 문의사항 조회"
+            summary = "문의사항 조회(로그인 후 이용가능)"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "문의가 조회되었습니다."),
@@ -79,8 +86,10 @@ public class UserBoardController {
     /**
      * 게시글 페이지 단위 조회
      */
+
     @GetMapping("")
-    public ResponseEntity<?> BoardList(Pageable pageable, @RequestParam(defaultValue = "false") boolean isDescending) {
+    public ResponseEntity<?> BoardList(
+            @ParameterObject Pageable pageable, @RequestParam(defaultValue = "false") boolean isDescending) {
         try {
             // 인증된 사용자 정보 가져오기
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -111,6 +120,7 @@ public class UserBoardController {
     }
 
 
+
     @Operation(
             summary = "특정 문의사항 및 관리자 답변 조회(로그인 후 이용가능)",
             description = "내가 쓴 특정 문의사항 및 관리자의 답변 조회"
@@ -132,7 +142,7 @@ public class UserBoardController {
             String userEmail = authentication.getName();
 
             // 사용자와 연관된 게시판 목록 가져오기 (정렬 포함)
-            List<Board> userBoards = boardRepository.findByUserId(userEmail)
+            List<Board> userBoards = boardRepository.findByEmail(userEmail)
                     .stream()
                     .sorted((b1, b2) -> Integer.compare(b1.getBoardOrder(), b2.getBoardOrder()))
                     .toList();
@@ -182,7 +192,7 @@ public class UserBoardController {
             String userEmail = authentication.getName();
 
             // 사용자와 연관된 게시판 목록 가져오기 (정렬 포함)
-            List<Board> userBoards = boardRepository.findByUserId(userEmail)
+            List<Board> userBoards = boardRepository.findByEmail(userEmail)
                     .stream()
                     .sorted((b1, b2) -> Integer.compare(b1.getBoardOrder(), b2.getBoardOrder()))
                     .toList();
@@ -202,7 +212,7 @@ public class UserBoardController {
             return ResponseEntity.status(500).body("게시글 삭제 중 문제가 발생했습니다.");
         }
     }
-    
+
     /**
      * 전체 게시글 boardOrder 재정렬
      */
@@ -224,7 +234,9 @@ public class UserBoardController {
     })
     @PostMapping("/{order}/update")
     @Transactional
-    public ResponseEntity<?> updateNotice(@PathVariable("order") int boardOrder, @RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> updateBoard(
+            @PathVariable("order") int boardOrder,
+            @RequestBody BoardDto.BoardPost request) {
         try {
             // 인증된 사용자 정보 가져오기
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -235,7 +247,7 @@ public class UserBoardController {
             String userEmail = authentication.getName();
 
             // 사용자와 연관된 게시판 목록 가져오기 (정렬 포함)
-            List<Board> userBoards = boardRepository.findByUserId(userEmail)
+            List<Board> userBoards = boardRepository.findByEmail(userEmail)
                     .stream()
                     .sorted((b1, b2) -> Integer.compare(b1.getBoardOrder(), b2.getBoardOrder()))
                     .toList();
@@ -248,24 +260,28 @@ public class UserBoardController {
             Board boardToUpdate = userBoards.get(boardOrder - 1); // 인덱스는 0부터 시작하므로 -1 처리
 
             // 필요한 필드만 업데이트
-            if (request.containsKey("title")) {
-                boardToUpdate.setTitle(request.get("title").toString());
+            if (request.getTitle() != null) {
+                boardToUpdate.setTitle(request.getTitle());
             }
 
-            if (request.containsKey("content")) {
-                boardToUpdate.setContent(request.get("content").toString());
+            if (request.getContent() != null) {
+                boardToUpdate.setContent(request.getContent());
             }
+
+            // createdAt 필드에 현재 시각 설정
+            boardToUpdate.setCreatedAt(LocalDateTime.now());
 
             // 데이터 저장
             boardRepository.save(boardToUpdate);
 
             return ResponseEntity.ok(Map.of(
-                    "content", request.containsKey("content") ? "내용 업데이트" : "내용 없음",
-                    "title", request.containsKey("title") ? "제목 업데이트" : "제목 없음"
+                    "content", request.getContent() != null ? "내용 업데이트" : "내용 없음",
+                    "title", request.getTitle() != null ? "제목 업데이트" : "제목 없음"
             ));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("공지사항 업데이트 중 문제가 발생했습니다.");
         }
     }
+
 }

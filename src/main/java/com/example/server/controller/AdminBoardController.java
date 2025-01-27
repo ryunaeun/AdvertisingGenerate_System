@@ -1,6 +1,7 @@
 package com.example.server.controller;
 
 import com.example.server.dto.ReplyDto;
+import com.example.server.dto.UserDto;
 import com.example.server.model.Board;
 import com.example.server.model.Notice;
 import com.example.server.model.Reply;
@@ -83,7 +84,7 @@ AdminBoardController {
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
 
-    // 관리자가 user 문의사항 지우기
+    // 관리자가 email 문의사항 지우기
     @DeleteMapping("/{order}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -108,27 +109,32 @@ AdminBoardController {
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
 
-    //특정 user 조회
+// 특정 email로 게시글 조회
     @GetMapping("/specific")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> specificBoardList(@RequestBody Map<String, String> request) {
+    public ResponseEntity<?> specificBoardList(@RequestBody UserDto.EmailRequest request) {
         try {
+            // 인증된 사용자 정보 가져오기
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("로그인이 필요합니다.");
             }
-            String userId = String.valueOf(request.get("userId")); // 요청에서 ID 추출
-            System.out.println(userId);
-            if (userId == null) {
-                return ResponseEntity.badRequest().body("사용자 ID가 필요합니다.");
+
+            // 요청에서 email 추출
+            String email = request.getEmail();
+            if (email == null || email.isEmpty()) {
+                return ResponseEntity.badRequest().body("사용자 Email이 필요합니다.");
             }
-            var boardList = boardRepository.findByUserId(userId); // 사용자의 게시글 조회
+
+            // email을 기준으로 게시글 목록 조회
+            List<Board> boardList = boardRepository.findByEmail(email);
             return ResponseEntity.ok(boardList); // 게시글 목록 반환
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("게시글 조회 중 문제가 발생했습니다.");
         }
     }
+
 
     @Operation(
             summary = "문의사항 답변(관리자 로그인 후 이용가능)",
@@ -149,18 +155,18 @@ AdminBoardController {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("로그인이 필요합니다.");
             }
-            // 요청에서 사용자 ID와 문의사항 ID 추출
-            String userId = replyPost.getUserId();
+            // 요청에서 사용자 Email과 문의사항 ID 추출
+            String email = replyPost.getEmail();
             Long boardId = replyPost.getBoardId();
 
-            // 사용자 ID와 문의사항 ID 유효성 검사
-            if (userId == null || boardId == null) {
-                return ResponseEntity.badRequest().body("userId와 boardId가 필요합니다.");
+            // 사용자 Email과 문의사항 ID 유효성 검사
+            if (email == null || boardId == null) {
+                return ResponseEntity.badRequest().body("email와 boardId가 필요합니다.");
             }
             // 1. boardId로 Board 조회
-            List<Board> boardOptionalUser = boardRepository.findByUserId(userId);
+            List<Board> boardOptionalUser = boardRepository.findByEmail(email);
             if (boardOptionalUser.isEmpty()) {
-                return ResponseEntity.status(404).body("해당 User에 대한 문의사항을 찾을 수 없습니다.");
+                return ResponseEntity.status(404).body("해당 Email에 대한 문의사항을 찾을 수 없습니다.");
             }
             // 1. boardId로 Board 조회
             Optional<Board> boardOptional = boardRepository.findByBoardId(boardId);
@@ -170,9 +176,9 @@ AdminBoardController {
 
             Board board = boardOptional.get();
 
-            // 2. userId와 boardId 조건으로 Reply 엔티티 생성
+            // 2. email과 boardId 조건으로 Reply 엔티티 생성
             Reply reply = new Reply();
-            reply.setUserId(userId); // 답변 작성자 ID 설정
+            reply.setEmail(email); // 답변 작성자 Email 설정
             reply.setBoardId(boardId); // 관련 문의사항 ID 설정
             reply.setTitle(replyPost.getTitle()); // 제목 설정
             reply.setContent(replyPost.getContent()); // 내용 설정

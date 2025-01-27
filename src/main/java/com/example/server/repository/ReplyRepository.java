@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReplyRepository extends JpaRepository<Reply, Long> {
     // 사용자 ID를 기준으로 게시글 검색
-    Optional<Reply> findByUserId(String userId);
+    Optional<Reply> findByEmail(String email);
     Optional<Reply> findByBoardId(Long boardId);
 }

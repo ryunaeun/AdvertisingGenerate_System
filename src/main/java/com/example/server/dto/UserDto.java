@@ -191,4 +191,34 @@ public class UserDto {
     public static class FullUserPostWithFile extends FullUserPost {
         private MultipartFile businessFile; // 파일 업로드
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserChange {
+        @NotBlank(message = "이름은 필수 입력 값입니다.")
+        @Size(min = 3, max = 20, message = "이름은 3자 이상 20자 이하여야 합니다.")
+        @Pattern(regexp = "^[a-zA-Z]+$", message = "이름은 영어 알파벳만 가능합니다.")
+        private String username;
+
+
+        @NotBlank(message = "이름은 필수 입력 값입니다.")
+        @Size(min = 3, max = 20, message = "이름은 3자 이상 20자 이하여야 합니다.")
+        @Pattern(regexp = "^[a-zA-Z]+$", message = "이름은 영어 알파벳만 가능합니다.")
+        private String newUsername;
+        private String role;
+        private String billing;
+    }
+
+    @Getter
+    @Setter
+    public static class DeleteRequest {
+        private String email; // 삭제할 사용자의 이메일
+    }
+    @Getter
+    @Setter
+    public static class EmailRequest {
+        private String email; // 조회할 사용자의 이메일
+    }
 }

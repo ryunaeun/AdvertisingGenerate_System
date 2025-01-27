@@ -2,6 +2,7 @@ package com.example.server.service;
 import com.example.server.model.Board;
 import com.example.server.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -81,10 +82,10 @@ public class BoardService {
         // 변경된 데이터 저장
         boardRepository.saveAll(boards);
     }
-    public Page<Board> getUserBoards(String userId, Pageable pageable, boolean isDescending) {
+    public Page<Board> getUserBoards(String email, Pageable pageable, boolean isDescending) {
         Sort sort = isDescending ? Sort.by("createdAt").descending() : Sort.by("createdAt").ascending();
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-        return boardRepository.findByUserId(userId,pageable);
+        return boardRepository.findByEmail(email,pageable);
     }
     /**
      * 게시글 페이지네이션 조회

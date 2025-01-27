@@ -1,5 +1,6 @@
 package com.example.server.controller;
 
+import com.example.server.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -73,37 +74,39 @@ public class AdminUserController {
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
 
-    // 관리자가 회원가입된 user 삭제
     @PostMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public ResponseEntity<?> deleteUser(@RequestBody Map<String, String> request) {
-        System.out.println("Delete Hello");
+    public ResponseEntity<?> deleteUser(@RequestBody UserDto.DeleteRequest request) {
         try {
+            // 인증된 사용자 확인
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("로그인이 필요합니다.");
             }
-            String username = String.valueOf(request.get("username")); // 요청에서 ID 추출
-            System.out.println(username);
-            if (username == null) {
-                return ResponseEntity.badRequest().body("사용자 ID가 필요합니다.");
+
+            // 요청에서 이메일 추출
+            String email = request.getEmail();
+            if (email == null || email.isEmpty()) {
+                return ResponseEntity.badRequest().body("이메일은 필수 입력값입니다.");
             }
 
-            // 사용자 확인 후 삭제
-            if (userRepository.existsByUsername(username)) {
-                System.out.println("Delete Hello2");
-                userRepository.deleteByUsername(username);
-                return ResponseEntity.ok("사용자가 성공적으로 삭제되었습니다.");
+            // 이메일을 기반으로 사용자 삭제
+            if (userRepository.existsByEmail(email)) {
+                userRepository.deleteByEmail(email);
+                return ResponseEntity.ok(Map.of(
+                        "message", "사용자가 성공적으로 삭제되었습니다.",
+                        "email", email
+                ));
             } else {
-                return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
+                return ResponseEntity.status(404).body("해당 이메일의 사용자를 찾을 수 없습니다.");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("사용자 삭제 중 문제가 발생했습니다.");
         }
     }
+
 
     @Operation(
             summary = "회원 수정(관리자 로그인 후 이용가능)",
@@ -115,48 +118,52 @@ public class AdminUserController {
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
 
-    //관리자가 회원가입된 user 데이터 업데이트
     @PostMapping("/update")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateUser(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> updateUser(@RequestBody UserDto.UserChange request) {
         try {
+            // 인증된 사용자 정보 가져오기
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("로그인이 필요합니다.");
             }
-            String username = String.valueOf(request.get("username")); // 요청에서 기존 username 추출
-            if (username == null) {
+
+            // 기존 사용자 이름 추출
+            String username = request.getUsername();
+            if (username == null || username.isEmpty()) {
                 return ResponseEntity.badRequest().body("사용자 ID가 필요합니다.");
             }
 
+            // 사용자 조회
             Optional<User> userOpt = userRepository.findByUsername(username);
-            if (userOpt.isPresent()) {
-                User user = userOpt.get();
-
-                // 새로운 username 처리 (추가)
-                if (request.containsKey("newUsername")) {
-                    user.setUsername(request.get("newUsername").toString());
-                }
-
-                if (request.containsKey("role")) {
-                    user.setRole(request.get("role").toString());
-                }
-                if (request.containsKey("billing")) {
-                    user.setBilling(request.get("billing").toString());
-                }
-
-                // 데이터 저장
-                userRepository.save(user);
-                return ResponseEntity.ok(Map.of(
-                        "message", "사용자 이름이 성공적으로 업데이트되었습니다.",
-                        "user", user.getUsername()
-                ));
-            } else {
+            if (userOpt.isEmpty()) {
                 return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
             }
+
+            User user = userOpt.get();
+
+            // 값이 있는 경우에만 업데이트
+            if (request.getNewUsername() != null && !request.getNewUsername().isEmpty()) {
+                user.setUsername(request.getNewUsername());
+            }
+            if (request.getRole() != null && !request.getRole().isEmpty()) {
+                user.setRole(request.getRole());
+            }
+            if (request.getBilling() != null && !request.getBilling().isEmpty()) {
+                user.setBilling(request.getBilling());
+            }
+
+            // 데이터 저장
+            userRepository.save(user);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "사용자 정보가 성공적으로 업데이트되었습니다.",
+                    "user", user.getUsername()
+            ));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("사용자 정보 업데이트 중 문제가 발생했습니다.");
         }
     }
+
 }

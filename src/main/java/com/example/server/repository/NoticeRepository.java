@@ -10,11 +10,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
     // 사용자 ID를 기준으로 게시글 검색
-    List<Notice> findByUserId(String userId);
+    List<Notice> findByEmail(String email);
     Optional<Notice> findByNoticeId(Long noticeId);
     Optional<Notice> findByNoticeOrder(int noticeOrder);
     List<Notice> findAllByOrderByNoticeOrder();
-    Boolean existsByUserId(String userId);
+    Boolean existsByEmail(String email);
     Integer deleteByNoticeOrder(int noticeOrder);
     // boardOrder 기준으로 페이지 단위 조회
     Page<Notice> findAllByOrderByNoticeOrderAsc(Pageable pageable);

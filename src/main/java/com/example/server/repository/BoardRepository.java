@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
     // 사용자 ID를 기준으로 게시글 검색
-    List<Board> findByUserId(String userId);
+    List<Board> findByEmail(String email);
     Optional<Board> findByBoardId(Long boardId);
     Optional<Board> findByBoardOrder(int boardOrder);
     List<Board> findAllByOrderByBoardOrder();
@@ -19,5 +19,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Page<Board> findAllByOrderByBoardOrderAsc(Pageable pageable);
     // 게시판 기록 전체 조회 (전체 재정렬용)
     List<Board> findAllByOrderByBoardOrderAsc();
-    Page<Board> findByUserId(String userId, Pageable pageable);
+    Page<Board> findByEmail(String email, Pageable pageable);
 }

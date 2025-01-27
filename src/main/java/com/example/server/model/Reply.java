@@ -21,7 +21,7 @@ public class Reply {
     private Long replyId; // PK (기본 키)
 
     @Column(nullable = false)
-    private String userId; // 답변해주는 회원 ID
+    private String email; // 답변해주는 회원 ID
 
     @Column(nullable = false)
     private Long boardId;

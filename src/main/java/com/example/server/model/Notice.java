@@ -20,7 +20,7 @@ public class Notice {
     private Long noticeId; // PK (기본 키)
 
     @Column(nullable = false)
-    private String userId; // 작성자 ID
+    private String email; // 작성자 ID
 
     @Column(nullable = false)
     private String title; // 제목

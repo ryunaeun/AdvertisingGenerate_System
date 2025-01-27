@@ -1,13 +1,20 @@
 package com.example.server.controller;
 
 
+import com.example.server.dto.NoticeDto;
 import com.example.server.model.Board;
 import com.example.server.model.Notice;
 import com.example.server.service.NoticeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
+import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.example.server.repository.NoticeRepository;
@@ -46,9 +53,9 @@ public class AdminNoticeController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
-    
+
     @PostMapping("/write")
-    public ResponseEntity<?> createNotice(@RequestBody Notice notice) {
+    public ResponseEntity<?> createNotice(@RequestBody NoticeDto.NoticePost request) {
         try {
             // 인증된 사용자 정보 가져오기
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -56,9 +63,9 @@ public class AdminNoticeController {
                 return ResponseEntity.status(401).body("로그인이 필요합니다.");
             }
 
-            // 사용자 이메일 설정 => Notice의 userId 필드에 할당
-            String userEmail = authentication.getName();
-            notice.setUserId(userEmail);
+            // 사용자 이메일 설정 => Notice의 email 필드에 할당
+            String useremail = authentication.getName();
+            Notice notice = request.toEntity(useremail);
 
             // Notice 생성
             Notice createdNotice = noticeService.createNotice(notice);
@@ -79,7 +86,7 @@ public class AdminNoticeController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
-    
+
     @GetMapping("")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> NoticeList(Pageable pageable,@RequestParam(defaultValue = "false") boolean isDescending) {
@@ -106,7 +113,7 @@ public class AdminNoticeController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
-    
+
     @GetMapping("/{order}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> NoticeList(@PathVariable("order") int noticeOrder) {
@@ -143,7 +150,7 @@ public class AdminNoticeController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
-    
+
     @DeleteMapping("/{order}")
     public ResponseEntity<String> deleteNotice(@PathVariable("order") int noticeOrder) {
         Optional<Notice> noticeOptional = noticeRepository.findAllByOrderByNoticeOrder()
@@ -166,7 +173,7 @@ public class AdminNoticeController {
 //        noticeService.reorderNoticeOrders();
 //        return ResponseEntity.ok("게시판 번호가 재정렬되었습니다.");
 //    }
-    
+
     @Operation(
             summary = "공지사항 수정(관리자 로그인 후 이용가능)",
             description = "관리자가 공지사항 수정"
@@ -178,7 +185,7 @@ public class AdminNoticeController {
     })
     @PostMapping("/{order}/update")
     @Transactional
-    public ResponseEntity<?> updateNotice(@PathVariable("order") int noticeOrder, @RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> updateNotice(@PathVariable("order") int noticeOrder, @RequestBody NoticeDto.NoticePost request) {
         try {
             // 인증된 사용자 정보 가져오기
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -194,20 +201,21 @@ public class AdminNoticeController {
                 Notice notice = noticeOpt.get();
 
                 // 필요한 필드만 업데이트
-                if (request.containsKey("title")) {
-                    notice.setTitle(request.get("title").toString());
+                if (request.getTitle() != null) {
+                    notice.setTitle(request.getTitle().toString());
                 }
 
-                if (request.containsKey("content")) {
-                    notice.setContent(request.get("content").toString());
+                if (request.getContent() != null) {
+                    notice.setContent(request.getContent().toString());
                 }
 
+                notice.setCreatedAt(LocalDateTime.now());
                 // 데이터 저장
                 noticeRepository.save(notice);
 
                 return ResponseEntity.ok(Map.of(
-                        "content", request.containsKey("content") ? "내용 업데이트" : "내용 없음",
-                        "title", request.containsKey("title") ? "제목 업데이트" : "제목 없음"
+                        "content", request.getContent() != null ? "내용 업데이트" : "내용 없음",
+                        "title", request.getTitle() != null? "제목 업데이트" : "제목 없음"
                 ));
             } else {
                 return ResponseEntity.status(404).body("공지사항을 찾을 수 없습니다.");

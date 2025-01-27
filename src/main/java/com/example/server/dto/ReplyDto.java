@@ -2,6 +2,7 @@ package com.example.server.dto;
 
 
 import com.example.server.model.Reply;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -26,7 +27,7 @@ public class ReplyDto {
         private Long boardId;
 
         @NotBlank(message = "보낼 사람은 필수입니다.")
-        private String userId;
+        private String email;
 
         @NotBlank(message = "제목은 필수입니다.")
         private String title;
@@ -34,23 +35,8 @@ public class ReplyDto {
         @NotBlank(message = "내용은 필수입니다.")
         private String content;
 
+        @Schema(hidden = true)
         private LocalDateTime createdAt; // 읽기 전용 (응답 시 사용)
-
-        // DTO -> 엔티티 변환 메서드
-        public Reply toEntity(String userId) {
-            logger.debug("Converting BoardPost DTO to Entity. UserId: {}", userId);
-            logger.debug("Title: {}, Content: {}", title, content);
-
-            Reply reply = new Reply();
-            reply.setUserId(userId);       // 로그인한 사용자 ID 설정
-            reply.setTitle(this.title);    // 제목 설정
-            reply.setContent(this.content); // 내용 설정
-            reply.setCreatedAt(LocalDateTime.now()); // 작성 시간 자동 설정
-
-            // createdAt 필드는 DTO에서 읽기 전용으로 전달 (엔티티 시간 반영)
-            this.createdAt = reply.getCreatedAt();
-
-            return reply;
         }
-    }
+        // DTO -> 엔티티 변환 메서드
 }
