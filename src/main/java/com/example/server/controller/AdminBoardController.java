@@ -112,7 +112,7 @@ AdminBoardController {
 // 특정 email로 게시글 조회
     @GetMapping("/specific")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> specificBoardList(@RequestBody UserDto.EmailRequest request) {
+    public ResponseEntity<?> specificBoardList(@RequestParam String email) {
         try {
             // 인증된 사용자 정보 가져오기
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -120,20 +120,24 @@ AdminBoardController {
                 return ResponseEntity.status(401).body("로그인이 필요합니다.");
             }
 
-            // 요청에서 email 추출
-            String email = request.getEmail();
+            // email 유효성 검사
             if (email == null || email.isEmpty()) {
                 return ResponseEntity.badRequest().body("사용자 Email이 필요합니다.");
             }
 
             // email을 기준으로 게시글 목록 조회
             List<Board> boardList = boardRepository.findByEmail(email);
-            return ResponseEntity.ok(boardList); // 게시글 목록 반환
+            System.out.println("Email : " + email);
+            System.out.println("Board : " + boardList);
+
+            // 게시글 목록 반환
+            return ResponseEntity.ok(boardList);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("게시글 조회 중 문제가 발생했습니다.");
         }
     }
+
 
 
     @Operation(
@@ -155,6 +159,7 @@ AdminBoardController {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("로그인이 필요합니다.");
             }
+
             // 요청에서 사용자 Email과 문의사항 ID 추출
             String email = replyPost.getEmail();
             Long boardId = replyPost.getBoardId();
@@ -163,20 +168,20 @@ AdminBoardController {
             if (email == null || boardId == null) {
                 return ResponseEntity.badRequest().body("email와 boardId가 필요합니다.");
             }
-            // 1. boardId로 Board 조회
-            List<Board> boardOptionalUser = boardRepository.findByEmail(email);
-            if (boardOptionalUser.isEmpty()) {
-                return ResponseEntity.status(404).body("해당 Email에 대한 문의사항을 찾을 수 없습니다.");
-            }
+
             // 1. boardId로 Board 조회
             Optional<Board> boardOptional = boardRepository.findByBoardId(boardId);
             if (boardOptional.isEmpty()) {
                 return ResponseEntity.status(404).body("해당 boardId에 대한 문의사항을 찾을 수 없습니다.");
             }
 
-            Board board = boardOptional.get();
+            // 2. 해당 boardId에 이미 답변이 있는지 확인
+            boolean replyExists = replyRepository.existsByBoardId(boardId);
+            if (replyExists) {
+                return ResponseEntity.badRequest().body("해당 게시글에는 이미 답변이 작성되었습니다.");
+            }
 
-            // 2. email과 boardId 조건으로 Reply 엔티티 생성
+            // 3. 답변 생성 및 저장
             Reply reply = new Reply();
             reply.setEmail(email); // 답변 작성자 Email 설정
             reply.setBoardId(boardId); // 관련 문의사항 ID 설정
@@ -197,4 +202,5 @@ AdminBoardController {
             return ResponseEntity.status(500).body("답변 작성 중 문제가 발생했습니다.");
         }
     }
+
 }

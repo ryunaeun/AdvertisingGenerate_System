@@ -15,6 +15,7 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Not;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.example.server.repository.NoticeRepository;
@@ -89,7 +90,7 @@ public class AdminNoticeController {
 
     @GetMapping("")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> NoticeList(Pageable pageable,@RequestParam(defaultValue = "false") boolean isDescending) {
+    public ResponseEntity<?> NoticeList(@ParameterObject Pageable pageable, @RequestParam(defaultValue = "false") boolean isDescending) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
@@ -97,7 +98,13 @@ public class AdminNoticeController {
             }
             // 데이터베이스에서 모든 Notice 조회
             Page<Notice> notices = noticeService.getNotices(pageable,isDescending);
-            return ResponseEntity.ok(notices);
+            List<Notice> reorderedNotices = notices.stream()
+                    .map(notice -> {
+                        notice.setNoticeOrder(notices.getContent().indexOf(notice) + 1);
+                        return notice;
+                    })
+                    .toList();
+            return ResponseEntity.ok(reorderedNotices);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("공지사항 조회 중 문제가 발생했습니다.");

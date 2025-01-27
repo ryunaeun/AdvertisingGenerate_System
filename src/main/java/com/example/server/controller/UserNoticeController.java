@@ -7,12 +7,17 @@ import com.example.server.service.NoticeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,18 +40,24 @@ public class UserNoticeController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
-    
+
     @GetMapping("")
-    public ResponseEntity<?> NoticeList(Pageable pageable, @RequestParam(defaultValue = "false") boolean isDescending) {
+    public ResponseEntity<?> NoticeList(@ParameterObject Pageable pageable, @RequestParam(defaultValue = "false") boolean isDescending) {
         try {
-            Page<Notice> notices = noticeService.getNotices(pageable, isDescending);
-            return ResponseEntity.ok(notices);
+            // 데이터베이스에서 모든 Notice 조회
+            Page<Notice> notices = noticeService.getNotices(pageable,isDescending);
+            List<Notice> reorderedNotices = notices.stream()
+                    .map(notice -> {
+                        notice.setNoticeOrder(notices.getContent().indexOf(notice) + 1);
+                        return notice;
+                    })
+                    .toList();
+            return ResponseEntity.ok(reorderedNotices);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("공지사항 조회 중 문제가 발생했습니다.");
         }
     }
-
 
     @Operation(
             summary = "특정 공지사항 조회(로그인 없이 이용가능)",

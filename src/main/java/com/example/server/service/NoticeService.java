@@ -89,11 +89,13 @@ public class NoticeService {
      * 게시글 페이지네이션 조회
      */
     public Page<Notice> getNotices(Pageable pageable, boolean isDescending) {
-        Sort sort = isDescending ? Sort.by("noticeOrder").descending() : Sort.by("noticeOrder").ascending();
+        // 정렬 조건 생성
+        Sort sort = isDescending ? Sort.by("createdAt").descending() : Sort.by("createdAt").ascending();
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
-        // JpaRepository 기본 제공 메소드를 사용하여 해결
-        return noticeRepository.findAll(sortedPageable);
+        // 모든 공지사항 조회
+        return noticeRepository.findAll(pageable);
     }
+
 
 }
