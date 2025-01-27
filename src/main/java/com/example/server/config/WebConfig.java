@@ -17,6 +17,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.Components;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 
 @Configuration
 public class WebConfig {
@@ -55,7 +63,10 @@ public class WebConfig {
                                 "/api/reset-password", // 비밀번호 초기화
                                 "/api/verify-email",// 이메일 인증 확인
                                 "/api/verify-reset-code",
-                                "/api/users/notice/**"
+                                "/api/users/notice/**", // 공지사항 보기
+                                "/swagger-ui/**",       // Swagger UI 접근 허용
+                                "/v3/api-docs/**",      // OpenAPI 문서 접근 허용
+                                "/swagger-resources/**" // Swagger 리소스 허용
                         ).permitAll() // 공용 접근 허용
                         // 인증이 필요한 요청
                         .requestMatchers(
@@ -92,5 +103,27 @@ public class WebConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+    @Bean
+    public OpenAPI openAPI() {
+        String jwt = "JWT";
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwt);
+        Components components = new Components().addSecuritySchemes(jwt, new SecurityScheme()
+                .name(jwt)
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("JWT")
+        );
+        return new OpenAPI()
+                .components(new Components())
+                .info(apiInfo())
+                .addSecurityItem(securityRequirement)
+                .components(components);
+    }
+    private Info apiInfo() {
+        return new Info()
+                .title("API Test") // API의 제목
+                .description("Let's practice Swagger UI") // API에 대한 설명
+                .version("1.0.0"); // API의 버전
     }
 }
