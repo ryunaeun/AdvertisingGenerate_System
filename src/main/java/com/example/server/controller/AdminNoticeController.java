@@ -4,6 +4,9 @@ package com.example.server.controller;
 import com.example.server.model.Board;
 import com.example.server.model.Notice;
 import com.example.server.service.NoticeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +36,17 @@ public class AdminNoticeController {
     private final NoticeRepository noticeRepository;
     private final NoticeService noticeService;
 
+
+    @Operation(
+            summary = "공지사항 작성(관리자 로그인 후 이용가능)",
+            description = "관리자가 공지사항 작성(title과 content만 남기고 작성)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공지사항을 작성했습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+    
     @PostMapping("/write")
     public ResponseEntity<?> createNotice(@RequestBody Notice notice) {
         try {
@@ -56,6 +70,16 @@ public class AdminNoticeController {
     }
 
 
+    @Operation(
+            summary = "공지사항 조회(관리자 로그인 후 이용가능)",
+            description = "관리자가 공지사항 조회"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공지사항을 조회했습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+    
     @GetMapping("")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> NoticeList(Pageable pageable,@RequestParam(defaultValue = "false") boolean isDescending) {
@@ -73,6 +97,16 @@ public class AdminNoticeController {
         }
     }
 
+    @Operation(
+            summary = "특정 공지사항 조회(관리자 로그인 후 이용가능)",
+            description = "관리자가 특정 공지사항 조회"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공지사항을 조회했습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+    
     @GetMapping("/{order}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> NoticeList(@PathVariable("order") int noticeOrder) {
@@ -99,6 +133,17 @@ public class AdminNoticeController {
             return ResponseEntity.status(500).body("게시글 및 답변 조회 중 문제가 발생했습니다.");
         }
     }
+
+    @Operation(
+            summary = "공지사항 삭제(관리자 로그인 후 이용가능)",
+            description = "관리자가 공지사항 삭제"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공지사항이 삭제되었습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+    
     @DeleteMapping("/{order}")
     public ResponseEntity<String> deleteNotice(@PathVariable("order") int noticeOrder) {
         Optional<Notice> noticeOptional = noticeRepository.findAllByOrderByNoticeOrder()
@@ -113,15 +158,24 @@ public class AdminNoticeController {
         return ResponseEntity.ok("게시글이 삭제되었습니다.");
     }
 
-    /**
-     * 전체 게시글 noticeOrder 재정렬
-     */
-    @PutMapping("/reorder")
-    public ResponseEntity<String> reorderNoticeOrders() {
-        noticeService.reorderNoticeOrders();
-        return ResponseEntity.ok("게시판 번호가 재정렬되었습니다.");
-    }
-
+//    /**
+//     * 전체 게시글 noticeOrder 재정렬
+//     */
+//    @PutMapping("/reorder")
+//    public ResponseEntity<String> reorderNoticeOrders() {
+//        noticeService.reorderNoticeOrders();
+//        return ResponseEntity.ok("게시판 번호가 재정렬되었습니다.");
+//    }
+    
+    @Operation(
+            summary = "공지사항 수정(관리자 로그인 후 이용가능)",
+            description = "관리자가 공지사항 수정"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공지사항이 수정되었습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     @PostMapping("/{order}/update")
     @Transactional
     public ResponseEntity<?> updateNotice(@PathVariable("order") int noticeOrder, @RequestBody Map<String, Object> request) {

@@ -26,6 +26,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
 @RequestMapping("/api")
@@ -39,7 +43,17 @@ public class UserController {
     private final EmailService emailService;
     private final FileStorageService fileService;
 
-
+    // 공란 부분 작성해야함
+    
+    @Operation(
+            summary = "회원가입 과정 1번째",
+            description = "사용자 이름 중복 여부 체크"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용할 수 있는 이름입니다"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     // ** 아이디 중복 확인 API **
     @GetMapping("/check-username")
     public ResponseEntity<?> checkUsernameDuplicate(@RequestParam String username) {
@@ -52,7 +66,15 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-
+    @Operation(
+            summary = "회원가입 과정 2번째",
+            description = "인증번호 요청"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "인증번호가 요청되었습니다"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     // ** 회원가입 인증 코드 요청 API **
     @PostMapping("/send-verification-code")
     public ResponseEntity<?> sendVerificationCode(@RequestBody @Valid UserDto.UserPostWithoutPassword userPost) {
@@ -66,6 +88,16 @@ public class UserController {
         }
     }
 
+
+    @Operation(
+            summary = "회원가입 과정 3번째",
+            description = "인증코드 확인"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "인증코드를 확인했습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     // ** 인증 코드 확인 **
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody @Valid UserDto.VerificationRequest verificationRequest) {
@@ -84,6 +116,16 @@ public class UserController {
     }
 
 
+    @Operation(
+            summary = "회원가입 과정 4번째",
+            description = "회원가입 양식 작성"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원가입이 완료되었습니다"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+    
     //비밀번호 치는 회원가입 최종버튼
     @PostMapping("/register-full")
     public ResponseEntity<?> registerFullUser(@ModelAttribute UserDto.FullUserPostWithFile userDto) {
@@ -113,7 +155,15 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원가입 처리 중 오류가 발생했습니다.");
         }
     }
-
+    @Operation(
+            summary = "공란",
+            description = "공란"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     // ** 인증 코드 재전송 API **
     @PostMapping("/resend-verification-code")
     public ResponseEntity<?> resendVerificationCode(@RequestParam String email) {
@@ -127,6 +177,48 @@ public class UserController {
         }
     }
 
+    @Operation(
+            summary = "마이페이지에서 계정 삭제 요청",
+            description = "이메일 입력 후 계정 삭제"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "계정이 삭제되었습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+
+    @DeleteMapping("/user-info/delete")
+    @jakarta.transaction.Transactional
+    public ResponseEntity<?> deleteMyself(@RequestBody Map<String, String> request) {
+        try {
+            String username = request.get("username"); // 요청에서 ID 추출
+            if (username == null) {
+                return ResponseEntity.badRequest().body("사용자 ID가 필요합니다.");
+            }
+
+            // 사용자 확인 후 삭제
+            if (userRepository.existsByUsername(username)) {
+                userRepository.deleteByUsername(username);
+                return ResponseEntity.ok("사용자가 성공적으로 삭제되었습니다.");
+            } else {
+                return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("사용자 삭제 중 문제가 발생했습니다.");
+        }
+    }
+
+    @Operation(
+            summary = "공란",
+            description = "공란"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     //로그인 화면에서 이메일을 입력하고 옆에 인증번호를 달라고 할때 api
     @PostMapping("/request-reset-password")
     public ResponseEntity<?> requestResetPassword(@RequestParam String email) {
@@ -140,6 +232,16 @@ public class UserController {
         }
     }
 
+
+    @Operation(
+            summary = "공란",
+            description = "공란"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     //인증번호 6자리를 입력하고, 인증하기 버튼을 눌렀을때의 api
     @PostMapping("/verify-reset-code")
     public ResponseEntity<?> verifyResetCode(@RequestBody Map<String, String> request) {
@@ -160,6 +262,16 @@ public class UserController {
         }
     }
 
+
+    @Operation(
+            summary = "공란",
+            description = "공란"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     //새로 만들 비밀번호를 입력하고 변경하기 버튼을 누를때 api
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
@@ -176,6 +288,17 @@ public class UserController {
         }
     }
 
+
+
+    @Operation(
+            summary = "로그인",
+            description = "로그인(관리자 계정 ID : admin@example.com, 관리자계정 PW : Admin1234@)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용할 수 있는 이름입니다"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
 
     // 로그인
     @PostMapping("/login")
@@ -220,7 +343,16 @@ public class UserController {
         }
     }
 
-
+    @Operation(
+            summary = "로그아웃",
+            description = "로그아웃"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그아웃 되었습니다"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+    
     // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
@@ -250,6 +382,16 @@ public class UserController {
         }
     }
 
+    @Operation(
+            summary = "공란",
+            description = "공란"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+    
     // 리프레시 토큰을 통한 액세스 토큰 갱신
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
@@ -292,6 +434,16 @@ public class UserController {
         }
     }
 
+    @Operation(
+            summary = "공란",
+            description = "공란"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+
     // 토큰 만료 시간 확인
     @GetMapping("/token-expiration")
     public ResponseEntity<?> getTokenExpiration(@RequestParam String token) {
@@ -316,6 +468,16 @@ public class UserController {
             }
         }
     }
+
+    @Operation(
+            summary = "공란",
+            description = "공란"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
 
     //내 정보 - 기본정보 조회만
     @GetMapping("/user-info/personal")
@@ -345,6 +507,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사용자 개인정보 조회 실패");
         }
     }
+
+    @Operation(
+            summary = "공란",
+            description = "공란"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
 
     //내 정보 - 기본 정보 - 아이디, 회사명, 사업자 번호 수정
     @PutMapping("/user-info/update/text")
@@ -409,6 +581,16 @@ public class UserController {
     }
 
 
+    @Operation(
+            summary = "공란",
+            description = "공란"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+
     //내 정보 - 기본 정보 - 사업자 폴더 수정
     @PutMapping("/user-info/update/file")
     public ResponseEntity<?> updateUserFileInfo(
@@ -453,6 +635,16 @@ public class UserController {
         return ResponseEntity.ok("파일이 성공적으로 업데이트되었습니다.");
     }
 
+    @Operation(
+            summary = "공란",
+            description = "공란"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+
     //내 정보 - 결제 정보 조회만
     @GetMapping("/user-info/payment")
     public ResponseEntity<?> getPaymentUserInfo(Authentication authentication) {
@@ -476,6 +668,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사용자 결제 정보 조회 실패");
         }
     }
+
+    @Operation(
+            summary = "공란",
+            description = "공란"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
 
     @PutMapping("/user-info/update-password")
     public ResponseEntity<?> updatePassword(
@@ -544,28 +746,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류가 발생했습니다.");
         }
     }
-    @DeleteMapping("/delete")
-    @jakarta.transaction.Transactional
-    public ResponseEntity<?> deleteMyself(@RequestBody Map<String, String> request) {
-        try {
-            String username = request.get("username"); // 요청에서 ID 추출
-            if (username == null) {
-                return ResponseEntity.badRequest().body("사용자 ID가 필요합니다.");
-            }
 
-            // 사용자 확인 후 삭제
-            if (userRepository.existsByUsername(username)) {
-                userRepository.deleteByUsername(username);
-                return ResponseEntity.ok("사용자가 성공적으로 삭제되었습니다.");
-            } else {
-                return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("사용자 삭제 중 문제가 발생했습니다.");
-        }
-    }
 }
 
 

@@ -1,5 +1,8 @@
 package com.example.server.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.example.server.model.User;
@@ -30,6 +33,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminUserController {
     private final UserRepository userRepository;
     //관리자가 user 조회
+
+    @Operation(
+            summary = "회원 조회(관리자 로그인 후 이용가능)",
+            description = "관리자가 사이트 내 가입 회원 조회"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "계정이 삭제되었습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+    
+
     @GetMapping("")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getUsers(Pageable pageable) {
@@ -47,6 +62,16 @@ public class AdminUserController {
             return ResponseEntity.status(500).body("사용자 조회 중 문제가 발생했습니다.");
         }
     }
+
+    @Operation(
+            summary = "회원 삭제(관리자 로그인 후 이용가능)",
+            description = "관리자가 사이트 내 가입 회원 삭제"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "계정이 삭제되었습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
 
     // 관리자가 회원가입된 user 삭제
     @PostMapping("/delete")
@@ -79,6 +104,16 @@ public class AdminUserController {
             return ResponseEntity.status(500).body("사용자 삭제 중 문제가 발생했습니다.");
         }
     }
+
+    @Operation(
+            summary = "회원 수정(관리자 로그인 후 이용가능)",
+            description = "관리자가 사이트 내 가입 회원 수정"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "계정이 수정되었습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
 
     //관리자가 회원가입된 user 데이터 업데이트
     @PostMapping("/update")

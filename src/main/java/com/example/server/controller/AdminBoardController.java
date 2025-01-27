@@ -2,6 +2,7 @@ package com.example.server.controller;
 
 import com.example.server.dto.ReplyDto;
 import com.example.server.model.Board;
+import com.example.server.model.Notice;
 import com.example.server.model.Reply;
 import com.example.server.repository.BoardRepository;
 import com.example.server.repository.NoticeRepository;
@@ -13,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -24,8 +27,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
 @RequestMapping("/api/admin/users/board") // URL 계층을 분리
@@ -35,28 +42,47 @@ import org.springframework.web.bind.annotation.RestController;
 public class
 AdminBoardController {
 
-    private final NoticeRepository noticeRepository;
-    private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final ReplyRepository replyRepository;
     private final BoardService boardService;
     //
+
+    @Operation(
+            summary = "모든 문의사항 조회(관리자 로그인 후 이용가능)",
+            description = "모든 문의사항 조회"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모든 문의사항을 조회했습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+
     @GetMapping("")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> myBoardList() {
+    public ResponseEntity<?> myBoardList(Pageable pageable, @RequestParam(defaultValue = "false") boolean isDescending) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("로그인이 필요합니다.");
             }
-            // 데이터베이스에서 모든 User 조회
-            List<Board> boards = boardRepository.findAll();
+            Page<Board> boards = boardService.getBoards(pageable,isDescending);
             return ResponseEntity.ok(boards); // 조회 결과 반환
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("문의사항 조회 중 문제가 발생했습니다.");
         }
     }
+
+    @Operation(
+            summary = "문의사항 삭제(관리자 로그인 후 이용가능)",
+            description = "문의사항 삭제"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "문의사항을 삭제했습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+
     // 관리자가 user 문의사항 지우기
     @DeleteMapping("/{order}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -71,6 +97,17 @@ AdminBoardController {
         boardService.deleteBoardByBoardOrder(board.getBoardOrder());
         return ResponseEntity.ok("게시글이 삭제되었습니다.");
     }
+
+    @Operation(
+            summary = "특정 유저 문의사항 조회(관리자 로그인 후 이용가능)",
+            description = "유저의 문의사항 조회"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "문의사항을 조회했습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+
     //특정 user 조회
     @GetMapping("/specific")
     @PreAuthorize("hasRole('ADMIN')")
@@ -92,6 +129,18 @@ AdminBoardController {
             return ResponseEntity.status(500).body("게시글 조회 중 문제가 발생했습니다.");
         }
     }
+
+    @Operation(
+            summary = "문의사항 답변(관리자 로그인 후 이용가능)",
+            description = "문의사항 답변"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "문의사항을 답변했습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+
+
     @PostMapping("/reply")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> replyBoard(@RequestBody @Validated ReplyDto.ReplyPost replyPost) {

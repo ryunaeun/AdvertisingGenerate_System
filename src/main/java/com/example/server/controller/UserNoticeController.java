@@ -4,6 +4,9 @@ package com.example.server.controller;
 import com.example.server.model.Notice;
 import com.example.server.repository.NoticeRepository;
 import com.example.server.service.NoticeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +26,16 @@ public class UserNoticeController {
     private final NoticeService noticeService;
     private final NoticeRepository noticeRepository;
 
+    @Operation(
+            summary = "공지사항 조회(로그인 없이 이용가능)",
+            description = "공지사항 조회"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공지사항을 조회했습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+    
     @GetMapping("")
     public ResponseEntity<?> NoticeList(Pageable pageable, @RequestParam(defaultValue = "false") boolean isDescending) {
         try {
@@ -34,6 +47,16 @@ public class UserNoticeController {
         }
     }
 
+
+    @Operation(
+            summary = "특정 공지사항 조회(로그인 없이 이용가능)",
+            description = "특정 공지사항 조회"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공지사항을 조회했습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     @GetMapping("/{order}")
     public ResponseEntity<?> NoticeList(@PathVariable("order") int noticeOrder) {
         try {

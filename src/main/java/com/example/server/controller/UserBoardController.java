@@ -5,6 +5,9 @@ import com.example.server.model.Reply;
 import com.example.server.repository.BoardRepository;
 import com.example.server.repository.ReplyRepository;
 import com.example.server.service.BoardService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +32,16 @@ public class UserBoardController {
     private final ReplyRepository replyRepository;
     private final BoardRepository boardRepository;
 
+
+    @Operation(
+            summary = "문의사항 작성(로그인 후 이용가능)",
+            description = "유저가 관리자에게 보낼 문의사항 작성"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "문의가 작성되었습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     /**
      * 게시글 생성
      */
@@ -54,6 +67,15 @@ public class UserBoardController {
         }
     }
 
+    @Operation(
+            summary = "문의사항 조회(로그인 후 이용가능)",
+            description = "내가 쓴 문의사항 조회"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "문의가 조회되었습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     /**
      * 게시글 페이지 단위 조회
      */
@@ -88,6 +110,16 @@ public class UserBoardController {
         }
     }
 
+
+    @Operation(
+            summary = "특정 문의사항 및 관리자 답변 조회(로그인 후 이용가능)",
+            description = "내가 쓴 특정 문의사항 및 관리자의 답변 조회"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "문의가 조회되었습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     @GetMapping("/{order}")
     public ResponseEntity<?> specificBoardAndReplies(@PathVariable("order") int boardOrder) {
         try {
@@ -125,6 +157,16 @@ public class UserBoardController {
             return ResponseEntity.status(500).body("게시글 및 답변 조회 중 문제가 발생했습니다.");
         }
     }
+
+    @Operation(
+            summary = "문의사항 삭제(로그인 후 이용가능)",
+            description = "내가 쓴 문의사항 삭제"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "문의사항이 삭제되었습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     /**
      * 특정 게시글 삭제
      */
@@ -160,16 +202,26 @@ public class UserBoardController {
             return ResponseEntity.status(500).body("게시글 삭제 중 문제가 발생했습니다.");
         }
     }
-
+    
     /**
      * 전체 게시글 boardOrder 재정렬
      */
-    @PutMapping("/reorder")
-    public ResponseEntity<String> reorderBoardOrders() {
-        boardService.reorderBoardOrders();
-        return ResponseEntity.ok("게시판 번호가 재정렬되었습니다.");
-    }
+//    @PutMapping("/reorder")
+//    public ResponseEntity<String> reorderBoardOrders() {
+//        boardService.reorderBoardOrders();
+//        return ResponseEntity.ok("게시판 번호가 재정렬되었습니다.");
+//    }
 
+
+    @Operation(
+            summary = "게시글 수정하기(로그인 후 작성가능)",
+            description = "내가 쓴 문의사항 수정"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "문의사항이 수정되었습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
     @PostMapping("/{order}/update")
     @Transactional
     public ResponseEntity<?> updateNotice(@PathVariable("order") int boardOrder, @RequestBody Map<String, Object> request) {
