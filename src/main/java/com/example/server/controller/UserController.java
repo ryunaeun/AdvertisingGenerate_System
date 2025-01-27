@@ -44,7 +44,7 @@ public class UserController {
     private final FileStorageService fileService;
 
     // 공란 부분 작성해야함
-    
+
     @Operation(
             summary = "회원가입 과정 1번째",
             description = "사용자 이름 중복 여부 체크"
@@ -125,7 +125,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
-    
+
     //비밀번호 치는 회원가입 최종버튼
     @PostMapping("/register-full")
     public ResponseEntity<?> registerFullUser(@ModelAttribute UserDto.FullUserPostWithFile userDto) {
@@ -156,11 +156,11 @@ public class UserController {
         }
     }
     @Operation(
-            summary = "공란",
-            description = "공란"
+            summary = "인증코드 재전송",
+            description = "회원가입 부분에서 인증코드를 다시 요청하는 api입니다."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "200", description = "인증코드가 다시 이메일로 전송되었습니다"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
@@ -211,11 +211,11 @@ public class UserController {
     }
 
     @Operation(
-            summary = "공란",
-            description = "공란"
+            summary = "비밀번호 찾기 인증번호 전송",
+            description = "로그인 부분에서 인증코드를 요청하는 api입니다."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "200", description = "비밀번호 재설정을 위한 인증코드가 이메일로 전송되었습니다."),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
@@ -234,11 +234,11 @@ public class UserController {
 
 
     @Operation(
-            summary = "공란",
-            description = "공란"
+            summary = "비밀번호 찾기 부분 인증번호 인증",
+            description = "로그인 부분에서 비밀번호 찾기의 인증번호 6자리를 인증하는 api입니다."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "200", description = "인증번호 확인이 완료되었습니다."),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
@@ -264,11 +264,11 @@ public class UserController {
 
 
     @Operation(
-            summary = "공란",
-            description = "공란"
+            summary = "비밀번호 변경 후, 변경하기 버튼",
+            description = "로그인 부분에서 인증번호 6자리 입력 받은 후 비밀번호 변경하기 부분의 api입니다."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "200", description = "비밀번호가 성공적으로 변경되었습니다."),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
@@ -352,7 +352,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
-    
+
     // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
@@ -383,15 +383,16 @@ public class UserController {
     }
 
     @Operation(
-            summary = "공란",
-            description = "공란"
+            summary = "액세스 토큰 갱신",
+            description = "리프레시 토큰을 통해 새로운 액세스 토큰과 리프레시 토큰을 요청하는 api입니다."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "200", description = "새로운 액세스 토큰과 리프레시 토큰이 발급되었습니다."),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "401", description = "유효하지 않거나 잘못된 refreshToken입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
-    
+
     // 리프레시 토큰을 통한 액세스 토큰 갱신
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
@@ -435,11 +436,11 @@ public class UserController {
     }
 
     @Operation(
-            summary = "공란",
-            description = "공란"
+            summary = "토큰 만료시간 확인",
+            description = "JWT의 토큰의 만료시간을 확인하는 api입니다."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "200", description = "토큰 만료시간 반환"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
@@ -470,11 +471,11 @@ public class UserController {
     }
 
     @Operation(
-            summary = "공란",
-            description = "공란"
+            summary = "마이페이지 사용자 기본정보 조회",
+            description = "현재 로그인한 사용자의 api를 조회"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "200", description = "사용자의 기본정보가 반환됩니다."),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
@@ -509,11 +510,11 @@ public class UserController {
     }
 
     @Operation(
-            summary = "공란",
-            description = "공란"
+            summary = "사용자 기본정보 수정(텍스트)",
+            description = "기본정보 중 텍스트만 수정(아이디, 회사명, 사업자 번호) api"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "200", description = "사용자의 텍스트 정보가 성공적으로 업데이트 되었습니다."),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
@@ -582,11 +583,11 @@ public class UserController {
 
 
     @Operation(
-            summary = "공란",
-            description = "공란"
+            summary = "사용자 기본정보 수정(파일)",
+            description = "기본 정보 중(파일 업로드) 수정하는 api"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "200", description = "사용자의 파일정보가 업데이트 되었습니다."),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
@@ -636,11 +637,11 @@ public class UserController {
     }
 
     @Operation(
-            summary = "공란",
-            description = "공란"
+            summary = "마이페이지 결제정보 조회",
+            description = "현재 로그인 된 사용자의 결제 정보를 조회하는 api입니다."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "200", description = "사용자의 결제정보가 반환됩니다."),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
@@ -670,11 +671,11 @@ public class UserController {
     }
 
     @Operation(
-            summary = "공란",
-            description = "공란"
+            summary = "마이페이지 비밀번호 변경",
+            description = "마이페이지 안에서 비밀번호를 변경하는 api 입니다."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "공란"),
+            @ApiResponse(responseCode = "200", description = "비밀번호가 성공적으로 변경되었습니다."),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
