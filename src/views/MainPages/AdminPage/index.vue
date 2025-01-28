@@ -35,6 +35,8 @@
           Notice Management
         </li>
       </ul>
+      <!-- 로그아웃 버튼 -->
+      <button class="logout-btn" @click="logout">Logout</button>
     </div>
 
     <!-- Main Content -->
@@ -69,6 +71,7 @@ import ConversationManagement from "./components/ConversationManagement.vue";
 import UserManagement from "./components/UserManagement.vue";
 import PostManagement from "./components/PostManagement.vue";
 import NoticeManagement from "./components/NoticeManagement.vue";
+import axios from "axios";
 
 export default {
   name: "AdminPage",
@@ -83,6 +86,27 @@ export default {
     UserManagement,
     PostManagement,
     NoticeManagement, // 공지사항 관리 컴포넌트 추가
+  },
+  methods: {
+    async logout() {
+      try {
+        // 로그아웃 API 호출
+        await axios.post("http://43.201.26.71:8080/api/logout", null, {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Accept: "application/json",
+          },
+        });
+
+        // 토큰 제거 및 로그인 페이지로 이동
+        sessionStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        this.$router.push("/login");
+      } catch (error) {
+        console.error("Logout failed:", error);
+        alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
+      }
+    },
   },
 };
 </script>
@@ -137,6 +161,21 @@ export default {
   background-color: #2196f3;
   color: white;
   font-weight: bold;
+}
+
+.logout-btn {
+  margin-top: auto; /* 하단에 위치 */
+  padding: 12px 20px;
+  border: none;
+  background-color: #f44336;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.logout-btn:hover {
+  background-color: #d32f2f;
 }
 
 .content {
