@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -125,33 +126,35 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
-
-    //비밀번호 치는 회원가입 최종버튼
-    @PostMapping("/register-full")
-    public ResponseEntity<?> registerFullUser(@ModelAttribute UserDto.FullUserPostWithFile userDto) {
+    @PostMapping(value = "/register-full", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> registerFullUser(
+            @Parameter(description = "이메일", required = true) @RequestParam String email,
+            @Parameter(description = "비밀번호", required = true) @RequestParam String password,
+            @Parameter(description = "회사명", required = true) @RequestParam String companyName,
+            @Parameter(description = "사업자 번호", required = true) @RequestParam String businessNumber,
+            @Parameter(description = "사업자 파일") @RequestParam(required = false) MultipartFile businessFile
+    ) {
         try {
             // 선택적 파일 업로드 경로 처리
-            String storedFilePath = userDto.getBusinessFile() != null
-                    ? fileService.saveFile(userDto.getBusinessFile())
-                    : null;
+            String storedFilePath = businessFile != null ? fileService.saveFile(businessFile) : null;
 
             // 등록 요청한 이메일 확인 후 데이터 갱신
             userService.completeUserRegistration(
-                    userDto.getEmail(),
-                    userDto.getPassword(),
-                    userDto.getCompanyName(),
-                    userDto.getBusinessNumber(),
+                    email,
+                    password,
+                    companyName,
+                    businessNumber,
                     storedFilePath
             );
 
             return ResponseEntity.ok("회원가입이 성공적으로 완료되었습니다.");
         } catch (IllegalArgumentException e) {
             // 실패 시 해당 이메일로 등록된 사용자 삭제
-            userService.deleteUserByEmail(userDto.getEmail());
+            userService.deleteUserByEmail(email);
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             // 실패 시 해당 이메일로 등록된 사용자 삭제
-            userService.deleteUserByEmail(userDto.getEmail());
+            userService.deleteUserByEmail(email);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원가입 처리 중 오류가 발생했습니다.");
         }
     }
