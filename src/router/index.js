@@ -34,7 +34,7 @@ import ElProgressBars from "../layouts/sections/elements/progress-bars/ProgressB
 import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
 
-import axios from "axios";
+import apiClient from "@/api/axiosClient";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -68,6 +68,7 @@ const router = createRouter({
       path: "/mypage",
       name: "mypage",
       component: MyPage,
+      meta: { requiresAuth: true },
     },
     {
       path: "/login",
@@ -220,38 +221,86 @@ router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!accessToken && refreshToken) {
       try {
-        const response = await axios.post("http://52.79.227.50:8080/api/refresh-token", { refreshToken });
+        console.log("🔄 Refresh Token으로 Access Token 갱신 시도...");
+
+        // 🔹 Refresh Token 요청 (이제 새로운 Refresh Token도 받아옴)
+        const response = await apiClient.post("/refresh-token", { refreshToken });
         const newAccessToken = response.data.accessToken;
+        const newRefreshToken = response.data.refreshToken;
 
+        // 🔹 Vue에 갱신된 토큰 저장
         sessionStorage.setItem("accessToken", newAccessToken);
-        console.log("Access Token 갱신 성공");
+        localStorage.setItem("refreshToken", newRefreshToken);
 
-        const userResponse = await axios.get("http://52.79.227.50:8080/api/current-user", {
-          headers: { Authorization: `Bearer ${newAccessToken}` },
-        });
+        console.log("✅ Access Token 갱신 성공");
+
+        // 🔹 사용자 정보 요청
+        const userResponse = await apiClient.get("/user-info/personal");
+        console.log("✅ 사용자 정보 확인 완료:", userResponse.data);
+
         const userRole = userResponse.data.role;
-
         if (userRole === "ROLE_ADMIN" && to.name !== "admin") {
           return next({ name: "admin" });
-        } else if (userRole !== "ROLE_ADMIN" && to.name !== "home") {
+        } 
+        if (userRole !== "ROLE_USER" && to.name !== "home") {
           return next({ name: "home" });
         }
 
         return next();
       } catch (error) {
-        console.error("Access Token 갱신 실패:", error);
+        console.error("❌ Access Token 갱신 실패:", error);
         localStorage.removeItem("refreshToken");
         sessionStorage.removeItem("accessToken");
         alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-        return next({ name: "loginPage" });
+        return next({ name: "login" });
       }
     } else if (!accessToken) {
-      console.warn("Refresh Token 없음, 로그인 페이지로 이동");
-      return next({ name: "loginPage" });
+      console.warn("🚨 Refresh Token 없음, 로그인 페이지로 이동");
+      return next({ name: "login" });
     }
   }
-
   next();
 });
+
+// router.beforeEach(async (to, from, next) => {
+//   const accessToken = sessionStorage.getItem("accessToken");
+//   const refreshToken = localStorage.getItem("refreshToken");
+
+//   if (to.matched.some((record) => record.meta.requiresAuth)) {
+//     if (!accessToken && refreshToken) {
+//       try {
+//         // ✅ apiClient 사용하여 Access Token 갱신
+//         const response = await apiClient.post("/refresh-token", { refreshToken });
+//         const newAccessToken = response.data.accessToken;
+//         sessionStorage.setItem("accessToken", newAccessToken);
+//         console.log("✅ Access Token 갱신 성공");
+
+//         // ✅ apiClient 사용하여 사용자 정보 가져오기
+//         const userResponse = await apiClient.get("/user-info/personal");
+//         const userRole = userResponse.data.role;
+
+//         if (userRole === "ROLE_ADMIN" && to.name !== "admin") {
+//           return next({ name: "admin" });
+//         } 
+//         if (userRole !== "ROLE_ADMIN" && to.name !== "home") {
+//           return next({ name: "home" });
+//         }
+
+//         return next();
+//       } catch (error) {
+//         console.error("❌ Access Token 갱신 실패:", error);
+//         localStorage.removeItem("refreshToken");
+//         sessionStorage.removeItem("accessToken");
+//         alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+//         return next({ name: "login" });
+//       }
+//     } else if (!accessToken) {
+//       console.warn("🚨 Refresh Token 없음, 로그인 페이지로 이동");
+//       return next({ name: "login" });
+//     }
+//   }
+
+//   next();
+// });
 
 export default router;

@@ -253,8 +253,8 @@
 </template>
 
 <script>
-import axios from "axios";
-
+// import axios from "axios";
+import apiClient from "@/api/axiosClient";
 export default {
   name: "LoginPage",
   data() {
@@ -327,8 +327,8 @@ export default {
     },
     async requestResetPassword() {
       try {
-        const response = await axios.post(
-          "http://43.201.26.71:8080/api/request-reset-password",
+        const response = await apiClient.post(
+          "/request-reset-password",
           null,
           {
             params: { email: this.modalEmail },
@@ -350,8 +350,8 @@ export default {
         return;
       }
       try {
-        const response = await axios.post(
-          "http://43.201.26.71:8080/api/verify-reset-code",
+        const response = await apiClient.post(
+          "/verify-reset-code",
           {
             email: this.modalEmail,
             verificationCode: this.verificationCode,
@@ -394,8 +394,8 @@ export default {
       }
 
       try {
-        const response = await axios.post(
-          "http://43.201.26.71:8080/api/reset-password",
+        const response = await apiClient.post(
+          "/reset-password",
           {
             email: this.modalEmail,
             newPassword: this.password,
@@ -413,8 +413,8 @@ export default {
     },
     async resendVerificationCode() {
       try {
-        const response = await axios.post(
-          "http://43.201.26.71:8080/api/resend-verification-code",
+        const response = await apiClient.post(
+          "/resend-verification-code",
           null,
           {
             params: { email: this.modalEmail },
@@ -435,8 +435,8 @@ export default {
         return;
       }
       try {
-        const response = await axios.post(
-          "http://43.201.26.71:8080/api/verify-reset-code",
+        const response = await apiClient.post(
+          "/verify-reset-code",
           {
             email: this.modalEmail,
             verificationCode: this.verificationCode,
@@ -517,8 +517,8 @@ export default {
     },
     async login() {
       try {
-        const response = await axios.post(
-          "http://43.201.26.71:8080/api/login",
+        const response = await apiClient.post(
+          "/login",
           {
             email: this.email,
             password: this.password,
@@ -562,8 +562,8 @@ export default {
     },
     async resendVerificationCode() {
       try {
-        const response = await axios.post(
-          "/api/auth/resend-verification-code",
+        const response = await apiClient.post(
+          "/resend-verification-code",
           null,
           {
             params: { email: this.email },

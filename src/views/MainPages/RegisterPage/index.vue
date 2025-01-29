@@ -111,14 +111,14 @@
       <div class="form-group">
         <label class="form-label">회사명</label>
         <div class="input-wrapper">
-          <input type="text" class="form-control" placeholder="Company Name">
+          <input type="text" class="form-control" placeholder="Company Name" v-model="companyName">
         </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">사업자등록번호</label>
         <div class="input-wrapper">
-          <input type="text" class="form-control" placeholder="10자리를 입력해주세요">
+          <input type="text" class="form-control" placeholder="10자리를 입력해주세요" v-model="businessNumber">
         </div>
       </div>
 
@@ -207,7 +207,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import apiClient from "@/api/axiosClient";
 
 export default {
   name: "RegisterPage",
@@ -293,14 +293,20 @@ export default {
       formData.append('email', this.email);
       formData.append('password', this.password);
       formData.append('username', this.username);
-      formData.append('companyName', this.companyName);
-      formData.append('businessNumber', this.businessNumber);
+      if (this.companyName){
+        formData.append('companyName', this.companyName);
+      }
+      if (this.businessNumber) {
+        formData.append('businessNumber', this.businessNumber);
+      }
       formData.append('verificationCode', this.verificationCode);
       if (this.selectedFile) {
         formData.append('businessFile', this.selectedFile);
       }
 
-      axios.post("http://52.79.227.50:8080/api/register-full", formData, {
+      console.log("🚀 FormData Entries:", [...formData.entries()]);
+
+      apiClient.post("/register-full", formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -392,7 +398,7 @@ export default {
         return;
       }
       
-      axios.get(`http://52.79.227.50:8080/api/check-username?username=${this.username}`)
+      apiClient.get(`/check-username?username=${this.username}`)
         .then(response => {
           if (response.data.isDuplicate) {
             this.isUsernameValid = false;
@@ -412,7 +418,7 @@ export default {
         alert("유효한 이메일 주소를 입력해주세요.");
         return;
       }
-      axios.post("http://52.79.227.50:8080/api/send-verification-code", {
+      apiClient.post("/send-verification-code", {
         email: this.email,
         username: this.username
       })
@@ -435,24 +441,30 @@ export default {
         return;
       }
 
-      axios.post("http://52.79.227.50:8080/api/register", {
-        email: this.email,
-        verificationCode: this.verificationCode
-      })
-      .then(response => {
-        this.isVerificationCodeValid = true;
-        alert(response.data);
-      })
-      .catch(error => {
-        if (error.response) {
-          alert(error.response.data || "인증 코드 확인 중 서버 오류가 발생했습니다.");
-        } else if (error.request) {
-          alert("서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.");
-        } else {
-          alert("인증 코드 확인 요청 중 오류가 발생했습니다.");
-        }
-        console.error("인증 코드 확인 실패:", error);
-      });
+        apiClient.post("/register", {
+          email: this.email,
+          verificationCode: this.verificationCode
+        })
+        .then(response => {
+          this.isVerificationCodeValid = true;
+
+          // ✅ 응답 메시지만 출력
+          if (response.data && response.data.message) {
+            alert(response.data.message);
+          } else {
+            alert("인증이 완료되었습니다."); // 백업 메시지
+          }
+        })
+        .catch(error => {
+          if (error.response) {
+            alert(error.response.data || "인증 코드 확인 중 서버 오류가 발생했습니다.");
+          } else if (error.request) {
+            alert("서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.");
+          } else {
+            alert("인증 코드 확인 요청 중 오류가 발생했습니다.");
+          }
+          console.error("인증 코드 확인 실패:", error);
+        });
     }
   },
   watch: {

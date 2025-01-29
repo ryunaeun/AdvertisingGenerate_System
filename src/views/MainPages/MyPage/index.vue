@@ -39,7 +39,7 @@
               </span>
             </div>
             <p>
-              아이디: kk6991428@naver.com
+              이메일: {{ email }}
               <button @click="openPasswordModal" class="password-change-button">
                 비밀번호 변경
               </button>
@@ -64,19 +64,20 @@
               </div>
             </div>
           </div>
-          <!-- 비밀번호 변경 모달 -->
+          <!-- ✅ 비밀번호 변경 모달 -->
           <div v-if="isPasswordModalOpen" class="modal-overlay-password">
             <div class="modal-content-password">
               <h2>비밀번호 변경</h2>
+
               <!-- 새 비밀번호 입력 -->
               <div class="password-field">
                 <label for="newPassword">새 비밀번호</label>
                 <div class="password-input-container">
                   <input
-                    type="password"
+                    :type="showNewPassword ? 'text' : 'password'"
                     id="newPassword"
                     v-model="newPassword"
-                    placeholder="새로운 비밀번호를 입력해주세요"
+                    placeholder="새로운 비밀번호 입력"
                   />
                   <span @click="toggleNewPasswordVisibility">
                     <i :class="showNewPassword ? 'password-eye-open-icon' : 'password-eye-closed-icon'"></i>
@@ -89,7 +90,7 @@
                 <label for="confirmPassword">비밀번호 확인</label>
                 <div class="password-input-container">
                   <input
-                    type="password"
+                    :type="showConfirmPassword ? 'text' : 'password'"
                     id="confirmPassword"
                     v-model="confirmPassword"
                     placeholder="비밀번호를 한 번 더 입력해주세요"
@@ -110,8 +111,8 @@
 
           <!-- 가입일, 최근 수정, 마지막 접속 가로 배치 -->
           <div class="horizontal-info">
-            <p><strong>가입일:</strong> 2025.01.07</p>
-            <p><strong>마지막 접속:</strong> 2025.01.07</p>
+            <p><strong>가입일:</strong> {{ createdAt }}</p>
+            <p><strong>마지막 접속:</strong> {{ nowAt }}</p>
           </div>
 
           <!-- 사업자 정보 섹션 -->
@@ -169,24 +170,26 @@
             </div>
             <div class="field">
               <label for="business-file">사업자 등록증</label>
-              <!-- 사업자 등록증 네모 칸 -->
+
+              <!-- 업로드된 파일 표시 -->
               <div class="business-certificate-container">
                 <div class="upload-box">
                   <p v-if="!businessFileName" class="placeholder-text">사업자 등록증 파일 미등록</p>
                   <p v-else class="file-name">업로드된 파일: {{ businessFileName }}</p>
                 </div>
 
-                <!-- +파일 업로드 버튼 -->
+                <!-- 파일 업로드 버튼 -->
                 <button class="upload-button" @click="triggerFileUpload">+ 파일 업로드</button>
               </div>
 
               <!-- 숨겨진 파일 입력 필드 -->
               <input 
-                type="file" 
-                id="business-file" 
-                ref="businessFileInput" 
-                @change="handleBusinessFileChange" 
-                hidden 
+                type="file"
+                id="business-file"
+                ref="businessFileInput"
+                @change="handleBusinessFileChange"
+                accept=".pdf,.jpg,.jpeg,.png"
+                hidden
               />
             </div>
 
@@ -216,7 +219,7 @@
             <input
               type="email"
               id="email"
-              v-model="email"
+              v-model="tempEmail"
               placeholder="가입된 이메일 주소를 작성해주세요"
             />
           </div>
@@ -233,8 +236,8 @@
       <h3>현재 구독 중인 요금제</h3>
       <div class="custom-card-content">
         <div class="subscription-details">
-          <h4>무료 체험</h4>
-          <p>잔여 무료 체험 기간: <strong>2025. 1. 31까지</strong></p>
+          <h4>{{billing}}</h4>
+          <p>잔여 무료 체험 기간: <strong>{{billingDate}}</strong></p>
         </div>
         <div class="cta">
           <p>더 많은 기능이 필요하신가요?<br />지금 바로 구독하고 모든 기능을 사용해보세요!</p>
@@ -267,171 +270,342 @@
   </template>
   
   <script>
-import Header from "../HomePage/components/Header.vue";
-
-export default {
-  name: "MyPage",
-  components: {
-    Header,
-  },
-  data() {
-    return {
-      activeTab: "basic",
-      profileImage: "",
-      companyName: "", // 회사명
-      businessNumber: "", // 사업자 등록 번호
-      businessFileName: "", // 업로드된 파일 이름
-      isModalOpen: false, // 모달 상태
-      email: "", // 입력한 이메일
-      isPasswordModalOpen: false, // 비밀번호 변경 모달 상태
-      newPassword: "", // 새 비밀번호
-      confirmPassword: "", // 비밀번호 확인
-      showNewPassword: false, // 새 비밀번호 표시 여부
-      showConfirmPassword: false, // 비밀번호 확인 표시 여부
-      nickname: "김유중", // 사용자 닉네임 (초기값)
-      tempNickname: "", // 수정 시 임시 닉네임
-      isNicknameEditModalOpen: false, // 닉네임 수정 모달 열림 여부
-      companyName: "ABC 주식회사", // 초기 회사명
-      businessNumber: "123-45-67890", // 초기 사업자 등록 번호
-      tempCompanyName: "", // 새 회사명
-      tempBusinessNumber: "", // 새 사업자 등록 번호
-      isCompanyNameEditDialogOpen: false, // 회사명 수정 다이얼로그 열림 여부
-      isBusinessNumberEditDialogOpen: false, // 사업자 등록 번호 수정 다이얼로그 열림 여부
-    };
-  },
-  methods: {
-    selectFile() {
-      this.$refs.fileInput.click(); // 파일 선택 창 열기
+  import Header from "../HomePage/components/Header.vue";
+  import apiClient from "@/api/axiosClient"; // ✅ 기존 axios 대신 apiClient 사용
+  
+  export default {
+    name: "MyPage",
+    components: {
+      Header,
     },
-    // 파일 업로드 창을 열기 위한 메서드
-    triggerFileUpload() {
-      this.$refs.businessFileInput.click(); // 숨겨진 파일 입력 필드 클릭
+    data() {
+      return {
+        activeTab: "basic",
+        profileImage: "",
+        companyName: "",
+        businessNumber: "",
+        businessFileName: "",
+        isModalOpen: false,
+        email: "",
+        tempEmail: "",
+        isPasswordModalOpen: false, // ✅ 비밀번호 변경 모달 상태
+        newPassword: "",
+        confirmPassword: "",
+        showNewPassword: false,
+        showConfirmPassword: false,
+        nickname: "",
+        tempNickname: "",
+        isNicknameEditModalOpen: false,
+        createdAt: "",
+        nowAt: "",
+        tempCompanyName: "",
+        tempBusinessNumber: "",
+        isCompanyNameEditDialogOpen: false,
+        isBusinessNumberEditDialogOpen: false,
+        billing:"",
+        billingDate:"",
+      };
     },
-    // 파일 선택 시 처리하는 메서드
-    handleBusinessFileChange(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.businessFileName = file.name; // 업로드된 파일 이름 저장
-        alert(`파일 "${file.name}"이 업로드되었습니다.`);
-      }
-    },
-    handleFileChange(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.profileImage = e.target.result; // 선택된 이미지 파일을 저장
-        };
-        reader.readAsDataURL(file); // 파일을 데이터 URL 형식으로 읽기
-      }
-    },
-    openModal() {
-      this.isModalOpen = true; // 모달 열기
-    },
-    closeModal() {
-      this.isModalOpen = false; // 모달 닫기
-    },
-    confirmDelete() {
-      if (this.email.trim() === "") {
-        alert("이메일을 입력해주세요."); // 이메일 미입력 시 경고
-        return;
-      }
-      alert(`회원 탈퇴가 완료되었습니다. 이메일: ${this.email}`);
-      this.closeModal(); // 모달 닫기
-    },
-
-    openPasswordModal() {
-      this.isPasswordModalOpen = true; // 모달 열기
-    },
-    closePasswordModal() {
-      this.isPasswordModalOpen = false; // 모달 닫기
-    },
-    toggleNewPasswordVisibility() {
-      this.showNewPassword = !this.showNewPassword;
-      const input = document.getElementById("newPassword");
-      input.type = this.showNewPassword ? "text" : "password";
-    },
-    toggleConfirmPasswordVisibility() {
-      this.showConfirmPassword = !this.showConfirmPassword;
-      const input = document.getElementById("confirmPassword");
-      input.type = this.showConfirmPassword ? "text" : "password";
-    },
-    updatePassword() {
-      if (this.newPassword === "" || this.confirmPassword === "") {
-        alert("모든 필드를 입력해주세요.");
-        return;
-      }
-      if (this.newPassword !== this.confirmPassword) {
-        alert("비밀번호가 일치하지 않습니다.");
-        return;
-      }
-      alert("비밀번호가 성공적으로 변경되었습니다.");
-      this.closePasswordModal(); // 모달 닫기
-    },
-    openNicknameEditModal() {
-      this.tempNickname = ""; // 새 닉네임 초기화
-      this.isNicknameEditModalOpen = true; // 닉네임 수정 모달 열기
-    },
-    closeNicknameEditModal() {
-      this.isNicknameEditModalOpen = false; // 닉네임 수정 모달 닫기
-    },
-    confirmNicknameEdit() {
-      if (this.tempNickname.trim()) {
-        if (confirm("정말로 수정하시겠습니까?")) {
-          this.nickname = this.tempNickname.trim(); // 닉네임 저장
+    methods: {
+      // ✅ 사용자 기본 정보 가져오기 (Spring Boot API 호출)
+      async fetchUserInfo() {
+        try {
+          const response = await apiClient.get("/user-info/personal");
+          const userData = response.data;
+  
+          this.nickname = userData.username;
+          this.email = userData.email;
+          this.createdAt = this.formatDate(userData.createdAt);
+          this.nowAt = this.formatDate(userData.nowAt);
+          this.companyName = userData.companyName;
+          this.businessNumber = userData.businessNumber;
+          this.businessFileName = userData.businessFilePath;
+        } catch (error) {
+          console.error("사용자 정보를 가져오는 중 오류 발생:", error);
+          alert("사용자 정보를 불러오지 못했습니다.");
         }
-        this.closeNicknameEditModal(); // 닉네임 수정 모달 닫기
-      } else {
-        alert("새 닉네임을 입력해주세요.");
-      }
-    },
-    // 회사명 수정 다이얼로그
-    openCompanyNameEditDialog() {
-      this.tempCompanyName = ""; // 초기화
-      this.isCompanyNameEditDialogOpen = true;
-    },
-    closeCompanyNameEditDialog() {
-      this.isCompanyNameEditDialogOpen = false;
-    },
-    confirmCompanyNameEdit() {
-      if (this.tempCompanyName.trim()) {
-        if (confirm("정말로 수정하시겠습니까?")) {
-          this.companyName = this.tempCompanyName.trim(); // 수정
+      },
+       // ✅ 결제 정보 가져오기
+      async fetchPaymentInfo() {
+        try {
+          const response = await apiClient.get("/user-info/payment");
+          this.billing = response.data.billing || "무료 체험"; // billing 값이 없으면 기본값
+          this.billingDate = this.formatDate(response.data.billingDate);
+        } catch (error) {
+          console.error("결제 정보 가져오기 실패:", error);
+          alert("결제 정보를 불러오지 못했습니다.");
         }
-        this.closeCompanyNameEditDialog();
-      } else {
-        alert("새 회사명을 입력해주세요.");
-      }
-    },
+      },
+    
+  
+      // ✅ 날짜 형식 변환 (YYYY-MM-DD → YYYY.MM.DD)
+      formatDate(dateString) {
+        if (!dateString) return "";
+        return new Date(dateString).toLocaleDateString("ko-KR", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).replace(/\./g, ".");
+      },
+  
+      // ✅ 닉네임 수정 (API 연동)
+      async confirmNicknameEdit() {
+        if (!this.tempNickname.trim()) {
+          alert("새 닉네임을 입력해주세요.");
+          return;
+        }
+        if (!confirm("정말로 수정하시겠습니까?")) return;
+  
+        try {
+          await apiClient.put("/user-info/update/text", { username: this.tempNickname.trim() });
+  
+          this.nickname = this.tempNickname.trim(); // UI 업데이트
+          this.isNicknameEditModalOpen = false;
+          alert("닉네임이 성공적으로 변경되었습니다.");
+        } catch (error) {
+          console.error("닉네임 수정 오류:", error);
+          alert("닉네임 변경에 실패했습니다.");
+        }
+      },
+  
+      // ✅ 닉네임 수정 다이얼로그 열기
+      openNicknameEditModal() {
+        this.tempNickname = this.nickname; // 기존 닉네임 저장
+        this.isNicknameEditModalOpen = true;
+      },
 
-    // 사업자 등록 번호 수정 다이얼로그
-    openBusinessNumberEditDialog() {
-      this.tempBusinessNumber = ""; // 초기화
-      this.isBusinessNumberEditDialogOpen = true;
-    },
-    closeBusinessNumberEditDialog() {
-      this.isBusinessNumberEditDialogOpen = false;
-    },
-    confirmBusinessNumberEdit() {
-      if (this.tempBusinessNumber.trim()) {
-        if (confirm("정말로 수정하시겠습니까?")) {
-          this.businessNumber = this.tempBusinessNumber.trim(); // 수정
+      // ✅ 닫기
+      closeNicknameEditModal() {
+        this.isNicknameEditModalOpen = false;
+      },
+
+      // ✅ 회사명 수정 다이얼로그 열기
+      openCompanyNameEditDialog() {
+        this.tempCompanyName = this.companyName; // 기존 회사명 저장
+        this.isCompanyNameEditDialogOpen = true;
+      },
+
+      // ✅ 닫기
+      closeCompanyNameEditDialog() {
+        this.isCompanyNameEditDialogOpen = false;
+      },
+
+      // ✅ 사업자 등록번호 수정 다이얼로그 열기
+      openBusinessNumberEditDialog() {
+        this.tempBusinessNumber = this.businessNumber; // 기존 사업자번호 저장
+        this.isBusinessNumberEditDialogOpen = true;
+      },
+
+      // ✅ 닫기
+      closeBusinessNumberEditDialog() {
+        this.isBusinessNumberEditDialogOpen = false;
+      },
+      // ✅ 회사명 수정 (API 연동)
+      async confirmCompanyNameEdit() {
+        if (!this.tempCompanyName.trim()) {
+          alert("새 회사명을 입력해주세요.");
+          return;
         }
-        this.closeBusinessNumberEditDialog();
-      } else {
-        alert("새 등록 번호를 입력해주세요.");
-      }
+        if (!confirm("정말로 수정하시겠습니까?")) return;
+  
+        try {
+          await apiClient.put("/user-info/update/text", { companyName: this.tempCompanyName.trim() });
+  
+          this.companyName = this.tempCompanyName.trim(); // UI 업데이트
+          this.isCompanyNameEditDialogOpen = false;
+          alert("회사명이 성공적으로 변경되었습니다.");
+        } catch (error) {
+          console.error("회사명 수정 오류:", error);
+          alert("회사명 변경에 실패했습니다.");
+        }
+      },
+  
+      // ✅ 사업자 번호 수정 (API 연동)
+      async confirmBusinessNumberEdit() {
+        if (!this.tempBusinessNumber.trim()) {
+          alert("새 사업자 번호를 입력해주세요.");
+          return;
+        }
+        if (!confirm("정말로 수정하시겠습니까?")) return;
+  
+        try {
+          await apiClient.put("/user-info/update/text", { businessNumber: this.tempBusinessNumber.trim() });
+  
+          this.businessNumber = this.tempBusinessNumber.trim(); // UI 업데이트
+          this.isBusinessNumberEditDialogOpen = false;
+          alert("사업자 번호가 성공적으로 변경되었습니다.");
+        } catch (error) {
+          console.error("사업자 번호 수정 오류:", error);
+          alert("사업자 번호 변경에 실패했습니다.");
+        }
+      },
+  
+      // ✅ 비밀번호 변경 모달 열기
+      openPasswordModal() {
+        this.isPasswordModalOpen = true;
+      },
+  
+      // ✅ 비밀번호 변경 모달 닫기
+      closePasswordModal() {
+        this.isPasswordModalOpen = false;
+      },
+  
+      // ✅ 비밀번호 변경 API 요청
+      async updatePassword() {
+        if (!this.newPassword || !this.confirmPassword) {
+          alert("모든 필드를 입력해주세요.");
+          return;
+        }
+  
+        if (this.newPassword !== this.confirmPassword) {
+          alert("비밀번호가 일치하지 않습니다.");
+          return;
+        }
+  
+        if (!this.validatePassword(this.newPassword)) {
+          alert("비밀번호는 8자 이상, 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다.");
+          return;
+        }
+  
+        try {
+          // ✅ 백엔드 API로 비밀번호 변경 요청
+          const response = await apiClient.put("/user-info/update-password", {
+            newPassword: this.newPassword,
+            confirmPassword: this.confirmPassword, // 백엔드와 맞추기 위해 추가
+          });
+  
+          alert(response.data); // 성공 메시지 출력
+          this.newPassword = "";
+          this.confirmPassword = "";
+          this.closePasswordModal();
+        } catch (error) {
+          console.error("비밀번호 변경 오류:", error);
+  
+          if (error.response && error.response.data) {
+            alert(`비밀번호 변경 실패: ${error.response.data}`);
+          } else {
+            alert("비밀번호 변경 중 오류가 발생했습니다.");
+          }
+        }
+      },
+  
+      // ✅ 비밀번호 가시성 토글 (눈 아이콘 클릭)
+      toggleNewPasswordVisibility() {
+        this.showNewPassword = !this.showNewPassword;
+      },
+  
+      toggleConfirmPasswordVisibility() {
+        this.showConfirmPassword = !this.showConfirmPassword;
+      },
+  
+      // ✅ 비밀번호 유효성 검사
+      validatePassword(password) {
+        const passwordRegex =
+          /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        return passwordRegex.test(password);
+      },
+  
+        selectFile() {
+          this.$refs.fileInput.click();
+        },
+
+        triggerFileUpload() {
+          this.$refs.businessFileInput.click();
+        },
+
+        async handleBusinessFileChange(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+
+          // 🔹 파일 크기 제한 (10MB)
+          const maxSize = 10 * 1024 * 1024;
+          if (file.size > maxSize) {
+            alert("파일 크기는 10MB를 초과할 수 없습니다.");
+            return;
+          }
+
+          // 🔹 허용된 파일 확장자 확인 (PDF, JPG, PNG)
+          const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
+          if (!allowedTypes.includes(file.type)) {
+            alert("PDF, JPEG, PNG 파일만 업로드 가능합니다.");
+            return;
+          }
+
+          this.businessFileName = file.name;
+          alert(`파일 "${file.name}"이 업로드되었습니다.`);
+
+          // 🔹 FormData 생성
+          const formData = new FormData();
+          formData.append("businessFile", file);
+
+          try {
+            // 🔹 파일 업로드 요청 (PUT 요청)
+            const response = await apiClient.put("/user-info/update/file", formData, {
+              headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            alert(response.data); // 성공 메시지 출력
+          } catch (error) {
+            console.error("파일 업로드 실패:", error);
+            alert(error.response?.data || "파일 업로드 중 오류가 발생했습니다.");
+          }
+        },
+      openModal() {
+        this.isModalOpen = true;
+      },
+      closeModal() {
+        this.isModalOpen = false;
+      },
+      confirmDelete() {
+
+        if (!this.tempEmail.trim()) {
+          alert("회원 탈퇴를 위해 이메일을 입력해주세요.");
+          return;
+        }
+
+        if (this.tempEmail.trim() !== this.email.trim()) {
+          alert("입력한 이메일이 기존 이메일과 일치하지 않습니다.");
+          return;
+        }
+
+        if (!confirm("정말로 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
+          return;
+        }
+
+        apiClient.delete("/user-info/delete", {
+          params: { email: this.tempEmail } 
+        })
+        .then(response => {
+          alert(response.data);
+          sessionStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          this.$router.push("/login");
+        })
+        .catch(error => {
+          console.error("회원 탈퇴 요청 실패:", error);
+
+          if (error.response) {
+            alert(error.response.data || "회원 탈퇴 중 오류가 발생했습니다.");
+          } else {
+            alert("서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.");
+          }
+        });
+      },
+      scrollToSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.scrollIntoView({ behavior: "smooth" });
+          this.activeTab = sectionId === "basic-info" ? "basic" : "subscription-info";
+        }
+      },
     },
-    scrollToSection(sectionId) {
-      const section = document.getElementById(sectionId);
-      if (section) {
-        section.scrollIntoView({ behavior: "smooth" });
-        this.activeTab = sectionId === "basic-info" ? "basic" : "subscription-info";
-      }
+    mounted() {
+      this.fetchUserInfo(); // ✅ 페이지 로드 시 API 호출
+      this.fetchPaymentInfo();
     },
-  },
-};
-</script>
+  };
+  </script>
+  
 
 <style scoped>
   /* 전체 레이아웃 */

@@ -62,7 +62,7 @@
 
 <script>
 import Header from "../HomePage/components/Header.vue";
-import * as d3 from "d3";
+//import * as d3 from "d3";
 
 export default {
   name: "AnalysisPage",

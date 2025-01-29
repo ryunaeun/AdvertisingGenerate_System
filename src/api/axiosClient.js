@@ -25,12 +25,12 @@ apiClient.interceptors.response.use(
 
     if (error.response && error.response.status === 401 && refreshToken) {
       try {
-        const response = await axios.post("/refresh-token", { refreshToken });
+        const response = await apiClient.post("/refresh-token", { refreshToken });
         const newAccessToken = response.data.accessToken;
 
         sessionStorage.setItem("accessToken", newAccessToken);
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return axios(originalRequest); // 실패한 요청 재시도
+        return apiClient(originalRequest); // 실패한 요청 재시도
       } catch (refreshError) {
         console.error("Refresh Token 갱신 실패:", refreshError);
 
