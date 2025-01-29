@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FileStorageService {
-    @Value("${file.upload-dir:C:\\\\Users\\\\User\\\\Desktop\\\\input_file\\\\}") // 기본 파일 저장 경로
+    @Value("${file.upload-dir:input_files}") // 기본 파일 저장 경로
     private String uploadDir;
 
     public String saveFile(MultipartFile file) throws IOException {
@@ -35,6 +35,11 @@ public class FileStorageService {
 
         // 3. 파일 이름 및 저장 경로 설정
         String originalFileName = file.getOriginalFilename();
+        if (originalFileName == null) {
+            throw new IllegalArgumentException("파일 이름이 올바르지 않습니다.");
+        }
+
+        // 파일 확장자 추출
         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf('.') + 1).toLowerCase();
 
         // 유효한 확장자인지 검증
@@ -42,16 +47,21 @@ public class FileStorageService {
             throw new IllegalArgumentException("지원되지 않는 파일 형식입니다: " + fileExtension);
         }
 
-        // 고유 파일명 생성
-        String uniqueFileName = System.currentTimeMillis() + "_" + originalFileName;
+        // 4. 괄호() 제거한 파일명 생성
+        String sanitizedFileName = originalFileName.replaceAll("[()]", "");
+        String uniqueFileName = System.currentTimeMillis() + "_" + sanitizedFileName;
         Path filePath = Paths.get(uploadDir, uniqueFileName);
 
-        // 4. 파일 저장
+        // 5. 파일 저장
         Files.copy(file.getInputStream(), filePath);
 
-        // 5. 저장된 파일 경로 반환
+        // 6. 변경된 파일명 로그 출력
+        System.out.println("파일 저장 완료: " + uniqueFileName + " (원래 이름: " + originalFileName + ")");
+
+        // 7. 저장된 파일 경로 반환
         return filePath.toString();
     }
+
     // 파일 삭제 메서드
     public void deleteFile(String filePath) {
         try {
