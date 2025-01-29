@@ -108,7 +108,7 @@ public class UserController {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "회원가입이 성공적으로 처리되었습니다.");
             response.put("email", verificationRequest.getEmail()); // 이후 API에서 식별 가능
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok().body(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -192,21 +192,15 @@ public class UserController {
 
     @DeleteMapping("/user-info/delete")
     @jakarta.transaction.Transactional
-    public ResponseEntity<?> deleteMyself(@RequestBody Map<String, String> request) {
+    public ResponseEntity<?> deleteMyself(@RequestParam String email) { // ✅ @RequestBody 대신 @RequestParam 사용
         try {
-            String username = request.get("username"); // 요청에서 ID 추출
-            if (username == null) {
-                return ResponseEntity.badRequest().body("사용자 ID가 필요합니다.");
-            }
-
-            // 사용자 확인 후 삭제
-            if (userRepository.existsByUsername(username)) {
-                userRepository.deleteByUsername(username);
+            Optional<User> user = userRepository.findByEmail(email);
+            if (user.isPresent()) {
+                userRepository.delete(user.get());
                 return ResponseEntity.ok("사용자가 성공적으로 삭제되었습니다.");
             } else {
                 return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("사용자 삭제 중 문제가 발생했습니다.");
