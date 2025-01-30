@@ -174,7 +174,7 @@ export default {
         const response = await fetch(apiUrl, {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjk1ZmE2MGEtZWFkNS00YWRmLWE0NmItYWYxMjVjZTcwZmQ1IiwiZXhwIjoxNzM4MDcxNjAzLCJpc3MiOiJTRUxGX0hPU1RFRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.SJWXCfkN60roNhToOOhalKYCYkJdh3GP2w3kguPRTxs",
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjk1ZmE2MGEtZWFkNS00YWRmLWE0NmItYWYxMjVjZTcwZmQ1IiwiZXhwIjo0ODkxNzMzMDY4LCJpc3MiOiJTRUxGX0hPU1RFRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.mwJEw5S1krLYoXuoQOkxvlmoeMccalIeqQmtL-6q4t8",
           },
         });
         const result = await response.json();
@@ -195,7 +195,7 @@ export default {
         const response = await fetch(apiUrl, {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjk1ZmE2MGEtZWFkNS00YWRmLWE0NmItYWYxMjVjZTcwZmQ1IiwiZXhwIjoxNzM4MDcxNjAzLCJpc3MiOiJTRUxGX0hPU1RFRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.SJWXCfkN60roNhToOOhalKYCYkJdh3GP2w3kguPRTxs",
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjk1ZmE2MGEtZWFkNS00YWRmLWE0NmItYWYxMjVjZTcwZmQ1IiwiZXhwIjo0ODkxNzMzMDY4LCJpc3MiOiJTRUxGX0hPU1RFRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.mwJEw5S1krLYoXuoQOkxvlmoeMccalIeqQmtL-6q4t8",
           },
         });
         const result = await response.json();
