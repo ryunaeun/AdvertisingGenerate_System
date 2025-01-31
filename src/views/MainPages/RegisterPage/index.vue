@@ -441,7 +441,7 @@ export default {
       })
       .then(response => {
         this.isVerificationCodeValid = true;
-        alert(response.data);
+        alert("본인인증이 완료되었습니다.");
       })
       .catch(error => {
         if (error.response) {

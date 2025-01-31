@@ -254,7 +254,7 @@ export default {
           id: 2,
           name: "김유중",
           role: "프론트엔드",
-          image: '/images/Profile.png',
+          image: '/images/ujoong.jpg',
         },
         {
           id: 3,
@@ -272,7 +272,7 @@ export default {
           id: 5,
           name: "변재연",
           role: "프론트엔드",
-          image: '/images/Profile.png',
+          image: '/images/jaeyeon.jpeg',
         },
         {
           id: 6,
