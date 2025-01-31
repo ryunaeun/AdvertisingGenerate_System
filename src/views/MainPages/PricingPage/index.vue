@@ -140,22 +140,19 @@ export default {
     return {
       blogs: [
         {
-          title: "Rover raised $65 million",
-          description:
-            "Finding temporary housing for your dog should be as easy as renting an Airbnb.",
+          title: "",
+          description: "",
           image: "./src/assets/img/ai.jpeg",
         },
         {
-          title: "MateLabs machine learning",
-          description:
-            "If you’ve ever wanted to train a machine learning model and integrate it with IFTTT, you now can.",
-          image: "./src/assets/img/ai.jpeg",
+          title: "",
+          description: "",
+          image: "./src/assets/img/annie-spratt.jpg",
         },
         {
-          title: "MateLabs machine learning",
-          description:
-            "If you’ve ever wanted to train a machine learning model and integrate it with IFTTT, you now can.",
-          image: "./src/assets/img/ai.jpeg",
+          title: "",
+          description: "",
+          image: "./src/assets/img/nastuh.jpg",
         },
       ],
     };

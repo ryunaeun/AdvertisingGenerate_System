@@ -3,55 +3,102 @@
     <div class="row h-100">
       <!-- 왼쪽 이미지 섹션 -->
       <div class="col-md-6 illustration-section">
-        <img src="../../../assets/img/illustrations/login.jpg" alt="Developer Workspace" class="illustration-image" />
+        <img
+          src="../../../assets/img/illustrations/login.jpg"
+          alt="Developer Workspace"
+          class="illustration-image"
+        />
       </div>
 
       <!-- 오른쪽 로그인 폼 섹션 -->
-  <div class="col-md-6 login-form-section">
-    <div class="login-form-container">
-      <h2 class="welcome-text">Welcome</h2>
-      <form @submit.prevent="login" class="login-form">
-        <div class="form-group mb-3">
-          <input type="email" class="form-control" placeholder="이메일을 입력하세요" v-model="email" />
+      <div class="col-md-6 login-form-section">
+        <div class="login-form-container">
+          <h2 class="welcome-text">Welcome</h2>
+          <form @submit.prevent="login" class="login-form">
+            <div class="form-group mb-3">
+              <input
+                type="email"
+                class="form-control"
+                placeholder="이메일을 입력하세요"
+                v-model="email"
+              />
+            </div>
+            <div class="form-group mb-3">
+              <input
+                type="password"
+                class="form-control"
+                placeholder="비밀번호를 입력하세요"
+                v-model="password"
+              />
+            </div>
+            <div class="form-check form-switch mb-3">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="rememberMe"
+                v-model="rememberMe"
+              />
+              <label class="form-check-label" for="rememberMe"
+                >아이디 저장하기</label
+              >
+            </div>
+            <button type="submit" class="btn btn-success w-100">로그인</button>
+            <div class="divider-container mt-3 mb-3">
+              <div class="divider-line"></div>
+              <span class="divider-text">또는</span>
+              <div class="divider-line"></div>
+            </div>
+            <div class="social-login mt-4">
+              <button
+                type="button"
+                class="btn btn-outline-secondary w-100 mb-2"
+              >
+                <img
+                  src="../../../assets/img/logos/login/kakao.png"
+                  alt="Kakao"
+                />
+                카카오로 시작
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary w-100 mb-2"
+              >
+                <img
+                  src="../../../assets/img/logos/login/naver.png"
+                  alt="Naver"
+                />
+                네이버로 시작
+              </button>
+              <button type="button" class="btn btn-outline-secondary w-100">
+                <img
+                  src="../../../assets/img/logos/login/google.png"
+                  alt="Google"
+                />
+                Google로 시작
+              </button>
+            </div>
+            <div class="mt-3 text-center">
+              <div class="mb-2">
+                <span class="text-muted">아직 회원이 아니신가요?</span> |
+                <router-link
+                  to="/register"
+                  class="text-success fw-bold text-decoration-none"
+                  >회원가입</router-link
+                >
+              </div>
+              <div>
+                <span class="text-muted">로그인이 실패하나요?</span> |
+                <a
+                  @click="showSearchModal"
+                  class="text-success fw-bold text-decoration-none"
+                  >비밀번호 찾기</a
+                >
+              </div>
+            </div>
+          </form>
         </div>
-        <div class="form-group mb-3">
-          <input type="password" class="form-control" placeholder="비밀번호를 입력하세요" v-model="password" />
-        </div>
-        <div class="form-check form-switch mb-3">
-          <input type="checkbox" class="form-check-input" id="rememberMe" v-model="rememberMe" />
-          <label class="form-check-label" for="rememberMe">아이디 저장하기</label>
-        </div>
-        <button type="submit" class="btn btn-success w-100">로그인</button>
-        <div class="divider-container mt-3 mb-3">
-          <div class="divider-line"></div>
-          <span class="divider-text">또는</span>
-          <div class="divider-line"></div>
-        </div>
-        <div class="social-login mt-4">
-          <button type="button" class="btn btn-outline-secondary w-100 mb-2">
-            <img src="../../../assets/img/logos/login/kakao.png" alt="Kakao" /> 카카오로 시작
-          </button>
-          <button type="button" class="btn btn-outline-secondary w-100 mb-2">
-            <img src="../../../assets/img/logos/login/naver.png" alt="Naver" /> 네이버로 시작
-          </button>
-          <button type="button" class="btn btn-outline-secondary w-100">
-            <img src="../../../assets/img/logos/login/google.png" alt="Google" /> Google로 시작
-          </button>
-        </div>
-        <div class="mt-3 text-center">
-          <div class="mb-2">
-            <span class="text-muted">아직 회원이 아니신가요?</span> |
-            <router-link to="/register" class="text-success fw-bold text-decoration-none">회원가입</router-link>
-          </div>
-          <div>
-            <span class="text-muted">로그인이 실패하나요?</span> |
-            <a @click="showSearchModal" class="text-success fw-bold text-decoration-none">비밀번호 찾기</a>
-          </div>
-        </div>
-      </form>
+      </div>
     </div>
-  </div>
-</div>
   </div>
   <!-- 비밀번호찾기 모달 -->
   <div class="modal fade" id="searchModal" tabindex="-1">
@@ -67,14 +114,28 @@
           <div class="form-group">
             <label class="form-label">이메일 주소</label>
             <div class="input-wrapper">
-              <input type="email" class="form-control" placeholder="hello@example.com" v-model="modalEmail"
-                @input="validateModalEmail">
-              <button type="button" class="btn-action" @click="requestResetPassword"
-                :disabled="!isEmailValid || isResetCodeSent">
+              <input
+                type="email"
+                class="form-control"
+                placeholder="hello@example.com"
+                v-model="modalEmail"
+                @input="validateModalEmail"
+              />
+              <button
+                type="button"
+                class="btn-action"
+                @click="requestResetPassword"
+                :disabled="!isEmailValid || isResetCodeSent"
+              >
                 인증 요청
               </button>
-              <span class="validation-message"
-                :class="{ 'error': !isEmailValid && modalEmail, 'success': isEmailValid && modalEmail }">
+              <span
+                class="validation-message"
+                :class="{
+                  error: !isEmailValid && modalEmail,
+                  success: isEmailValid && modalEmail,
+                }"
+              >
                 {{ emailMessage }}
               </span>
             </div>
@@ -83,16 +144,31 @@
           <div class="form-group">
             <label class="form-label">인증 번호</label>
             <div class="input-wrapper">
-              <input type="text" class="form-control" placeholder="인증번호 6자리를 입력해주세요" v-model="verificationCode"
-                maxlength="6">
-              <button type="button" class="btn-action" @click="verifyResetCode">본인 인증</button>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="인증번호 6자리를 입력해주세요"
+                v-model="verificationCode"
+                maxlength="6"
+              />
+              <button type="button" class="btn-action" @click="verifyResetCode">
+                본인 인증
+              </button>
             </div>
-            <span class="resend-link" @click="requestResetPassword">인증번호를 받지 못하셨나요?</span>
+            <span class="resend-link" @click="requestResetPassword"
+              >인증번호를 받지 못하셨나요?</span
+            >
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn custom-confirm-btn" @click="confirmSearch"
-            :disabled="!isVerificationCodeValid">인증하기</button>
+          <button
+            type="button"
+            class="btn custom-confirm-btn"
+            @click="confirmSearch"
+            :disabled="!isVerificationCodeValid"
+          >
+            인증하기
+          </button>
         </div>
       </div>
     </div>
@@ -111,14 +187,24 @@
           <div class="form-group">
             <label class="form-label">비밀번호</label>
             <div class="input-wrapper">
-              <input :type="showPassword ? 'text' : 'password'" class="form-control" placeholder="password"
-                v-model="modalPassword" @input="validateModalPassword">
+              <input
+                :type="showPassword ? 'text' : 'password'"
+                class="form-control"
+                placeholder="password"
+                v-model="modalPassword"
+                @input="validateModalPassword"
+              />
               <i class="material-icons password-toggle" @click="togglePassword">
-                {{ showPassword ? 'visibility_off' : 'visibility' }}
+                {{ showPassword ? "visibility_off" : "visibility" }}
               </i>
             </div>
-            <span class="validation-message"
-              :class="{ 'error': !isPasswordValid && modalPassword, 'success': isPasswordValid && modalPassword }">
+            <span
+              class="validation-message"
+              :class="{
+                error: !isPasswordValid && modalPassword,
+                success: isPasswordValid && modalPassword,
+              }"
+            >
               {{ passwordMessage }}
             </span>
           </div>
@@ -126,21 +212,40 @@
           <div class="form-group">
             <label class="form-label">비밀번호 확인</label>
             <div class="input-wrapper">
-              <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control" placeholder="password"
-                v-model="confirmPassword" @input="validateConfirmPassword">
-              <i class="material-icons password-toggle" @click="toggleConfirmPassword">
-                {{ showConfirmPassword ? 'visibility_off' : 'visibility' }}
+              <input
+                :type="showConfirmPassword ? 'text' : 'password'"
+                class="form-control"
+                placeholder="password"
+                v-model="confirmPassword"
+                @input="validateConfirmPassword"
+              />
+              <i
+                class="material-icons password-toggle"
+                @click="toggleConfirmPassword"
+              >
+                {{ showConfirmPassword ? "visibility_off" : "visibility" }}
               </i>
             </div>
-            <span class="validation-message"
-              :class="{ 'error': !isConfirmPasswordValid && confirmPassword, 'success': isConfirmPasswordValid && confirmPassword }">
+            <span
+              class="validation-message"
+              :class="{
+                error: !isConfirmPasswordValid && confirmPassword,
+                success: isConfirmPasswordValid && confirmPassword,
+              }"
+            >
               {{ confirmPasswordMessage }}
             </span>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn custom-confirm-btn" @click="resetPassword"
-            :disabled="!isPasswordValid || !isConfirmPasswordValid">변경하기</button>
+          <button
+            type="button"
+            class="btn custom-confirm-btn"
+            @click="resetPassword"
+            :disabled="!isPasswordValid || !isConfirmPasswordValid"
+          >
+            변경하기
+          </button>
         </div>
       </div>
     </div>
@@ -148,8 +253,8 @@
 </template>
 
 <script>
-import axios from "axios";
-
+// import axios from "axios";
+import apiClient from "@/api/axiosClient";
 export default {
   name: "LoginPage",
   data() {
@@ -172,14 +277,14 @@ export default {
       passwordMessage: "",
       confirmPasswordMessage: "",
       isResetCodeSent: false,
-      verificationCode: '',
+      verificationCode: "",
       isVerificationCodeValid: false,
       rememberMe: false,
     };
   },
   mounted() {
     // 페이지 로드 시 저장된 이메일 불러오기
-    const savedEmail = localStorage.getItem('savedEmail');
+    const savedEmail = localStorage.getItem("savedEmail");
     if (savedEmail) {
       this.email = savedEmail;
       this.rememberMe = true;
@@ -209,22 +314,26 @@ export default {
     validateEmail() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       this.isEmailValid = emailRegex.test(this.email);
-      this.emailMessage = this.isEmailValid ?
-        "올바른 이메일 형식입니다." :
-        "올바른 이메일 주소를 입력해주세요.";
+      this.emailMessage = this.isEmailValid
+        ? "올바른 이메일 형식입니다."
+        : "올바른 이메일 주소를 입력해주세요.";
     },
     validateModalEmail() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       this.isEmailValid = emailRegex.test(this.modalEmail);
-      this.emailMessage = this.isEmailValid ?
-        "올바른 이메일 형식입니다." :
-        "올바른 이메일 주소를 입력해주세요.";
+      this.emailMessage = this.isEmailValid
+        ? "올바른 이메일 형식입니다."
+        : "올바른 이메일 주소를 입력해주세요.";
     },
     async requestResetPassword() {
       try {
-        const response = await axios.post('http://52.79.227.50:8080/api/request-reset-password', null, {
-          params: { email: this.modalEmail }
-        });
+        const response = await apiClient.post(
+          "/request-reset-password",
+          null,
+          {
+            params: { email: this.modalEmail },
+          }
+        );
         alert(response.data);
         this.isResetCodeSent = true;
       } catch (error) {
@@ -241,10 +350,13 @@ export default {
         return;
       }
       try {
-        const response = await axios.post("http://52.79.227.50:8080/api/verify-reset-code", {
-          email: this.modalEmail,
-          verificationCode: this.verificationCode
-        });
+        const response = await apiClient.post(
+          "/verify-reset-code",
+          {
+            email: this.modalEmail,
+            verificationCode: this.verificationCode,
+          }
+        );
         alert(response.data);
         if (response.data === "인증 번호 확인이 완료되었습니다.") {
           this.isVerificationCodeValid = true;
@@ -281,12 +393,14 @@ export default {
         return;
       }
 
-
       try {
-        const response = await axios.post('http://52.79.227.50/:8080/api/reset-password', {
-          email: this.modalEmail,
-          newPassword: this.password
-        });
+        const response = await apiClient.post(
+          "/reset-password",
+          {
+            email: this.modalEmail,
+            newPassword: this.password,
+          }
+        );
         alert(response.data);
         this.closeResetModal(); // 비밀번호 변경 성공 시 모달 닫기
       } catch (error) {
@@ -299,9 +413,13 @@ export default {
     },
     async resendVerificationCode() {
       try {
-        const response = await axios.post('http://52.79.227.50:8080/api/resend-verification-code', null, {
-          params: { email: this.modalEmail }
-        });
+        const response = await apiClient.post(
+          "/resend-verification-code",
+          null,
+          {
+            params: { email: this.modalEmail },
+          }
+        );
         alert(response.data);
       } catch (error) {
         if (error.response) {
@@ -317,10 +435,13 @@ export default {
         return;
       }
       try {
-        const response = await axios.post("http://52.79.227.50:8080/api/verify-reset-code", {
-          email: this.modalEmail,
-          verificationCode: this.verificationCode
-        });
+        const response = await apiClient.post(
+          "/verify-reset-code",
+          {
+            email: this.modalEmail,
+            verificationCode: this.verificationCode,
+          }
+        );
         alert(response.data);
         if (response.data === "인증 번호 확인이 완료되었습니다.") {
           this.isVerificationCodeValid = true;
@@ -367,24 +488,26 @@ export default {
       }
     },
     validatePassword() {
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+      const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
       this.isPasswordValid = passwordRegex.test(this.password);
-      this.passwordMessage = this.isPasswordValid ?
-        "올바른 비밀번호 형식입니다." :
-        "비밀번호는 8자 이상, 대문자, 소문자, 특수문자를 포함해야 합니다.";
+      this.passwordMessage = this.isPasswordValid
+        ? "올바른 비밀번호 형식입니다."
+        : "비밀번호는 8자 이상, 대문자, 소문자, 특수문자를 포함해야 합니다.";
     },
     validateModalPassword() {
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+      const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
       this.isPasswordValid = passwordRegex.test(this.modalPassword);
-      this.passwordMessage = this.isPasswordValid ?
-        "올바른 비밀번호 형식입니다." :
-        "비밀번호는 8자 이상, 대문자, 소문자, 특수문자를 포함해야 합니다.";
+      this.passwordMessage = this.isPasswordValid
+        ? "올바른 비밀번호 형식입니다."
+        : "비밀번호는 8자 이상, 대문자, 소문자, 특수문자를 포함해야 합니다.";
     },
     validateConfirmPassword() {
       this.isConfirmPasswordValid = this.modalPassword === this.confirmPassword;
-      this.confirmPasswordMessage = this.isConfirmPasswordValid ?
-        "비밀번호가 일치합니다." :
-        "비밀번호가 일치하지 않습니다.";
+      this.confirmPasswordMessage = this.isConfirmPasswordValid
+        ? "비밀번호가 일치합니다."
+        : "비밀번호가 일치하지 않습니다.";
     },
     togglePassword() {
       this.showPassword = !this.showPassword;
@@ -394,15 +517,18 @@ export default {
     },
     async login() {
       try {
-        const response = await axios.post("http://52.79.227.50:8080/api/login", {
-          email: this.email,
-          password: this.password,
-        });
+        const response = await apiClient.post(
+          "/login",
+          {
+            email: this.email,
+            password: this.password,
+          }
+        );
 
         if (this.rememberMe) {
-          localStorage.setItem('savedEmail', this.email);
+          localStorage.setItem("savedEmail", this.email);
         } else {
-          localStorage.removeItem('savedEmail');
+          localStorage.removeItem("savedEmail");
         }
 
         console.log("로그인 성공:", response.data);
@@ -419,7 +545,9 @@ export default {
         }
 
         // 권한에 따라 페이지 이동
-        const payload = JSON.parse(atob(response.data.accessToken.split(".")[1]));
+        const payload = JSON.parse(
+          atob(response.data.accessToken.split(".")[1])
+        );
         const userRole = payload.role;
 
         if (userRole === "ROLE_ADMIN") {
@@ -434,9 +562,13 @@ export default {
     },
     async resendVerificationCode() {
       try {
-        const response = await axios.post('/api/auth/resend-verification-code', null, {
-          params: { email: this.email }
-        });
+        const response = await apiClient.post(
+          "/resend-verification-code",
+          null,
+          {
+            params: { email: this.email },
+          }
+        );
         alert(response.data);
       } catch (error) {
         if (error.response) {
@@ -468,8 +600,8 @@ export default {
     },
     confirmPassword() {
       this.validateConfirmPassword();
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -601,9 +733,8 @@ export default {
   font-size: 0.9rem;
 }
 
-
 .form-group {
-  margin-bottom: 1.0rem;
+  margin-bottom: 1rem;
   position: relative;
 }
 
@@ -631,7 +762,7 @@ export default {
 
 .form-control:focus {
   outline: none;
-  border-bottom-color: #40A681;
+  border-bottom-color: #40a681;
 }
 
 .form-control::placeholder {
@@ -644,8 +775,8 @@ export default {
   right: 0;
   top: -5px;
   background: none;
-  border: 1px solid #40A681;
-  color: #40A681;
+  border: 1px solid #40a681;
+  color: #40a681;
   padding: 0.25rem 0.75rem;
   border-radius: 4px;
   font-size: 0.875rem;
@@ -663,7 +794,7 @@ export default {
 }
 
 .validation-message.success {
-  color: #40A681;
+  color: #40a681;
 }
 
 .resend-link {
@@ -678,7 +809,6 @@ export default {
 .resend-link:hover {
   opacity: 0.8;
 }
-
 
 .modal-body {
   max-height: 70vh;
@@ -697,7 +827,7 @@ export default {
 }
 
 .custom-confirm-btn {
-  background-color: #40A681;
+  background-color: #40a681;
   color: white;
   border: none;
   padding: 0.5rem 1.5rem;
@@ -705,13 +835,13 @@ export default {
 }
 
 .custom-confirm-btn:hover {
-  background-color: #40A681;
+  background-color: #40a681;
   opacity: 0.9;
 }
 
 .clickable {
   cursor: pointer;
-  color: #40A681;
+  color: #40a681;
   text-decoration: underline;
 }
 
@@ -737,7 +867,6 @@ export default {
   justify-content: center;
 }
 
-
 .close-button {
   background-color: transparent;
   border: none;
@@ -749,7 +878,7 @@ export default {
 }
 
 .close-button:hover {
-  color: #40A681;
+  color: #40a681;
 }
 
 .close-button:focus {

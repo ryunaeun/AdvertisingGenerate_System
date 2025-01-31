@@ -45,6 +45,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "NoticeManagement",
   data() {
@@ -57,15 +59,31 @@ export default {
     };
   },
   methods: {
+    // 공지사항 목록 가져오기
     async fetchNotices() {
       try {
-        const response = await fetch("https://api.example.com/notices"); // GET 관리자(공지사항 조회)
-        const data = await response.json();
-        this.notices = data.sort((a, b) => new Date(b.date) - new Date(a.date)); // 최신 공지사항 정렬
+        const accessToken = sessionStorage.getItem("accessToken");
+        const response = await axios.get(
+          "http://43.201.26.71:8080/api/admin/notice",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: "application/json",
+            },
+            params: {
+              page: 0,
+              size: 20,
+              isDescending: false,
+            },
+          }
+        );
+        console.log("Fetched Notices:", response.data);
+        this.notices = response.data.content; // 공지사항 목록 저장
       } catch (error) {
         console.error("Failed to fetch notices:", error);
       }
     },
+    // 새로운 공지사항 작성
     async submitNotice() {
       if (!this.newNotice.title || !this.newNotice.content) {
         alert("Please fill in all fields.");
@@ -73,37 +91,39 @@ export default {
       }
 
       try {
-        const response = await fetch("https://api.example.com/notices", {
-          method: "POST", // POST 관리자(공지사항 쓰기)
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
+        const accessToken = sessionStorage.getItem("accessToken");
+        const response = await axios.post(
+          "http://43.201.26.71:8080/api/admin/notice",
+          {
             title: this.newNotice.title,
             content: this.newNotice.content,
-            date: new Date().toISOString(),
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to submit notice.");
-        }
-
-        // 성공적으로 작성 후 공지사항 목록 갱신
-        this.fetchNotices();
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log("Notice Submitted:", response.data);
+        alert("Notice successfully submitted!");
         this.newNotice.title = "";
         this.newNotice.content = "";
+        this.fetchNotices(); // 작성 후 공지사항 목록 새로고침
       } catch (error) {
         console.error("Failed to submit notice:", error);
+        alert("Failed to submit the notice. Please try again.");
       }
     },
+    // 날짜 형식 변환
     formatDate(dateString) {
       const options = { year: "numeric", month: "long", day: "numeric" };
       return new Date(dateString).toLocaleDateString(undefined, options);
     },
   },
   created() {
-    this.fetchNotices();
+    this.fetchNotices(); // 컴포넌트 생성 시 공지사항 로드
   },
 };
 </script>
