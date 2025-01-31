@@ -14,7 +14,7 @@ public class EmailService {
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
     private final JavaMailSender javaMailSender;
 
-    private static final String FROM_EMAIL = "wjdtjr9805@naver.com"; // 네이버 SMTP 이메일 계정
+    private static final String FROM_EMAIL = "jeongseok0002@gmail.com";
     private static final String FROM_NAME = "ADVI"; // 발신자 이름
 
     // 인증 이메일 전송 (HTML 템플릿 적용)
