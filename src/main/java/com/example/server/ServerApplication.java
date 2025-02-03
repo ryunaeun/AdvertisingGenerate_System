@@ -18,6 +18,7 @@ public class ServerApplication {
 		String dbUrl = dotenv.get("DB_URL");
 		String dbUsername = dotenv.get("DB_USERNAME");
 		String dbPassword = dotenv.get("DB_PASSWORD");
+		
 
 		// 환경 변수 유효성 검증
 		if (dbUrl == null || dbUsername == null || dbPassword == null) {
@@ -32,6 +33,8 @@ public class ServerApplication {
 		System.out.println("DB_USERNAME" + dbUsername);
 		System.setProperty("DB_PASSWORD", dbPassword);
 		System.out.println("DB_PASSWORD" + dbPassword);
+		System.setProperty("SMTP_USERNAME", dotenv.get("SMTP_USERNAME"));
+		System.setProperty("SMTP_PASSWORD", dotenv.get("SMTP_PASSWORD"));
 
 		SpringApplication.run(ServerApplication.class, args);
 	}
