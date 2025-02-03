@@ -52,7 +52,7 @@ public class User {
     @Column(nullable = true)
     private String companyName;
 
-    @Column(nullable = true, unique = true)
+    @Column(nullable = true)
     private String businessNumber;
 
     @Column(nullable = true)

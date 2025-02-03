@@ -28,14 +28,16 @@ public class ServerApplication {
 
 		// System 환경 변수로 전달
 		System.setProperty("DB_URL", dbUrl);
-		System.out.println("DB_URL" + dbUrl);
+
 		System.setProperty("DB_USERNAME", dbUsername);
-		System.out.println("DB_USERNAME" + dbUsername);
 		System.setProperty("DB_PASSWORD", dbPassword);
-		System.out.println("DB_PASSWORD" + dbPassword);
 		System.setProperty("SMTP_USERNAME", dotenv.get("SMTP_USERNAME"));
 		System.setProperty("SMTP_PASSWORD", dotenv.get("SMTP_PASSWORD"));
-
+		System.out.println("DB_URL : " + dbUrl);
+		System.out.println("DB_USERNAME : " + dbUsername);
+		System.out.println("DB_PASSWORD : " + dbPassword);
+		System.out.println("SMTP_USERNAME : " + dotenv.get("SMTP_USERNAME"));
+		System.out.println("SMTP_PASSWORD : " + dotenv.get("SMTP_PASSWORD"));
 		SpringApplication.run(ServerApplication.class, args);
 	}
 }
