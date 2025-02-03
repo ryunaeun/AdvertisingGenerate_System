@@ -378,7 +378,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Trouble Issue");
         }
     }
-
     @Operation(
             summary = "액세스 토큰 갱신",
             description = "리프레시 토큰을 통해 새로운 액세스 토큰과 리프레시 토큰을 요청하는 api입니다."
@@ -399,6 +398,7 @@ public class UserController {
                 return ResponseEntity.badRequest().body("Refresh Token이 제공되지 않았습니다.");
             }
 
+            // ✅ 사용자 정보 조회
             String email = jwtUtil.extractEmail(refreshToken);
             if (email == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 Refresh Token입니다.");
@@ -407,14 +407,17 @@ public class UserController {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
+            // ✅ DB에 저장된 Refresh Token이 없거나 만료된 경우
             if (user.getRefreshToken() == null || jwtUtil.isRefreshTokenExpired(user.getRefreshToken())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh Token이 만료되었습니다.");
             }
 
+            // ✅ 저장된 Refresh Token과 요청된 Refresh Token이 다를 경우
             if (!refreshToken.equals(user.getRefreshToken())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("저장된 Refresh Token과 일치하지 않습니다.");
             }
 
+            // ✅ 새로운 Access Token 발급 (Refresh Token은 변경하지 않음)
             String newAccessToken = jwtUtil.generateToken(email, user.getRole());
             String newRefreshToken = refreshToken; // ✅ 기존 Refresh Token 유지
 
