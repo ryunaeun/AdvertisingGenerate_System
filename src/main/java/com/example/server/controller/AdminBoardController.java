@@ -175,6 +175,7 @@ AdminBoardController {
                 return ResponseEntity.status(404).body("해당 boardId에 대한 문의사항을 찾을 수 없습니다.");
             }
 
+            Board board = boardOptional.get();
             // 2. 해당 boardId에 이미 답변이 있는지 확인
             boolean replyExists = replyRepository.existsByBoardId(boardId);
             if (replyExists) {
@@ -190,6 +191,8 @@ AdminBoardController {
 
             // ReplyRepository를 통해 데이터베이스에 저장
             replyRepository.save(reply);
+            board.setBreply(true);
+            boardRepository.save(board); // 업데이트된 Board 저장
 
             // 성공 응답 반환
             return ResponseEntity.ok(Map.of(

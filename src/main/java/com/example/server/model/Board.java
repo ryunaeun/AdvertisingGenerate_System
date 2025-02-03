@@ -34,6 +34,9 @@ public class Board {
     @Column(nullable = false)
     private int boardOrder; // 게시판 번호 (int)
 
+    @Column(nullable = false)
+    private boolean breply = false;
+
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
