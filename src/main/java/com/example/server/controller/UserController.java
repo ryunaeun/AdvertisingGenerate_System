@@ -399,10 +399,6 @@ public class UserController {
                 return ResponseEntity.badRequest().body("Refresh Token이 제공되지 않았습니다.");
             }
 
-            if (jwtUtil.isRefreshTokenExpired(refreshToken)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh Token이 만료되었습니다.");
-            }
-
             String email = jwtUtil.extractEmail(refreshToken);
             if (email == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 Refresh Token입니다.");
@@ -411,15 +407,16 @@ public class UserController {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
+            if (user.getRefreshToken() == null || jwtUtil.isRefreshTokenExpired(user.getRefreshToken())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh Token이 만료되었습니다.");
+            }
+
             if (!refreshToken.equals(user.getRefreshToken())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("저장된 Refresh Token과 일치하지 않습니다.");
             }
 
             String newAccessToken = jwtUtil.generateToken(email, user.getRole());
-            String newRefreshToken = jwtUtil.generateRefreshToken(email);
-
-            user.setRefreshToken(newRefreshToken);
-            userRepository.save(user);
+            String newRefreshToken = refreshToken; // ✅ 기존 Refresh Token 유지
 
             Map<String, String> response = new HashMap<>();
             response.put("accessToken", newAccessToken);
@@ -431,7 +428,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("토큰 갱신 중 문제가 발생했습니다.");
         }
     }
-
     @Operation(
             summary = "토큰 만료시간 확인",
             description = "JWT의 토큰의 만료시간을 확인하는 api입니다."
