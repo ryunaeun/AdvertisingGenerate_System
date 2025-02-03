@@ -232,41 +232,41 @@
       </div>
     </div>
     <!-- 현재 구독 정보 -->
-    <section id="subscription-info" class="subscription-info custom-card">
-      <h3>현재 구독 중인 요금제</h3>
-      <div class="custom-card-content">
-        <div class="subscription-details">
-          <h4>{{billing}}</h4>
-          <p>잔여 무료 체험 기간: <strong>{{billingDate}}</strong></p>
+    <section id="subscription-info" class="custom-card modern-card hover-highlight">
+        <h3>현재 구독 중인 요금제</h3>
+        <div class="custom-card-content centered">
+            <div class="subscription-details">
+                <h4 class="plan-title">{{ billing }}</h4>
+                <p class="subtitle">잔여 무료 체험 기간: <strong class="highlight">{{ billingDate }}</strong></p>
+            </div>
+            <div class="cta">
+                <p class="description">더 많은 기능이 필요하신가요?<br />
+                    지금 바로 구독하고 모든 기능을 사용해보세요!</p>
+                <router-link to="/pricing" class="custom-button primary-button">요금제 보러 가기</router-link>
+            </div>
         </div>
-        <div class="cta">
-          <p>더 많은 기능이 필요하신가요?<br />지금 바로 구독하고 모든 기능을 사용해보세요!</p>
-          <router-link to="/pricing" class="custom-button">
-            요금제 보러 가기
-          </router-link>
-        </div>
-      </div>
     </section>
 
     <!-- 기본 결제 수단 -->
-    <section id="paymentSection" class="payment-method custom-card">
-      <h3>기본 결제 수단</h3>
-      <div class="custom-card-content">
-        <p2>결제 수단을 등록해 주세요.</p2>
-        <div class ='cta'>
-          <p>한 번만 등록해 놓으면 쉽게 사용 가능합니다.</p>
-          <button class="custom-button">결제 수단 등록하기</button>
+    <section id="paymentSection" class="custom-card modern-card hover-highlight">
+        <h3>기본 결제 수단</h3>
+        <div class="custom-card-content centered">
+            <div>
+                <p class="subtitle">결제 수단을 등록해 주세요.</p>
+                <p class="description">한 번만 등록해 놓으면 쉽게 사용 가능합니다.</p>
+            </div>
+            <button class="custom-button primary-button">결제 수단 등록하기</button>
         </div>
-      </div>
     </section>
 
     <!-- 최근 청구 항목 -->
-    <section id="recentBillingSection" class="recent-billing custom-card">
-      <h3>최근 청구 항목</h3>
-      <div class="custom-card-content">
-        <p>최근 청구 항목이 없습니다.</p>
-      </div>
+    <section id="recentBillingSection" class="custom-card modern-card hover-highlight">
+        <h3>최근 청구 항목</h3>
+        <div class="custom-card-content centered">
+            <p class="subtitle">최근 청구 항목이 없습니다.</p>
+        </div>
     </section>
+
   </template>
   
   <script>
@@ -1313,57 +1313,101 @@
   text-align: right;
 }
 
-.custom-button {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
+    /* Centering the content */
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 100vh;
+        padding: 30px 0;
+        background: linear-gradient(135deg, #f8f9fa, #e3e6eb);
+    }
 
-.custom-button:hover {
-  background: #0056b3;
-}
+    .custom-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+        padding: 40px;
+        max-width: 700px;
+        width: 90%;
+        margin: 30px auto;
+        transition: all 0.3s ease-in-out;
+        border: 1px solid #d1d5db;
+        text-align: center;
+    }
 
-.tab-button {
-  background: transparent;
-  border: none;
-  color: #007bff;
-  font-size: 16px;
-  cursor: pointer;
-}
+    .modern-card {
+        padding: 50px;
+        box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.15);
+        border: none;
+    }
 
-.tab-button--active {
-  font-weight: bold;
-  text-decoration: underline;
-}
+    .hover-highlight:hover {
+        border: 3px solid #1c64f2;
+        box-shadow: 0px 10px 25px rgba(28, 100, 242, 0.3);
+        transform: scale(1.03);
+        transition: all 0.3s ease-in-out;
+    }
 
-h3 {
-  font-size: 18px;
-  margin-bottom: 10px;
-  text-align: left;
-}
+    .custom-card h3 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #222;
+        text-align: center;
+    }
 
-h4 {
-  font-size: 16px;
-  font-weight: bold;
-}
+    .custom-card-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
 
-p {
-  font-size: 10px;
-  margin: 5px 0;
-  line-height: 1.5;
-  color: #555;
-}
+    .plan-title {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #1c64f2;
+    }
 
-.recent-billing p,
-.payment-method p {
-  margin-top: 10px;
-}
+    .subtitle {
+        font-size: 1.2rem;
+        color: #495057;
+    }
 
-.recent-billing {
-  text-align: center;
-}
+    .description {
+        font-size: 1rem;
+        color: #555;
+    }
+
+    .highlight {
+        background-color: #fce38a;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-weight: bold;
+    }
+
+    .custom-button {
+        padding: 14px 20px;
+        border-radius: 10px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+        margin-top: 20px;
+    }
+
+    .primary-button {
+        background-color: #1c64f2;
+        color: white;
+        border: none;
+    }
+
+    .primary-button:hover {
+        background-color: #1558c1;
+        transform: translateY(-3px);
+    }
   </style>
   
