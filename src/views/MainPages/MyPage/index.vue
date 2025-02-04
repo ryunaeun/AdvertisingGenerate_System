@@ -671,7 +671,7 @@
 .horizontal-info {
   display: flex;
   justify-content: space-between; /* 가로로 간격 조절 */
-  width: 21%; /* 가로로 넓이 꽉 채우기 */
+  width: 25%; /* 가로로 넓이 꽉 채우기 */
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
@@ -1310,7 +1310,15 @@
 }
 
 .cta {
-  text-align: right;
+    display: flex;
+    flex-direction: column; /* 세로 배치 */
+    align-items: center; /* 버튼을 중앙 정렬 */
+    text-align: center; /* 기본적으로 중앙 정렬 */
+}
+
+.description {
+    text-align: right; /* 텍스트를 우측 정렬 */
+    width: 100%; /* 부모 요소의 전체 너비 사용 */
 }
 
     /* Centering the content */
@@ -1378,18 +1386,13 @@
         color: #495057;
     }
 
-    .description {
-        font-size: 1rem;
-        color: #555;
-    }
-
     .highlight {
         background-color: #fce38a;
         padding: 5px 10px;
         border-radius: 6px;
         font-weight: bold;
     }
-
+    
     .custom-button {
         padding: 14px 20px;
         border-radius: 10px;

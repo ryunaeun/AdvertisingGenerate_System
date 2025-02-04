@@ -231,6 +231,7 @@ export default {
 .btn-primary.action-button {
   background-color: #40a681; /* 원래 기본 연간 구독 버튼 색상 */
   color: #ffffff;
+  box-shadow: none;
 }
 
 .btn-success.action-button {
