@@ -31,7 +31,7 @@
             <p>상품 정보부터 타겟 광고 설정까지<br>모든 기능을 한번에 사용하여 광고를 만들어 보세요.</p>
           </div>
           
-          <div class="option-card">
+          <div class="option-card" @click="goToTxt2VidGenerator">
             <div class="icon">
               <span class="material-icons-round">edit_note</span>
             </div>
@@ -39,7 +39,7 @@
             <p>자신만의 광고 스토리로<br>광고를 만들어 보세요.</p>
           </div>
           
-          <div class="option-card" @click="goToTxt2VidGenerator">
+          <div class="option-card">
             <div class="icon">
               <span class="material-icons-round">image</span>
             </div>
