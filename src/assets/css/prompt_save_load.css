@@ -1,0 +1,120 @@
+/* Prompt Save/Load Button Styles */
+.prompt-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.prompt-actions button {
+    padding: 8px 16px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Save Button (Purple) */
+.prompt-actions button:nth-child(1) {
+    background-color: var(--save-button, #8A2BE2);
+}
+
+.prompt-actions button:nth-child(1):hover {
+    background-color: var(--save-button-hover, #9B30FF);
+}
+
+/* Load Button (Pink) */
+.prompt-actions button:nth-child(2) {
+    background-color: var(--load-button, #FF69B4);
+}
+
+.prompt-actions button:nth-child(2):hover {
+    background-color: var(--load-button-hover, #FF82AB);
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--shadow-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: var(--background-secondary);
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+}
+
+.modal h2 {
+    margin-top: 0;
+    color: var(--text-primary);
+}
+
+.modal input[type="text"],
+.modal select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    background-color: var(--input-background);
+    border: 1px solid var(--input-border);
+    color: var(--input-text);
+    border-radius: 4px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-buttons button {
+    padding: 8px 16px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Save Modal Primary Button */
+.modal-buttons button:first-child {
+    background-color: var(--save-button, #8A2BE2);
+}
+
+.modal-buttons button:first-child:hover {
+    background-color: var(--save-button-hover, #9B30FF);
+}
+
+/* Cancel Button */
+.modal-buttons button:nth-child(2) {
+    background-color: var(--cancel-button, #FF0000);
+}
+
+.modal-buttons button:nth-child(2):hover {
+    background-color: var(--cancel-button-hover, #FF3333);
+}
+
+/* Load Modal Specific Styles */
+.modal-content:has(select) .modal-buttons button:first-child {
+    background-color: var(--load-button, #FF69B4);
+}
+
+.modal-content:has(select) .modal-buttons button:first-child:hover {
+    background-color: var(--load-button-hover, #FF82AB);
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+    .modal-content {
+        width: 90%;
+        max-width: 300px;
+    }
+}
