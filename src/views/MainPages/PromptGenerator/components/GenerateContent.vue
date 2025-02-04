@@ -116,8 +116,8 @@ export default {
     handleVideoGeneration() {
       // 비디오 생성 페이지로 이동하기 전에 현재 프롬프트 저장
       sessionStorage.setItem('videoPrompt', this.promptContent);
-      // 비디오 생성 페이지로 이동
-      window.location.href = '/txt2vid-generator';
+      // Vue Router를 사용해 페이지 이동
+      this.$router.push('/txt2vid-generator');
     },
 
     // 외부에서 프롬프트 내용을 설정할 수 있는 메서드
