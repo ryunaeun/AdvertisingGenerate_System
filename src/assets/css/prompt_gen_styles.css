@@ -1,0 +1,227 @@
+.settings-update {
+    margin-bottom: 15px;
+    text-align: right;
+}
+
+.update-settings-btn {
+    background-color: #4a90e2;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.update-settings-btn:hover {
+    background-color: #357abd;
+}
+
+.settings-update .loading {
+    display: inline-block;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+/* Layout Specific Styles */
+.prompt-gen-container {
+    flex: 0 0 38%;
+}
+
+.preview-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Preview Area */
+.image-preview-area {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+    min-height: 200px;
+    background-color: var(--background-primary);
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.preview-image {
+    flex: 1;
+    max-width: 23%;
+    height: 200px;
+    border-radius: 4px;
+    object-fit: contain;
+}
+
+/* Loading Animation Position */
+.loading {
+    position: absolute;
+    top: 38%;
+    left: 47%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+/* Button Group Styles */
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+
+.prompt-to-video-btn {
+    background-color: var(--accent-primary);
+}
+
+.example-image-btn {
+    background-color: #3498db;
+}
+
+.example-image-btn:hover {
+    background-color: #2980b9 !important;
+}
+
+/* Specific Textarea Styles */
+#generatedPrompt {
+    min-height: 250px;
+    margin: 2px 0 0px 0;
+}
+
+.input-prompt {
+    min-height: 150px;
+}
+
+/* Generate Button */
+.generate-prompt-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Path Input Specific Styles */
+.path-input-group {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.path-input-group label {
+    flex: 0 0 auto;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.path-input-group input {
+    flex: 1;
+}
+
+.path-separator {
+    color: var(--text-primary);
+    font-weight: bold;
+    margin: 0 5px;
+}
+
+/* Target Settings Styles */
+.target-settings {
+    background-color: var(--background-primary);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.target-settings h2 {
+    margin: 0 0 20px 0;
+    color: var(--text-primary);
+    font-size: 1.5em;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.setting-item label {
+    font-size: 0.9em;
+    color: var(--text-primary);
+}
+
+.setting-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    background-color: var(--input-background);
+    color: var(--input-text);
+    font-size: 0.9em;
+}
+
+.setting-select:hover {
+    border-color: var(--accent-primary);
+}
+
+.setting-select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(92, 180, 148, 0.2);
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--shadow-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: var(--background-secondary);
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+}
+
+.modal h2 {
+    margin-top: 0;
+    color: var(--text-primary);
+}
+
+.modal input[type="text"],
+.modal select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    background-color: var(--input-background);
+    border: 1px solid var(--input-border);
+    color: var(--input-text);
+    border-radius: 4px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .path-separator {
+        display: none;
+    }
+}

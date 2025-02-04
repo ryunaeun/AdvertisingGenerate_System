@@ -23,7 +23,7 @@
       <section class="new-design">
         <h2 class="section-title">새로운 디자인 만들기</h2>
         <div class="design-options">
-          <div class="option-card">
+          <div class="option-card" @click="goToPromptGen">
             <div class="icon">
               <span class="material-icons-round">description</span>
             </div>
@@ -39,7 +39,7 @@
             <p>자신만의 광고 스토리로<br>광고를 만들어 보세요.</p>
           </div>
           
-          <div class="option-card">
+          <div class="option-card" @click="goToTxt2VidGenerator">
             <div class="icon">
               <span class="material-icons-round">image</span>
             </div>
@@ -98,7 +98,15 @@ export default {
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
-    }
+    },
+    goToPromptGen() {
+      // 새 탭에서 Flask 서버의 프롬프트 생성 페이지 열기
+      this.$router.push('/prompt-generator');
+    },
+    goToTxt2VidGenerator() {
+      // 새 탭에서 Flask 서버의 비디오 생성 페이지 열기
+      this.$router.push('/txt2vid-generator');
+    },
   }
 }
 </script>

@@ -1,0 +1,594 @@
+/* Layout Specific Styles */
+.input-container {
+    flex: 0 0 38%;
+}
+
+.output-container {
+    flex: 1;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Save Path Styles */
+.save-path-group {
+    width: 100%;
+    margin: 15px 0;
+}
+
+.path-input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.path-input-group {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.path-input-group label {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.path-input-group input {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+}
+
+.path-separator {
+    flex: 0 0 auto;
+    margin: 0 5px;
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+/* Radio Group Styles */
+.radio-group {
+    margin: 10px 0;
+}
+
+.radio-group label {
+    display: inline;
+    margin-right: 15px;
+    font-weight: normal;
+}
+
+/* Download Link Styles */
+.download-link {
+    display: none;
+    margin-top: 10px;
+    color: var(--accent-primary);
+    text-decoration: none;
+}
+
+.download-link:hover {
+    text-decoration: underline;
+}
+
+/* Slider Styles */
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.slider {
+    flex: 1;
+    height: 8px;
+    -webkit-appearance: none;
+    background: var(--input-border);
+    border-radius: 4px;
+    outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+.slider-container input[type="number"] {
+    width: 70px;
+    text-align: center;
+    padding: 4px 8px;  /* 상하 패딩 줄임 */
+    height: 28px;      /* 전체 높이 지정 */
+    line-height: 20px; /* 텍스트 세로 정렬을 위한 line-height */
+    -webkit-appearance: none;  /* Safari 지원 */
+    -moz-appearance: textfield; /* Firefox 지원 */
+    appearance: none;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+/* Resolution Controls */
+.resolution-group {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.resolution-group h3 {
+    margin-top: 5px;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+/* Aspect Ratio Buttons */
+.aspect-ratio-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.aspect-ratio-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.aspect-ratio-row:nth-child(2) .aspect-ratio-btn:first-child {
+    grid-column: span 1;
+}
+
+.aspect-ratio-row:nth-child(2) .aspect-ratio-btn:last-child {
+    grid-column: span 3;
+}
+
+.aspect-ratio-btn {
+    width: 100%;
+    padding: 8px;
+    background-color: var(--input-background);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 12px;
+    box-sizing: border-box;
+}
+
+.aspect-ratio-btn:hover {
+    background-color: var(--background-primary);
+    border-color: var(--accent-primary);
+}
+
+.aspect-ratio-btn.active {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+}
+
+/* Orientation Buttons */
+.orientation-buttons {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.orientation-btn {
+    flex: 1;
+    padding: 8px;
+    background-color: var(--input-background);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 80px;
+    font-size: 14px;
+}
+
+.orientation-btn:hover {
+    background-color: var(--background-primary);
+    border-color: var(--accent-primary);
+}
+
+.orientation-btn.active {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+}
+
+.orientation-btn#exchangeBtn {
+    background-color: #3498db;
+    border-color: #2980b9;
+    color: white;
+}
+
+.orientation-btn#exchangeBtn:hover {
+    background-color: #2980b9;
+    border-color: #2471a3;
+}
+
+/* Upscale Controls */
+.upscale-controls {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
+}
+
+.upscale-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+}
+
+.upscale-controls .slider-container input[type="range"] {
+    width: 80%;  /* 슬라이더의 너비를 80%로 제한 */
+}
+
+/* Section Labels */
+.section-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+/* Orientation and Controls */
+.orientation-and-upscale-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.radio-settings {
+    flex: 0 0 36%;
+    width: 36%;
+}
+
+.radio-settings .aspect-ratio-group,
+.radio-settings .orientation-group {
+    margin-bottom: 15px;
+}
+
+#currentResolution {
+    color: var(--text-secondary);
+    font-size: 0.8em;
+    font-weight: normal;
+}
+
+.vertical-divider {
+    width: 1px;
+    align-self: stretch;
+    background-color: var(--border-color);
+    margin: 0 5px;
+}
+
+/* Dimension Controls */
+.dimension-controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+}
+
+.dimension-group {
+    width: 100%;
+    margin-bottom: 0px;
+}
+
+.dimension-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    padding-right: 5px;
+}
+
+.max-steps-label {
+    color: var(--text-secondary);
+    font-size: 0.7em;
+    font-weight: normal;
+    margin-left: 1px;
+}
+
+/* Steps and CFG Group */
+.steps-cfg-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.steps-container,
+.cfg-container {
+    flex: 0 1 50%;
+    min-width: 0;
+}
+
+.steps-container .slider-container,
+.cfg-container .slider-container {
+    width: 100%;
+}
+
+.steps-container .slider,
+.cfg-container .slider {
+    width: 100%;
+    min-width: 0;
+}
+
+.steps-container .dimension-label,
+.cfg-container .dimension-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.steps-container .dimension-label label,
+.cfg-container .dimension-label label {
+    flex: 0 0 auto;
+    font-size: 1em;
+}
+
+.steps-container .slider-container input[type="number"],
+.cfg-container .slider-container input[type="number"] {
+    width: 60px;
+    text-align: center;
+}
+
+/* Seed Group */
+.seed-group {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+.seed-group input[type="number"] {
+    margin-bottom: 8px;
+}
+
+/* Image Controls Group */
+.image-controls-group {
+    margin-bottom: 15px;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.input-row label {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.input-button-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.input-button-wrapper input[type="number"] {
+    width: 60px;
+    min-width: 60px;
+    text-align: center;
+}
+
+.generate-button {
+    flex: 1;
+    white-space: nowrap;
+    padding: 8px 16px;
+    background-color: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Negative Prompt Styles */
+.negative-prompt-toggle {
+    cursor: pointer;
+    color: var(--accent-primary);
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    user-select: none;
+}
+
+.negative-prompt-container {
+    display: none;
+    margin-top: 10px;
+}
+
+.negative-prompt-container.visible {
+    display: block;
+}
+
+.chevron {
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+.chevron.rotated {
+    transform: rotate(180deg);
+}
+
+/* Image Grid Layout */
+.images-grid {
+    display: grid;
+    gap: 20px;
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+}
+
+.images-grid.single {
+    grid-template-columns: 1fr;
+}
+
+.images-grid.horizontal-split {
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr;
+}
+
+.images-grid.vertical-split {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+}
+
+.images-grid.grid-four {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+/* Image Cell Styles */
+.image-cell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background-primary);
+    border-radius: 8px;
+    overflow: hidden;
+    min-height: 200px;
+}
+
+.image-cell .loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.image-cell .output-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    margin: 0;
+    background-color: var(--background-primary);
+}
+
+.image-cell .download-link {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--background-secondary);
+    padding: 5px 10px;
+    border-radius: 4px;
+    z-index: 1;
+}
+
+/* Mobile Optimization */
+@media (max-width: 1200px) {
+    .input-container {
+        min-width: 0;
+    }
+    
+    .orientation-and-upscale-group {
+        flex-direction: column;
+    }
+    
+    .radio-settings {
+        width: 100%;
+    }
+    
+    .vertical-divider {
+        display: none;
+    }
+    
+    .dimension-controls {
+        width: 100%;
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 720px) {
+    .orientation-and-upscale-group {
+        gap: 20px;
+    }
+    
+    .dimension-controls {
+        margin-top: 15px;
+    }
+
+    /* Update number input styles for mobile */
+    .slider-container input[type="number"] {
+        width: 55px;  /* Match PC version width */
+        min-width: 55px;
+        -webkit-appearance: none;  /* For iOS Safari */
+        -moz-appearance: textfield; /* For Firefox */
+        appearance: none;
+        padding: 4px 8px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    /* Safari specific adjustments */
+    .slider-container input[type="number"]::-webkit-inner-spin-button,
+    .slider-container input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Steps and CFG container specific adjustments */
+    .steps-container .slider-container input[type="number"],
+    .cfg-container .slider-container input[type="number"] {
+        width: 55px;
+        min-width: 55px;
+    }
+
+    .image-cell {
+        min-height: 120px;
+    }
+
+    .dimension-label {
+        font-size: 0.9em;
+        gap: 8px;
+        margin-right: 5px;
+    }
+
+    .aspect-ratio-buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .path-input-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .path-input-group {
+        width: 100%;
+    }
+
+    .path-separator {
+        display: none;
+    }
+}

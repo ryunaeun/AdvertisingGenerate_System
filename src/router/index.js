@@ -8,6 +8,8 @@ import RegisterPage from "../views/MainPages/RegisterPage/index.vue";
 import LoginPage from "../views/MainPages/LoginPage/index.vue";
 import AdminPage from "../views/MainPages/AdminPage/index.vue";
 import MyPage from "../views/MainPages/MyPage/index.vue";
+import PromptGenerator from "../views/MainPages/PromptGenerator/index.vue";
+import Txt2VidGenerator from "../views/MainPages/Txt2VidGenerator/index.vue";
 import AnalysisPage from "../views/MainPages/AnalysisPage/index.vue";
 import PresentationView from "../views/Presentation/PresentationView.vue";
 import AboutView from "../views/LandingPages/AboutUs/AboutView.vue";
@@ -91,6 +93,18 @@ const router = createRouter({
       name: "analysis",
       component: AnalysisPage,
     },
+
+    {
+      path: '/prompt-generator',
+      name: 'promptGenerator',
+      component: PromptGenerator,
+    },
+    {
+      path: '/txt2vid-generator',
+      name: 'txt2vid',
+      component: Txt2VidGenerator,
+    },
+
     {
       path: "/presentation",
       name: "presentation",
