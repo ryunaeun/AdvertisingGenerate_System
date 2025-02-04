@@ -26,7 +26,6 @@
             <span class="dropdown-item" @click="scrollToSection('my-inquiries-section')">내 문의함</span>
             <span class="dropdown-item" @click="scrollToSection('notice-section')">공지사항</span>
             <span class="dropdown-item" @click="scrollToSection('faq-section')">FAQ</span>
-            <span class="dropdown-item" @click="scrollToSection('inquiry-section')">문의하기</span>
           </div>
         </div>
       </div>
