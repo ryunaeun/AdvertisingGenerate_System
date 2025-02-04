@@ -1,12 +1,7 @@
 <template>
   <div class="home-page">
     <Header />
-    <div class="admin-section">
-      <router-link to="/admin" class="btn bg-gradient-primary">
-        관리자 페이지 보기
-      </router-link>
-    </div>
-    
+
     <div class="container">
       <section class="recent-designs">
         <h2 class="section-title">기존 디자인 불러오기</h2>
@@ -86,12 +81,12 @@ export default {
         {
           title: "Rover raised $65 mil",
           description: "Finding temporary housing for your dog",
-          image: "/path-to-rover-image.jpg"
+          image: "../../../assets/img/examples/testimonial-6-2.jpg"
         },
         {
           title: "MateLabs machine learning",
           description: "If you've ever wanted to train a machine learning",
-          image: "/path-to-matelabs-image.jpg"
+          image: "../../../assets/img/examples/testimonial-6-3.jpg"
         }
         // 추가 디자인 카드들...
       ]
@@ -114,16 +109,11 @@ export default {
   background-color: #f8f9fa;
 }
 
-.admin-section {
-  padding: 1rem 2rem;
-  background-color: white;
-  border-bottom: 1px solid #eee;
-}
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+  padding-top: 4rem;
 }
 
 .section-title {
