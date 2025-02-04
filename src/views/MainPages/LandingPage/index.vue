@@ -44,7 +44,7 @@ onMounted(() => {
             이제껏 경험 못했던 쉽고 편리한 광고 서비스,
           </p>
           <p class="description-text mt-3 animate slide-up">
-            OO와 함께 새로운 일상을 설계하세요.
+            <span class="highlight-text">ADVi</span>와 함께 새로운 일상을 설계하세요.
           </p>
         </div>
       </section>
@@ -97,34 +97,52 @@ onMounted(() => {
         </div>
       </section>
 
-      <!-- 요금제 미리보기 Section -->
       <section id="pricing-section" class="page-section pricing-section">
         <div data-aos="fade-up" class="content text-center">
           <h2 class="section-title">요금제 미리보기</h2>
+          <!-- 요금제 카드 -->
           <div class="pricing-cards">
             <div
               class="pricing-card"
               v-for="plan in pricingPlans"
               :key="plan.id"
+              :class="{ 'highlight-plan': plan.recommended }"
             >
-              <h3>{{ plan.name }}</h3>
-              <p class="price">{{ plan.price }}</p>
-              <ul>
-                <li v-for="feature in plan.features" :key="feature">
-                  {{ feature }}
-                </li>
-              </ul>
-              <!-- 버튼 클래스명 변경 -->
-              <button
-                class="action-button action-button-outline-primary"
-                @click="navigateToPricing"
-              >
-                시작하기
-              </button>
+              <h3 class="plan-name">{{ plan.name }}</h3>
+              <p class="plan-description">{{ plan.description }}</p>
+              <p class="price">
+                <span class="original-price" v-if="isAnnual && plan.monthlyPrice">${{ plan.monthlyPrice }}/월</span>
+              </p>
+              <router-link to="/login">
+                <button class="action-button" :class="plan.buttonClass">
+                  {{ plan.buttonText }}
+                </button>
+              </router-link>
+
             </div>
           </div>
+
+          <!-- 기능 비교 테이블 -->
+          <table class="feature-table">
+            <thead>
+              <tr>
+                <th>기능</th>
+                <th v-for="plan in pricingPlans" :key="plan.id">{{ plan.name }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(feature, index) in features" :key="index">
+                <td>{{ feature.name }}</td>
+                <td v-for="plan in pricingPlans" :key="plan.id">
+                  <span v-if="feature.values[plan.id] === '✔️'">✔️</span>
+                  <span v-else>{{ feature.values[plan.id] }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
+
 
       <!-- 예시 갤러리 Section -->
       <section id="gallery-section" class="page-section gallery-section">
@@ -224,62 +242,91 @@ export default {
         { id: 1, title: "효율적인 광고 제작", description: "최소 시간으로 최대 효과를 얻으세요." },
         { id: 2, title: "실시간 데이터 분석", description: "성과를 실시간으로 확인하고 최적화하세요." },
       ],
+      isAnnual: true, // 연간 요금제 기본 선택
       pricingPlans: [
         {
-          id: 1,
-          name: "Basic Plan",
-          price: "$399/월",
-          features: ["기본 광고 제작", "제한된 분석"],
+          id: "Basic Plan",
+          name: "Basic",
+          description: "중소형 브랜드 고객을 위한 플랜",
+          monthlyPrice: 399,
+          annualPrice: 299,
+          buttonText: "연간 구독",
+          buttonClass: "btn-outline",
         },
         {
-          id: 2,
-          name: "Enterprise Plan",
-          price: "영업팀 문의",
-          features: ["모든 기능 사용 가능", "우선 지원"],
+          id: "Enterprise Plan",
+          name: "Enterprise",
+          description: "대형 브랜드 및 기업 고객을 위한 맞춤 플랜",
+          monthlyPrice: "협의",
+          annualPrice: "협의",
+          buttonText: "기업 도입 문의",
+          buttonClass: "btn-outline",
         },
       ],
-      galleryImages: [
-        { id: 1, url: "/video/example1.gif", alt: "Gallery Image 1" },
-        { id: 2, url: "/video/example2.gif", alt: "Gallery Image 2" },
-        { id: 3, url: "/video/example3.gif", alt: "Gallery Image 3" },
+      features: [
+        {
+          name: "영상 내보내기",
+          values: { "Basic Plan": "$399/월", "Enterprise Plan": "협의" },
+        },
+        {
+          name: "이미지 내보내기",
+          values: { "Basic Plan": "무제한", "Enterprise Plan": "무제한" },
+        },
+        {
+          name: "업로드 스토리지",
+          values: { "Basic Plan": "50GB", "Enterprise Plan": "협의" },
+        },
+        {
+          name: "광고 운영",
+          values: { "Basic Plan": "✔️", "Enterprise Plan": "✔️" },
+        },
+        {
+          name: "재판매 라이선스",
+          values: { "Basic Plan": "-", "Enterprise Plan": "협의" },
+        },
       ],
       team: [
         {
           id: 1,
           name: "강성현",
-          role: "백엔드",
-          image: '/images/Profile.png',
+          role: "BE | AI Dev",
+          image: '/images/seong_hyun.jpg',
         },
         {
           id: 2,
           name: "김유중",
-          role: "프론트엔드",
+          role: "FE | AI Dev",
           image: '/images/ujoong.jpg',
         },
         {
           id: 3,
           name: "류나은",
-          role: "프론트엔드",
-          image: '/images/Profile.png',
+          role: "FE | BE | AI Dev",
+          image: '/images/na_eun.jpg',
         },
         {
           id: 4,
           name: "박정석",
-          role: "백엔드",
-          image: '/images/Profile.png',
+          role: "BE | AI Dev",
+          image: '/images/jeong_seok.jpg',
         },
         {
           id: 5,
           name: "변재연",
-          role: "프론트엔드",
+          role: "FE | AI Dev",
           image: '/images/jaeyeon.jpeg',
         },
         {
           id: 6,
           name: "서정호",
-          role: "AI개발",
-          image: '/images/Profile.png',
+          role: "AI Dev | FE",
+          image: '/images/jeong_ho.jpg',
         },
+      ],
+      galleryImages: [
+        { id: 1, url: "/video/gallery1.gif", alt: "GIF 이미지 1" },
+        { id: 2, url: "/video/gallery1.gif", alt: "GIF 이미지 2" },
+        { id: 3, url: "/video/gallery1.gif", alt: "GIF 이미지 3" },
       ],
     };
   },
@@ -408,13 +455,14 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  margin-top: 2rem; /* 내용 간 간격 추가 */
+  margin-top: 6rem;
 }
 
 .feature-item {
   display: flex;
   align-items: center;
   gap: 2rem;
+  margin-bottom: 100px;
 }
 
 .feature-item.reverse {
@@ -462,6 +510,7 @@ export default {
 
 .team-photo {
   width: 100%;
+  height: 205px;
   border-radius: 10px;
 }
 
@@ -518,71 +567,86 @@ export default {
 
 .pricing-section {
   padding: 60px 20px;
-  background-color: #f9f9f9;
+  background-color: #f9faff;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 34px;
+  transition: 0.4s;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #007bff;
+}
+
+input:checked + .slider::before {
+  transform: translateX(26px);
 }
 
 .pricing-cards {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
   gap: 20px;
 }
 
 .pricing-card {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 12px;
   padding: 20px;
-  width: 280px;
   text-align: center;
-  transition: transform 0.3s, box-shadow 0.3s;
+  width: 250px;
+  border: 2px solid #5CB494;  /* 초록색 태두리 */
+  display: flex;
+  flex-direction: column;      /* 카드 내 콘텐츠 세로 정렬 */
+  height: 350px;               /* 카드 높이 지정 (필요에 따라 조정) */
+  justify-content: space-between;  /* 버튼을 하단에 배치 */
 }
 
-.pricing-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+.feature-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
 }
 
-.pricing-card h3 {
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 10px;
+.feature-table th,
+.feature-table td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
 }
 
-.pricing-card .price {
-  font-size: 1.25rem;
-  color: #5CB494;
-  margin-bottom: 15px;
-}
-
-.pricing-card ul {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 20px;
-}
-
-.pricing-card ul li {
-  font-size: 0.9rem;
-  color: #555;
-  margin: 5px 0;
-}
-
-/* 기존 btn -> action-button 으로 변경 */
-.action-button {
-  display: inline-block;
+.pricing-card button {
+  background-color: #5CB494;  /* 초록색 배경 */
+  color: white;               /* 흰색 글씨 */
+  border: none;
+  border-radius: 20px;        /* 둥근 모서리 */
   padding: 10px 20px;
-  font-size: 1rem;
-  color: #5CB494;
-  border: 2px solid #5CB494;
-  border-radius: 5px;
-  background-color: transparent;
-  transition: background-color 0.3s, color 0.3s;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  align-self: center;         /* 버튼을 카드의 중앙에 배치 */
+  box-shadow: none;
 }
 
-.action-button:hover {
-  background-color: #5CB494;
-  color: #fff;
+.pricing-card button:hover {
+  background-color: #218838;  /* 호버 시 어두운 초록색 */
 }
 
 .gallery-container {
@@ -611,6 +675,9 @@ export default {
 .gallery-item:hover {
   transform: scale(1.05); /* 호버 시 확대 효과 */
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15); /* 호버 시 그림자 강조 */
+}
+.highlight-text {
+  color: #5CB494;
 }
 
 </style>
