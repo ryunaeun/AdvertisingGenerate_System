@@ -28,7 +28,7 @@
         },
         {
           "value": "kids",
-          "label": "키즈 (0-9세)"
+          "label": "어린이(0-9세)"
         },
         {
           "value": "teens",
@@ -85,12 +85,24 @@
           "label": "식품 & 식자재"
         },
         {
-          "value": "home",
+          "value": "home&furniture",
           "label": "인테리어 & 가구"
         },
         {
           "value": "sports",
           "label": "스포츠 & 아웃도어"
+        },
+        {
+          "value": "IT",
+          "label": "IT"
+        },
+        {
+          "value": "books",
+          "label": "도서"
+        },
+        {
+          "value": "dailyNecessities",
+          "label": "생활용품"
         }
       ]
     },
