@@ -32,7 +32,10 @@ onMounted(async () => {
       sessionStorage.setItem("accessToken", newAccessToken);
 
       console.log("자동 로그인 성공, 사용자 정보 확인 중...");
-      const userResponse = await apiClient.get("/user-info/personal");
+
+      const userResponse = await apiClient.get("/user-info/personal", {
+        headers: { Authorization: `Bearer ${newAccessToken}` },
+      });
       const userRole = userResponse.data.role;
 
       if (userRole === "ROLE_ADMIN") {
