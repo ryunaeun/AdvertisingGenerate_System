@@ -32,6 +32,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -497,7 +498,7 @@ public class UserController {
             personalInfo.put("companyName", user.getCompanyName());
             personalInfo.put("businessNumber", user.getBusinessNumber());
             personalInfo.put("businessFilePath", user.getBusinessFilePath());
-
+            personalInfo.put("role",user.getRole());
             return ResponseEntity.ok(personalInfo);
         } catch (Exception e) {
             e.printStackTrace();

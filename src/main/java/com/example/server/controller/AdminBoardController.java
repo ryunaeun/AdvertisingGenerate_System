@@ -35,6 +35,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+
 @RestController
 @RequestMapping("/api/admin/users/board") // URL 계층을 분리
 @RequiredArgsConstructor
