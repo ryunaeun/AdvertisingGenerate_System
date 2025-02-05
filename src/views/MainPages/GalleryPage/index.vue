@@ -2,6 +2,9 @@
   <div class="gallery-page">
     <Header />
     <div class="container py-5">
+      <!-- Path Settings -->
+      <PathSettings @path-change="handlePathChange" />
+
       <!-- Breadcrumb and Section Header -->
       <div class="breadcrumb-container mb-4">
         <nav aria-label="breadcrumb">
@@ -79,6 +82,66 @@
           </div>
         </div>
       </div>
+
+      <!-- Loading State -->
+      <div v-if="loading" class="text-center my-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">갤러리를 불러오는 중...</p>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="alert alert-danger" role="alert">
+        {{ error }}
+      </div>
+
+      <!-- Empty State -->
+      <div v-else-if="filteredAndSortedItems.length === 0" class="text-center my-5">
+        <p>표시할 영상이 없습니다.</p>
+      </div>
+
+      <!-- Gallery Grid -->
+      <div v-else class="row">
+        <div
+          class="col-lg-3 col-md-4 col-sm-6 mb-4"
+          v-for="(item, index) in filteredAndSortedItems"
+          :key="index"
+        >
+          <div class="card">
+            <div class="thumbnail-container">
+              <img 
+                :src="baseUrl + item.image" 
+                class="card-img-top" 
+                :alt="item.title"
+                @error="handleImageError"
+              />
+              <div class="video-duration">{{ item.duration }}</div>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">{{ item.title }}</h5>
+              <p class="card-date text-muted">{{ item.createdAt }}</p>
+              <div class="tags">
+                <span class="badge" @click="handleShare(item.video_url)">
+                  <i class="fas fa-share"></i> 공유하기
+                </span>
+                <span class="badge" @click="handleCheckPrompt(item.title)">
+                  <i class="fas fa-check-circle"></i> 프롬프트 확인
+                </span>
+                <a 
+                  :href="baseUrl + '/download/' + encodeURIComponent(userId + '/videos/' + item.filename)"
+                  class="badge"
+                  download
+                >
+                  <i class="fas fa-download"></i> 다운로드
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
       <!-- 공유 모달 -->
       <div v-if="isShareModalOpen" class="share-modal-overlay" @click.self="closeShareModal">
         <div class="share-modal">
@@ -111,45 +174,10 @@
           <button class="btn btn-secondary mt-3" @click="closeShareModal">
             닫기
           </button>
-        </div>
-      </div>
-      <!-- Gallery Grid -->
-      <div class="row">
-        <div
-          class="col-lg-3 col-md-4 col-sm-6 mb-4"
-          v-for="(item, index) in filteredAndSortedItems"
-          :key="index"
-        >
-          <div class="card">
-            <div class="thumbnail-container">
-              <img :src="item.image" class="card-img-top" :alt="item.title" />
-              <!-- 썸네일 우측 하단에 영상 길이 표시 -->
-              <div class="video-duration">{{ item.duration }}</div>
-            </div>
-            <div class="card-body">
-              <h5 class="card-title">{{ item.title }}</h5>
-              <p class="card-date text-muted">{{ item.createdAt }}</p>
-              <div class="tags">
-                <span class="badge" @click="handleShare(item.title)">
-                  <i class="fas fa-share"></i> 공유하기
-                </span>
-                <span class="badge" @click="handleCheckPrompt(item.title)">
-                  <i class="fas fa-check-circle"></i> 프롬프트 확인
-                </span>
-                <a
-                  :href="item.image"
-                  :download="`${item.title}.jpg`"
-                  class="badge"
-                >
-                  <i class="fas fa-download"></i> 다운로드
-                </a>
-              </div>
-            </div>
           </div>
         </div>
       </div>
-    </div>
-
+      
     <footer class="footer">
       <div class="footer-container">
         <div class="footer-left">
@@ -178,6 +206,8 @@
 
 <script>
 import Header from "../HomePage/components/Header.vue";
+import PathSettings from "./components/PathSettings.vue";
+import axios from 'axios';
 
 export default {
   name: "GalleryPage",
@@ -186,6 +216,7 @@ export default {
   },
   data() {
     return {
+      baseUrl: 'http://192.168.219.101:8888', // 실제 서버 URL로 변경하세요
       isShareModalOpen: false, // 공유 모달 상태
       currentShareUrl: "", // 공유할 URL
       searchQuery: "",
@@ -194,38 +225,8 @@ export default {
       isPeriodDropdownOpen: false,
       selectedPeriod: "all", // 선택된 기간 (필터링 로직에서 사용)
       selectedPeriodLabel: "전체 기간", // 선택된 기간의 이름 (UI에 표시됨)
-      galleryItems: [
-        {
-          title: "Soccer",
-          image: "/images/Profile.png",
-          createdAt: "2025.01.09 10:20:17",
-          duration: "0:10"
-        },
-        {
-          title: "Baseball",
-          image: "/images/Profile.png",
-          createdAt: "2025.01.08 14:35:00",
-          duration: "0:09"
-        },
-        {
-          title: "Tennis",
-          image: "/images/Profile.png",
-          createdAt: "2025.01.07 09:15:30",
-          duration: "0:13"
-        },
-        {
-          title: "Running",
-          image: "/images/Profile.png",
-          createdAt: "2025.01.06 18:45:10",
-          duration: "0:07"
-        },
-        {
-          title: "Basketball",
-          image: "/images/Profile.png",
-          createdAt: "2025.01.05 12:10:05",
-          duration: "0:18"
-        },
-      ],
+      galleryItems: [],
+      userId: 'KTaivle',
       periodOptions: [
         { value: "all", label: "전체 기간" },
         { value: "today", label: "오늘" },
@@ -233,6 +234,8 @@ export default {
         { value: "month", label: "최근 1달" },
         { value: "year", label: "최근 1년" },
       ],
+      loading: false,
+      error: null
     
     };
   },
@@ -290,6 +293,50 @@ export default {
     },
   },
   methods: {
+    handleImageError(e) {
+      // 이미지 로드 실패시 기본 이미지로 대체
+      e.target.src = '/static/default-thumbnail.png';
+    },
+    async fetchGalleryItems() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.get(`${this.baseUrl}/gallery_check`, {
+          params: { userId: this.userId }
+        });
+        
+        if (response.data.success) {
+          this.galleryItems = response.data.files;
+          console.log('Fetched gallery items:', this.galleryItems);
+        } else {
+          throw new Error(response.data.error || '갤러리 데이터를 불러오는데 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('Error fetching gallery items:', error);
+        this.error = error.response?.data?.error || error.message || '갤러리 아이템을 불러오는데 실패했습니다.';
+      } finally {
+        this.loading = false;
+      }
+    },
+    handlePathChange(pathData) {
+      this.userId = pathData.userId;
+      this.fetchGalleryItems();
+    },
+    handleShare(videoUrl) {
+      this.currentShareUrl = `${this.baseUrl}${videoUrl}`;
+      this.isShareModalOpen = true;
+    },
+    closeShareModal() {
+      this.isShareModalOpen = false;
+    },
+    copyToClipboard() {
+      navigator.clipboard.writeText(this.currentShareUrl).then(() => {
+        alert("URL이 복사되었습니다!");
+      });
+    },
+    shareVia(platform) {
+      alert(`${platform}로 공유하기 기능은 현재 준비 중입니다.`);
+    },
     handleSearch() {
       console.log(`Searching for: ${this.searchQuery}`);
     },
@@ -313,32 +360,25 @@ export default {
       this.selectedPeriodLabel = label; // 버튼 텍스트 변경
       this.isPeriodDropdownOpen = false; // 드롭다운 닫기
     },
-    handleShare(title) {
-      alert(`${title}을(를) 공유합니다!`);
-    },
     handleCheckPrompt(title) {
       alert(`${title}의 프롬프트를 확인합니다.`);
     },
-    // 공유 모달 열기
-    handleShare(url) {
-      this.currentShareUrl = url; // 공유할 URL 설정
-      this.isShareModalOpen = true; // 모달 열기
-    },
-    // 공유 모달 닫기
-    closeShareModal() {
-      this.isShareModalOpen = false; // 모달 닫기
-    },
-    // URL 복사
-    copyToClipboard() {
-      navigator.clipboard.writeText(this.currentShareUrl).then(() => {
-        alert("URL이 복사되었습니다!");
-      });
-    },
-    // 소셜 미디어 공유 (임시)
-    shareVia(platform) {
-      alert(`${platform}로 공유하기 기능은 현재 준비 중입니다.`);
-    },
+    // 드롭다운 외부 클릭 시 닫기
+    handleClickOutside(event) {
+      if (this.isPeriodDropdownOpen && !event.target.closest('.dropdown')) {
+        this.isPeriodDropdownOpen = false;
+      }
+    }
   },
+  mounted() {
+    this.fetchGalleryItems();
+    // 드롭다운 외부 클릭 이벤트 리스너 추가
+    document.addEventListener('click', this.handleClickOutside);
+  },
+  beforeDestroy() {
+    // 컴포넌트 제거 시 이벤트 리스너 제거
+    document.removeEventListener('click', this.handleClickOutside);
+  }
 };
 </script>
 

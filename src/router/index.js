@@ -11,6 +11,7 @@ import MyPage from "../views/MainPages/MyPage/index.vue";
 import PromptGenerator from "../views/MainPages/PromptGenerator/index.vue";
 import Txt2VidGenerator from "../views/MainPages/Txt2VidGenerator/index.vue";
 import AnalysisPage from "../views/MainPages/AnalysisPage/index.vue";
+import ResultPage from "../views/MainPages/ResultPage/index.vue";
 import PresentationView from "../views/Presentation/PresentationView.vue";
 import AboutView from "../views/LandingPages/AboutUs/AboutView.vue";
 import ContactView from "../views/LandingPages/ContactUs/ContactView.vue";
@@ -104,6 +105,16 @@ const router = createRouter({
       name: 'txt2vid',
       component: Txt2VidGenerator,
     },
+    {
+      path: '/result',
+      name: 'result',
+      component: ResultPage,
+    },
+
+
+
+
+
 
     {
       path: "/presentation",

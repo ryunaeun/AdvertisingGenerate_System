@@ -3,11 +3,7 @@
     <div class="row h-100">
       <!-- 왼쪽 이미지 섹션 -->
       <div class="col-md-6 illustration-section">
-        <img
-          src="../../../assets/img/illustrations/login.jpg"
-          alt="Developer Workspace"
-          class="illustration-image"
-        />
+        <img src="../../../assets/img/illustrations/login.jpg" alt="Developer Workspace" class="illustration-image" />
       </div>
 
       <!-- 오른쪽 로그인 폼 섹션 -->
@@ -16,31 +12,14 @@
           <h2 class="welcome-text">Welcome</h2>
           <form @submit.prevent="login" class="login-form">
             <div class="form-group mb-3">
-              <input
-                type="email"
-                class="form-control"
-                placeholder="이메일을 입력하세요"
-                v-model="email"
-              />
+              <input type="email" class="form-control" placeholder="이메일을 입력하세요" v-model="email" />
             </div>
             <div class="form-group mb-3">
-              <input
-                type="password"
-                class="form-control"
-                placeholder="비밀번호를 입력하세요"
-                v-model="password"
-              />
+              <input type="password" class="form-control" placeholder="비밀번호를 입력하세요" v-model="password" />
             </div>
             <div class="form-check form-switch mb-3">
-              <input
-                type="checkbox"
-                class="form-check-input"
-                id="rememberMe"
-                v-model="rememberMe"
-              />
-              <label class="form-check-label" for="rememberMe"
-                >아이디 저장하기</label
-              >
+              <input type="checkbox" class="form-check-input" id="rememberMe" v-model="rememberMe" />
+              <label class="form-check-label" for="rememberMe">아이디 저장하기</label>
             </div>
             <button type="submit" class="btn btn-success w-100">로그인</button>
             <div class="divider-container mt-3 mb-3">
@@ -49,50 +28,31 @@
               <div class="divider-line"></div>
             </div>
             <div class="social-login mt-4">
-              <button
-                type="button"
-                class="btn btn-outline-secondary w-100 mb-2"
-              >
-                <img
-                  src="../../../assets/img/logos/login/kakao.png"
-                  alt="Kakao"
-                />
+              <button type="button" class="btn btn-outline-secondary w-100 mb-2"
+                onclick="alert('소셜 로그인 기능은 현재 준비 중입니다.')">
+                <img src="../../../assets/img/logos/login/kakao.png" alt="Kakao" />
                 카카오로 시작
               </button>
-              <button
-                type="button"
-                class="btn btn-outline-secondary w-100 mb-2"
-              >
-                <img
-                  src="../../../assets/img/logos/login/naver.png"
-                  alt="Naver"
-                />
+              <button type="button" class="btn btn-outline-secondary w-100 mb-2"
+                onclick="alert('소셜 로그인 기능은 현재 준비 중입니다.')">
+                <img src="../../../assets/img/logos/login/naver.png" alt="Naver" />
                 네이버로 시작
               </button>
-              <button type="button" class="btn btn-outline-secondary w-100">
-                <img
-                  src="../../../assets/img/logos/login/google.png"
-                  alt="Google"
-                />
+              <button type="button" class="btn btn-outline-secondary w-100" 
+                onclick="alert('소셜 로그인 기능은 현재 준비 중입니다.')">
+                <img src="../../../assets/img/logos/login/google.png" alt="Google" />
                 Google로 시작
               </button>
             </div>
+
             <div class="mt-3 text-center">
               <div class="mb-2">
                 <span class="text-muted">아직 회원이 아니신가요?</span> |
-                <router-link
-                  to="/register"
-                  class="text-success fw-bold text-decoration-none"
-                  >회원가입</router-link
-                >
+                <router-link to="/register" class="text-success fw-bold text-decoration-none">회원가입</router-link>
               </div>
               <div>
                 <span class="text-muted">로그인이 실패하나요?</span> |
-                <a
-                  @click="showSearchModal"
-                  class="text-success fw-bold text-decoration-none"
-                  >비밀번호 찾기</a
-                >
+                <a @click="showSearchModal" class="text-success fw-bold text-decoration-none">비밀번호 찾기</a>
               </div>
             </div>
           </form>
@@ -114,28 +74,16 @@
           <div class="form-group">
             <label class="form-label">이메일 주소</label>
             <div class="input-wrapper">
-              <input
-                type="email"
-                class="form-control"
-                placeholder="hello@example.com"
-                v-model="modalEmail"
-                @input="validateModalEmail"
-              />
-              <button
-                type="button"
-                class="btn-action"
-                @click="requestResetPassword"
-                :disabled="!isEmailValid || isResetCodeSent"
-              >
+              <input type="email" class="form-control" placeholder="hello@example.com" v-model="modalEmail"
+                @input="validateModalEmail" />
+              <button type="button" class="btn-action" @click="requestResetPassword"
+                :disabled="!isEmailValid || isResetCodeSent">
                 인증 요청
               </button>
-              <span
-                class="validation-message"
-                :class="{
-                  error: !isEmailValid && modalEmail,
-                  success: isEmailValid && modalEmail,
-                }"
-              >
+              <span class="validation-message" :class="{
+                error: !isEmailValid && modalEmail,
+                success: isEmailValid && modalEmail,
+              }">
                 {{ emailMessage }}
               </span>
             </div>
@@ -144,29 +92,18 @@
           <div class="form-group">
             <label class="form-label">인증 번호</label>
             <div class="input-wrapper">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="인증번호 6자리를 입력해주세요"
-                v-model="verificationCode"
-                maxlength="6"
-              />
+              <input type="text" class="form-control" placeholder="인증번호 6자리를 입력해주세요" v-model="verificationCode"
+                maxlength="6" />
               <button type="button" class="btn-action" @click="verifyResetCode">
                 본인 인증
               </button>
             </div>
-            <span class="resend-link" @click="requestResetPassword"
-              >인증번호를 받지 못하셨나요?</span
-            >
+            <span class="resend-link" @click="requestResetPassword">인증번호를 받지 못하셨나요?</span>
           </div>
         </div>
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn custom-confirm-btn"
-            @click="confirmSearch"
-            :disabled="!isVerificationCodeValid"
-          >
+          <button type="button" class="btn custom-confirm-btn" @click="confirmSearch"
+            :disabled="!isVerificationCodeValid">
             인증하기
           </button>
         </div>
@@ -187,24 +124,16 @@
           <div class="form-group">
             <label class="form-label">비밀번호</label>
             <div class="input-wrapper">
-              <input
-                :type="showPassword ? 'text' : 'password'"
-                class="form-control"
-                placeholder="password"
-                v-model="modalPassword"
-                @input="validateModalPassword"
-              />
+              <input :type="showPassword ? 'text' : 'password'" class="form-control" placeholder="password"
+                v-model="modalPassword" @input="validateModalPassword" />
               <i class="material-icons password-toggle" @click="togglePassword">
                 {{ showPassword ? "visibility_off" : "visibility" }}
               </i>
             </div>
-            <span
-              class="validation-message"
-              :class="{
-                error: !isPasswordValid && modalPassword,
-                success: isPasswordValid && modalPassword,
-              }"
-            >
+            <span class="validation-message" :class="{
+              error: !isPasswordValid && modalPassword,
+              success: isPasswordValid && modalPassword,
+            }">
               {{ passwordMessage }}
             </span>
           </div>
@@ -212,38 +141,23 @@
           <div class="form-group">
             <label class="form-label">비밀번호 확인</label>
             <div class="input-wrapper">
-              <input
-                :type="showConfirmPassword ? 'text' : 'password'"
-                class="form-control"
-                placeholder="password"
-                v-model="confirmPassword"
-                @input="validateConfirmPassword"
-              />
-              <i
-                class="material-icons password-toggle"
-                @click="toggleConfirmPassword"
-              >
+              <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control" placeholder="password"
+                v-model="confirmPassword" @input="validateConfirmPassword" />
+              <i class="material-icons password-toggle" @click="toggleConfirmPassword">
                 {{ showConfirmPassword ? "visibility_off" : "visibility" }}
               </i>
             </div>
-            <span
-              class="validation-message"
-              :class="{
-                error: !isConfirmPasswordValid && confirmPassword,
-                success: isConfirmPasswordValid && confirmPassword,
-              }"
-            >
+            <span class="validation-message" :class="{
+              error: !isConfirmPasswordValid && confirmPassword,
+              success: isConfirmPasswordValid && confirmPassword,
+            }">
               {{ confirmPasswordMessage }}
             </span>
           </div>
         </div>
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn custom-confirm-btn"
-            @click="resetPassword"
-            :disabled="!isPasswordValid || !isConfirmPasswordValid"
-          >
+          <button type="button" class="btn custom-confirm-btn" @click="resetPassword"
+            :disabled="!isPasswordValid || !isConfirmPasswordValid">
             변경하기
           </button>
         </div>

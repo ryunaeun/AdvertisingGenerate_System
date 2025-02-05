@@ -99,6 +99,9 @@
         <PathSettings @path-change="handlePathChange" />
       </div>
     </div>
+    <router-link to="/result" class="nav-item" :class="{ 'active': $route.path.includes('/result') }">
+          <h1>확인</h1>
+    </router-link>
   </div>
 </template>
 
@@ -293,7 +296,7 @@ export default {
     downloadVideo(event, index) {
       const filename = this.videoUrls[index].split('/').pop();
       event.target.download = filename;
-    }
+    },
   },
 
   watch: {
@@ -579,5 +582,21 @@ h1 {
     aspect-ratio: auto;
     min-height: 200px;
   }
+}
+
+
+.confirm-btn {
+  padding: 12px 24px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.confirm-btn:hover {
+  background-color: #45a049;
 }
 </style>
