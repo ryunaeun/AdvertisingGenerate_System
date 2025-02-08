@@ -59,7 +59,7 @@
       <div class="help-links">
       <p class="help-text">저희 서비스가 처음이신가요?</p>
       <div class="link-group">
-        <router-link to="/board#chatbot-section" class="help-link">챗봇 바로가기</router-link>
+        <router-link to="/board#my-inquiries-section" class="help-link">문의함 바로가기</router-link>
         <router-link to="/board#faq-section" class="help-link">FAQ 바로가기</router-link>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "http://43.201.26.71:8080/api",
+  baseURL: "http://aivle-advi.com:8080/api",
 });
 
 // 요청 인터셉터

@@ -9,7 +9,9 @@
       <!-- 오른쪽 로그인 폼 섹션 -->
       <div class="col-md-6 login-form-section">
         <div class="login-form-container">
-          <h2 class="welcome-text">Welcome</h2>
+          <router-link  to="/">
+            <img src="../../../assets/img/logos/garo-logo.png" alt="AdVi Logo" height="50" class="btn-brand">
+          </router-link>
           <form @submit.prevent="login" class="login-form">
             <div class="form-group mb-3">
               <input type="email" class="form-control" placeholder="이메일을 입력하세요" v-model="email" />
@@ -554,12 +556,11 @@ export default {
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
 }
 
-.welcome-text {
-  color: #40a681;
-  font-size: 24px;
-  font-weight: 600;
+.btn-brand {
   margin-bottom: 2rem;
-  text-align: center;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .form-control {
