@@ -71,8 +71,8 @@ import ConversationManagement from "./components/ConversationManagement.vue";
 import UserManagement from "./components/UserManagement.vue";
 import PostManagement from "./components/PostManagement.vue";
 import NoticeManagement from "./components/NoticeManagement.vue";
-import axios from "axios";
-
+//import axios from "axios";
+import apiClient from "@/api/axiosClient";
 export default {
   name: "AdminPage",
   data() {
@@ -91,7 +91,7 @@ export default {
     async logout() {
       try {
         // 로그아웃 API 호출
-        await axios.post("http://43.201.26.71:8080/api/logout", null, {
+        await apiClient.post("/logout", null, {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
             Accept: "application/json",

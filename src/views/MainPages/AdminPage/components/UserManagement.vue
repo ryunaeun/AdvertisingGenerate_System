@@ -93,7 +93,7 @@ export default {
       try {
         const accessToken = sessionStorage.getItem("accessToken");
         const response = await axios.get(
-          "http://43.201.26.71:8080/api/admin/users",
+          "http://aivle-advi.com:8080/api/admin/users",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -128,7 +128,7 @@ export default {
       try {
         const accessToken = sessionStorage.getItem("accessToken");
         await axios.post(
-          "http://43.201.26.71:8080/api/admin/users/update",
+          "http://aivle-advi.com:8080/api/admin/users/update",
           this.editData,
           {
             headers: {
@@ -151,7 +151,7 @@ export default {
       try {
         const accessToken = sessionStorage.getItem("accessToken");
         await axios.post(
-          "http://43.201.26.71:8080/api/admin/users/delete",
+          "http://aivle-advi.com:8080/api/admin/users/delete",
           { email },
           {
             headers: {

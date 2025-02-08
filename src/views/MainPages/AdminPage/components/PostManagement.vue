@@ -85,7 +85,7 @@ export default {
       try {
         const accessToken = sessionStorage.getItem("accessToken");
         const response = await axios.get(
-          "http://43.201.26.71:8080/api/admin/users/board",
+          "http://aivle-advi.com:8080/api/admin/users/board",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -129,7 +129,7 @@ export default {
         const accessToken = sessionStorage.getItem("accessToken");
 
         const response = await axios.post(
-          "http://43.201.26.71:8080/api/admin/users/board/reply",
+          "http://aivle-advi.com:8080/api/admin/users/board/reply",
           {
             boardId: this.selectedPost.boardId,
             email: this.selectedPost.email,
@@ -162,7 +162,7 @@ export default {
         const accessToken = sessionStorage.getItem("accessToken");
 
         const response = await axios.delete(
-          `http://43.201.26.71:8080/api/admin/users/board/${boardId}`,
+          `http://aivle-advi.com:8080/api/admin/users/board/${boardId}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,

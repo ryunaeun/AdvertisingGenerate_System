@@ -105,7 +105,7 @@ export default {
       try {
         const accessToken = sessionStorage.getItem("accessToken");
         const response = await axios.get(
-          "http://43.201.26.71:8080/api/admin/notice",
+          "http://aivle-advi.com:8080/api/admin/notice",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -131,7 +131,7 @@ export default {
       try {
         const accessToken = sessionStorage.getItem("accessToken");
         await axios.post(
-          "http://43.201.26.71:8080/api/admin/notice/write",
+          "http://aivle-advi.com:8080/api/admin/notice/write",
           {
             title: this.newNotice.title,
             content: this.newNotice.content,
@@ -161,7 +161,7 @@ export default {
       try {
         const accessToken = sessionStorage.getItem("accessToken");
         await axios.delete(
-          `http://43.201.26.71:8080/api/admin/notice/${noticeId}`,
+          `http://aivle-advi.com:8080/api/admin/notice/${noticeId}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -196,7 +196,7 @@ export default {
       try {
         const accessToken = sessionStorage.getItem("accessToken");
         await axios.post(
-          `http://43.201.26.71:8080/api/admin/notice/${this.editNotice.noticeId}/update`,
+          `http://aivle-advi.com:8080/api/admin/notice/${this.editNotice.noticeId}/update`,
           {
             title: this.editNotice.title,
             content: this.editNotice.content,

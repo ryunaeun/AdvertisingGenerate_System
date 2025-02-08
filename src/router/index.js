@@ -287,45 +287,4 @@ router.beforeEach(async (to, from, next) => {
   next();
 });
 
-// router.beforeEach(async (to, from, next) => {
-//   const accessToken = sessionStorage.getItem("accessToken");
-//   const refreshToken = localStorage.getItem("refreshToken");
-
-//   if (to.matched.some((record) => record.meta.requiresAuth)) {
-//     if (!accessToken && refreshToken) {
-//       try {
-//         // ✅ apiClient 사용하여 Access Token 갱신
-//         const response = await apiClient.post("/refresh-token", { refreshToken });
-//         const newAccessToken = response.data.accessToken;
-//         sessionStorage.setItem("accessToken", newAccessToken);
-//         console.log("✅ Access Token 갱신 성공");
-
-//         // ✅ apiClient 사용하여 사용자 정보 가져오기
-//         const userResponse = await apiClient.get("/user-info/personal");
-//         const userRole = userResponse.data.role;
-
-//         if (userRole === "ROLE_ADMIN" && to.name !== "admin") {
-//           return next({ name: "admin" });
-//         } 
-//         if (userRole !== "ROLE_ADMIN" && to.name !== "home") {
-//           return next({ name: "home" });
-//         }
-
-//         return next();
-//       } catch (error) {
-//         console.error("❌ Access Token 갱신 실패:", error);
-//         localStorage.removeItem("refreshToken");
-//         sessionStorage.removeItem("accessToken");
-//         alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-//         return next({ name: "login" });
-//       }
-//     } else if (!accessToken) {
-//       console.warn("🚨 Refresh Token 없음, 로그인 페이지로 이동");
-//       return next({ name: "login" });
-//     }
-//   }
-
-//   next();
-// });
-
 export default router;
