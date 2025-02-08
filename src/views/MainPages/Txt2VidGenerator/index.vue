@@ -7,34 +7,19 @@
         <div class="form-group">
           <!-- 프롬프트 입력 및 저장/불러오기 -->
           <label for="prompt">프롬프트 입력:</label>
-          <textarea 
-            id="prompt" 
-            v-model="generatedPrompt"
-            name="prompt" 
-            placeholder="Enter your prompt here..." 
-            rows="6"
-          >man drinking coffee in cafe bright morning</textarea>
-          
+          <textarea id="prompt" v-model="generatedPrompt" name="prompt" placeholder="Enter your prompt here..."
+            rows="6">man drinking coffee in cafe bright morning</textarea>
+
           <!-- 프롬프트 생성 페이지로 이동하는 버튼 -->
-          <button 
-            class="prompt-gen-btn"
-            @click="goToPromptGenerator"
-          >
+          <button class="prompt-gen-btn" @click="goToPromptGenerator">
             프롬프트 생성으로
           </button>
-          
-          <PromptSaveLoad 
-            v-if="currentServerUrl"
-            :server-url="currentServerUrl"
-            :user-id="savePath.userId"
-            :prompt-content="generatedPrompt"
-            @prompt-loaded="handlePromptLoaded"
-          />
+
+          <PromptSaveLoad v-if="currentServerUrl" :server-url="currentServerUrl" :user-id="savePath.userId"
+            :prompt-content="generatedPrompt" @prompt-loaded="handlePromptLoaded" />
 
           <!-- 비디오 설정 컴포넌트 -->
-          <VideoSettings
-            @settings-change="handleVideoSettingsChange"
-          />
+          <VideoSettings @settings-change="handleVideoSettingsChange" />
 
           <!-- 비디오 생성 컨트롤 -->
           <div class="form-group video-controls-group">
@@ -47,11 +32,7 @@
                   <option value="3">3</option>
                   <option value="4">4</option>
                 </select>
-                <button 
-                  id="generateBtn" 
-                  @click="generateVideos"
-                  :disabled="isLoading"
-                >광고 영상 생성하기</button>
+                <button id="generateBtn" @click="generateVideos" :disabled="isLoading">광고 영상 생성하기</button>
               </div>
             </div>
           </div>
@@ -61,47 +42,28 @@
       <div class="preview-container">
         <!-- 비디오 출력 영역 -->
         <div class="videos-grid" :class="gridClass" id="videosGrid">
-          <div 
-            v-for="index in videoCount" 
-            :key="index"
-            class="video-cell"
-            :style="{ display: index <= videoCount ? 'flex' : 'none' }"
-          >
-            <div 
-              class="loading" 
-              :id="`loading-${index}`"
-              v-show="loadingVideos[index-1]"
-            ></div>
-            <video 
-              :id="`outputVideo-${index}`"
-              class="output-video" 
-              v-show="videoUrls[index-1]"
-              controls 
-              autoplay 
-              loop 
-              muted
-            >
-              <source :src="videoUrls[index-1]" type="video/mp4">
+          <div v-for="index in videoCount" :key="index" class="video-cell"
+            :style="{ display: index <= videoCount ? 'flex' : 'none' }">
+            <div class="loading" :id="`loading-${index}`" v-show="loadingVideos[index - 1]"></div>
+            <video :id="`outputVideo-${index}`" class="output-video" v-show="videoUrls[index - 1]" controls autoplay loop
+              muted>
+              <source :src="videoUrls[index - 1]" type="video/mp4">
               Your browser does not support the video tag.
             </video>
-            <a 
-              :id="`downloadLink-${index}`"
-              class="download-link" 
-              v-show="videoUrls[index-1]"
-              :href="videoUrls[index-1]" 
-              download
-              @click="downloadVideo($event, index-1)"
-            >Download Video</a>
+            <a :id="`downloadLink-${index}`" class="download-link" v-show="videoUrls[index - 1]"
+              :href="videoUrls[index - 1]" download @click="downloadVideo($event, index - 1)">Download Video</a>
           </div>
         </div>
         <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-        
-        <PathSettings @path-change="handlePathChange" />
+
+        <div class="bottom-controls">
+          <PathSettings @path-change="handlePathChange" />
+          <router-link to="/result" class="confirm-btn">
+            결과 확인
+          </router-link>
+        </div>
       </div>
     </div>
-    <router-link to="/result" class="nav-item" :class="{ 'active': $route.path.includes('/result') }">
-          <h1>확인</h1>
-    </router-link>
   </div>
 </template>
 
@@ -113,14 +75,14 @@ import VideoSettings from './components/VideoSettings.vue'
 
 export default {
   name: 'Txt2VidGenerator',
-  
+
   components: {
     Header,
     PathSettings,
     PromptSaveLoad,
     VideoSettings
   },
-  
+
   data() {
     return {
       serverUrls: [
@@ -145,7 +107,7 @@ export default {
 
   computed: {
     gridClass() {
-      switch(Number(this.videoCount)) {
+      switch (Number(this.videoCount)) {
         case 1: return 'single';
         case 2: return 'horizontal-split';
         case 3:
@@ -167,7 +129,7 @@ export default {
             mode: 'cors',
             timeout: 5000
           });
-          
+
           if (response.ok) {
             this.currentServerUrl = url;
             console.log('Connected to server:', url);
@@ -216,7 +178,7 @@ export default {
 
       this.errorMessage = '';
       this.isLoading = true;
-      
+
       // 비디오 배열 초기화
       this.videoUrls = new Array(Number(this.videoCount)).fill('');
       this.loadingVideos = new Array(Number(this.videoCount)).fill(true);
@@ -263,10 +225,10 @@ export default {
         }
 
         const videoUrl = `${this.currentServerUrl}/output/${this.savePath.userId}/${data.folder}/${data.filename}`;
-        
+
         // 비디오 로드 확인
         await this.waitForVideoLoad(videoUrl, index);
-        
+
         this.videoUrls[index] = videoUrl;
         this.loadingVideos[index] = false;
 
@@ -310,7 +272,7 @@ export default {
   async mounted() {
     try {
       await this.findAvailableServer();
-      
+
       // sessionStorage에서 전달된 프롬프트 확인
       const transferredPrompt = sessionStorage.getItem('videoPrompt');
       if (transferredPrompt) {
@@ -344,18 +306,23 @@ export default {
 }
 
 .prompt-gen-container {
-  flex: 0 0 38%;  /* 너비 고정 */
+  flex: 0 0 38%;
+  /* 너비 고정 */
   background-color: var(--background-secondary);
   border-radius: 8px;
   box-shadow: 0 2px 4px var(--shadow-color);
   padding: 20px;
-  height: fit-content;  /* 내용물에 맞게 높이 조절 */
-  max-height: calc(100vh - 120px);  /* 최대 높이 제한 */
-  overflow-y: auto;  /* 내용이 넘칠 경우 스크롤 */
+  height: fit-content;
+  /* 내용물에 맞게 높이 조절 */
+  max-height: calc(100vh - 120px);
+  /* 최대 높이 제한 */
+  overflow-y: auto;
+  /* 내용이 넘칠 경우 스크롤 */
 }
 
 .form-group {
-  margin-bottom: 20px;  /* 컴포넌트 간 여백 */
+  margin-bottom: 20px;
+  /* 컴포넌트 간 여백 */
   width: 100%;
 }
 
@@ -384,7 +351,8 @@ export default {
 .prompt-gen-btn {
   width: 100%;
   padding: 10px 20px;
-  background-color: #3498db;  /* 기본 파란색 */
+  background-color: #3498db;
+  /* 기본 파란색 */
   color: white;
   border: none;
   border-radius: 4px;
@@ -394,7 +362,8 @@ export default {
 }
 
 .prompt-gen-btn:hover {
-  background-color: #2980b9;  /* hover시 진한 파란색으로 변경 */
+  background-color: #2980b9;
+  /* hover시 진한 파란색으로 변경 */
   opacity: 0.9;
   transform: translateY(-1px);
 }
@@ -405,7 +374,8 @@ export default {
 
 /* 프롬프트 저장/불러오기 버튼과 비디오 설정 사이 여백 */
 .prompt-actions {
-  margin-bottom: 30px;  /* 여백 증가 */
+  margin-bottom: 30px;
+  /* 여백 증가 */
 }
 
 /* 비디오 컨트롤 그룹 스타일 */
@@ -464,13 +434,16 @@ export default {
 
 /* 미리보기 컨테이너 */
 .preview-container {
-  flex: 1;  /* 남은 공간 차지 */
+  flex: 1;
+  /* 남은 공간 차지 */
   background-color: var(--background-secondary);
   border-radius: 8px;
   box-shadow: 0 2px 4px var(--shadow-color);
   padding: 20px;
   display: flex;
   flex-direction: column;
+  position: relative;
+  padding-bottom: 100px; 
 }
 
 /* 비디오 그리드 스타일 */
@@ -584,19 +557,38 @@ h1 {
   }
 }
 
+.bottom-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: calc(100% - 40px); /* 좌우 패딩 고려 */
+}
 
 .confirm-btn {
-  padding: 12px 24px;
-  background-color: #4CAF50;
+  padding:10px;
+  margin: 5px;
+  margin-left: 20px;
+  background-color: #5CB494;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 20px;
+  font-weight: 500;
+  text-decoration: none;
+  height: 43px;
+  width: 200px;
   transition: background-color 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .confirm-btn:hover {
   background-color: #45a049;
+  color: white;
 }
 </style>
