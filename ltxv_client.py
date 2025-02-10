@@ -11,7 +11,7 @@ from PIL import Image
 
 class LTXVClient:
     # 클래스 레벨 상수 정의
-    DEFAULT_FOLDER_NAME = "LTXVideo"
+    DEFAULT_FOLDER_NAME = "videos"
     DEFAULT_BASE_FILENAME = "video"
     DEFAULT_FRAME_LENGTH = 65
     DEFAULT_MAX_SIZE = 800  # JSON에서는 800x800을 사용

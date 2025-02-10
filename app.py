@@ -6,6 +6,10 @@ from config import load_config
 from prompt_generator import PromptGenerator
 from datetime import datetime
 from ad_recommender import AdRecommender
+from ltxv_client import LTXVClient
+from werkzeug.utils import secure_filename
+from PIL import Image 
+import asyncio
 import random
 import os
 import time
@@ -20,7 +24,9 @@ video_client = HunyuanVideoClient()
 image_client = FluxImageClient()
 prompt_generator = PromptGenerator()
 ad_recommender = AdRecommender()
-
+ltxv_client = LTXVClient()
+BASE_UPLOAD_FOLDER = r"D:\ComfyUI_windows_portable\ComfyUI\input"
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 OUTPUT_DIR = r"D:\ComfyUI_windows_portable\ComfyUI\output"
 
 @app.route('/')
@@ -560,6 +566,217 @@ def download_file(filename):
     except Exception as e:
         return jsonify({'error': str(e)}), 404
 
+@app.route('/get_latest_recommendation', methods=['GET'])
+def get_latest_recommendation():
+    try:
+        user_id = request.args.get('userId')
+        if not user_id:
+            return jsonify({'error': 'User ID is required'}), 400
+
+        # recommendations 디렉토리 경로
+        recommendations_dir = os.path.join(OUTPUT_DIR, user_id, 'recommendations')
+        
+        if not os.path.exists(recommendations_dir):
+            return jsonify({'error': 'No recommendations found'}), 404
+
+        # JSON 파일들을 생성 시간 기준으로 정렬
+        json_files = [f for f in os.listdir(recommendations_dir) if f.endswith('.json')]
+        if not json_files:
+            return jsonify({'error': 'No recommendation files found'}), 404
+
+        latest_file = max(
+            [os.path.join(recommendations_dir, f) for f in json_files],
+            key=os.path.getctime
+        )
+
+        # 최신 파일 읽기
+        with open(latest_file, 'r', encoding='utf-8') as f:
+            recommendation_data = json.load(f)
+
+        return jsonify({
+            'success': True,
+            'recommendation': recommendation_data
+        })
+
+    except Exception as e:
+        print(f"Error in get_latest_recommendation: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_latest_video', methods=['GET'])
+def get_latest_video():
+    try:
+        user_id = request.args.get('userId')
+        if not user_id:
+            return jsonify({'error': 'User ID is required'}), 400
+
+        # 비디오 디렉토리 경로
+        videos_dir = os.path.join(OUTPUT_DIR, user_id, 'videos')
+        
+        if not os.path.exists(videos_dir):
+            return jsonify({'error': 'No videos found'}), 404
+
+        # MP4 파일들을 생성 시간 기준으로 정렬
+        video_files = [f for f in os.listdir(videos_dir) if f.endswith('.mp4')]
+        if not video_files:
+            return jsonify({'error': 'No video files found'}), 404
+
+        latest_video = max(
+            [os.path.join(videos_dir, f) for f in video_files],
+            key=os.path.getctime
+        )
+
+        # 응답 데이터 구성
+        video_filename = os.path.basename(latest_video)
+        folder = os.path.basename(os.path.dirname(latest_video))
+
+        return jsonify({
+            'success': True,
+            'filename': video_filename,
+            'folder': folder
+        })
+
+    except Exception as e:
+        print(f"Error in get_latest_video: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# 파일 확장자 검증 함수
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# 이미지 업로드 라우트
+@app.route('/upload_image', methods=['POST'])
+def upload_image():
+    """이미지 업로드 처리"""
+    try:
+        if 'image' not in request.files:
+            return jsonify({'error': 'No image file provided'}), 400
+            
+        file = request.files['image']
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+            
+        if not allowed_file(file.filename):
+            return jsonify({'error': 'Invalid file type'}), 400
+
+        # 사용자 ID와 서브 경로 가져오기
+        user_id = request.form.get('userId', 'default')
+        sub_path = request.form.get('subPath', 'images')
+        
+        # 사용자별 업로드 디렉토리 생성
+        upload_folder = os.path.join(BASE_UPLOAD_FOLDER, user_id, sub_path)
+        os.makedirs(upload_folder, exist_ok=True)
+            
+        # 파일명 안전하게 처리 및 타임스탬프 추가
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{timestamp}_{secure_filename(file.filename)}"
+        save_path = os.path.join(upload_folder, filename)
+        
+        # 파일 저장
+        file.save(save_path)
+        
+        return jsonify({
+            'success': True,
+            'path': save_path
+        })
+
+    except Exception as e:
+        print(f"Error uploading image: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+def calculate_dimensions(image_path: str, max_size: int) -> tuple[int, int]:
+    """이미지 비율을 유지하면서 새로운 크기 계산"""
+    with Image.open(image_path) as img:
+        width, height = img.size
+        
+        if width >= height:
+            new_width = max_size
+            new_height = int((height * max_size) / width)
+        else:
+            new_height = max_size
+            new_width = int((width * max_size) / height)
+            
+        # 32의 배수로 조정
+        new_width = (new_width // 32) * 32
+        new_height = (new_height // 32) * 32
+        
+        return new_width, new_height
+
+@app.route('/generate_ltxv', methods=['POST'])
+def generate_ltxv():
+    """LTXV 비디오 생성"""
+    try:
+        data = request.json
+        prompt = data.get('prompt')
+        image_path = data.get('imagePath')
+        use_random_seed = data.get('useRandomSeed')
+        frame_length = data.get('frameLength', 65)
+        max_size = data.get('width', 800)  # 최대 해상도로 사용
+        folder_name = data.get('savePath', 'videos')
+        fps = data.get('fps', 25)
+        
+        if not prompt or not image_path:
+            return jsonify({'error': 'Prompt and image path are required'}), 400
+        
+        if not os.path.exists(image_path):
+            return jsonify({'error': 'Image file not found'}), 400
+            
+        if use_random_seed:
+            seed = random.randint(1, 999999999999999)
+        else:
+            try:
+                seed = int(data.get('seed'))
+                if not (1 <= seed <= 999999999999999):
+                    return jsonify({'error': 'Seed must be between 1 and 999999999999999'}), 400
+            except (TypeError, ValueError):
+                return jsonify({'error': 'Invalid seed value'}), 400
+        
+        try:
+            # 이미지 비율을 유지하며 크기 계산
+            width, height = calculate_dimensions(image_path, max_size)
+            print(f"Calculated dimensions: {width}x{height} from max_size: {max_size}")
+            
+            # ComfyUI 큐가 처리될 시간을 주기 위해 잠시 대기
+            time.sleep(1)
+            
+            video_path = asyncio.run(ltxv_client.generate_video(
+                image_path=image_path,
+                prompt=prompt,
+                folder_name=folder_name,
+                base_filename="video",
+                seed=seed,
+                frame_length=frame_length,
+                width=width,
+                height=height,
+                fps=fps
+            ))
+            
+            # 비디오 생성이 완료될 때까지 대기
+            while not os.path.exists(video_path):
+                time.sleep(0.5)
+                
+            # 파일이 완전히 쓰여질 때까지 추가 대기
+            time.sleep(2)
+            
+            filename = os.path.basename(video_path)
+            folder = os.path.basename(os.path.dirname(video_path))
+            return jsonify({
+                'success': True,
+                'seed': seed,
+                'filename': filename,
+                'folder': folder,
+                'dimensions': {
+                    'width': width,
+                    'height': height
+                }
+            })
+        except Exception as e:
+            print(f"Error generating LTXV video: {str(e)}")
+            return jsonify({'error': str(e)}), 500
+
+    except Exception as e:
+        print(f"Error in generate_ltxv: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 if __name__ == '__main__':
     config = load_config()
     app.run(debug=True, host='0.0.0.0', port=8888)
