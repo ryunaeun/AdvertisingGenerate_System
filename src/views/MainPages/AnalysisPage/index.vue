@@ -52,7 +52,7 @@ export default {
       }
 
       try {
-        const response = await fetch("http://127.0.0.1:5001/generate_graph", {
+        const response = await fetch("http://125.181.20.252:8888/generate_graph", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ company_name: this.companyName }),
@@ -155,7 +155,7 @@ export default {
     },
     async expandNode(event, d) {
       try {
-        const response = await fetch("http://127.0.0.1:5001/expand_node", {
+        const response = await fetch("http://125.181.20.252:8888/expand_node", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ parent_node: d.id }),

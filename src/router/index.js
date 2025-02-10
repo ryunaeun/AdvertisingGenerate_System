@@ -12,6 +12,7 @@ import PromptGenerator from "../views/MainPages/PromptGenerator/index.vue";
 import Txt2VidGenerator from "../views/MainPages/Txt2VidGenerator/index.vue";
 import AnalysisPage from "../views/MainPages/AnalysisPage/index.vue";
 import ResultPage from "../views/MainPages/ResultPage/index.vue";
+import Img2VidGenerator from "../views/MainPages/Img2VidGenerator/index.vue";
 
 
 import apiClient from "@/api/axiosClient";
@@ -86,6 +87,11 @@ const router = createRouter({
       path: '/result',
       name: 'result',
       component: ResultPage,
+    },
+    {
+      path: '/img2vid-generator',
+      name: 'img2vid',
+      component: Img2VidGenerator,
     },
   ],
 });

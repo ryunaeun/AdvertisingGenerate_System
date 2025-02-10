@@ -37,13 +37,13 @@
             <p>자신만의 광고 스토리로<br>광고를 만들어 보세요.</p>
           </div>
 
-          <div class="option-card">
+          <router-link to="/img2vid-generator" class="option-card">
             <div class="icon">
               <span class="material-icons-round">image</span>
             </div>
             <h3>이미지로 광고 만들기</h3>
             <p>자신의 상품을 통해 나만의<br>광고를 만들어 보세요.</p>
-          </div>
+          </router-link>
 
           <div class="option-card">
             <router-link to="/analysis" class="option-link">
