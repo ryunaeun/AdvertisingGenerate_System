@@ -5,11 +5,6 @@
     <div class="content-layout">
       <div class="left-column">
         <!-- 광고 노출 방법 모델 영역 -->
-<<<<<<< HEAD
-        <div class="text-center mb-5">
-          <p style="color: #344767; font-size: 1.25rem; font-weight: bold; margin-bottom: 3px;">최적 노출 시간대는 20:00로 도출되었습니다.</p>
-          <p style="color: #344767; font-size: 1.25rem; font-weight: bold; margin-bottom: 3px;">효과 극대화를 위해 배너 광고를 추천드립니다.</p>
-=======
         <div class="text-center mb-5" v-if="recommendationData">
           <p style="color: #344767; font-size: 1.25rem; font-weight: bold; margin-bottom: 3px;">
             최적 노출 시간대는 {{ recommendationData.recommendations.time }}로 도출되었습니다.
@@ -25,7 +20,6 @@
           <p style="color: #344767; font-size: 1.25rem; font-weight: bold; margin-bottom: 3px;">
             효과 극대화를 위해 배너 광고를 추천드립니다.
           </p>
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
         </div>
 
         <!-- 비디오 출력 영역 -->
@@ -69,33 +63,24 @@
         </div>
       </div>
     </div>
-<<<<<<< HEAD
-=======
     
     <!-- PathSettings 컴포넌트 (숨김 처리) -->
     <div style="display: none;">
       <PathSettings @path-change="handlePathChange" ref="pathSettings" />
     </div>
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
   </div>
 </template>
 
 <script>
 import Header from "../HomePage/components/Header.vue";
-<<<<<<< HEAD
-=======
 import PathSettings from './components/PathSettings.vue';
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
 import * as d3 from "d3";
 
 export default {
   name: "ResultPage",
   components: {
     Header,
-<<<<<<< HEAD
-=======
     PathSettings
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
   },
   data() {
     return {
@@ -108,10 +93,7 @@ export default {
         subPath: 'videos',
         fullPath: 'KTaivle\\videos'
       },
-<<<<<<< HEAD
-=======
       recommendationData: null,
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
       companyName: "",
       analysisResult: "",
       nodes: [],
@@ -119,9 +101,6 @@ export default {
     }
   },
   methods: {
-<<<<<<< HEAD
-    async generateVideo() {
-=======
     async handlePathChange(pathData) {
       this.savePath = pathData;
       await this.loadLatestRecommendation();
@@ -148,69 +127,32 @@ export default {
     },
 
     async loadLatestVideo() {
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
       this.loadingVideo = true;
       this.errorMessage = '';
 
       try {
-<<<<<<< HEAD
-        const requestData = {
-          prompt: "광고 영상을 위한 프롬프트",
-          useRandomSeed: true,
-          frameLength: 16,
-          width: 512,
-          height: 512,
-          enableUpscale: false,
-          savePath: this.savePath.fullPath
-        };
-
-        const response = await fetch(`${this.serverUrl}/generate`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(requestData)
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to generate video');
-=======
         // 최신 비디오 정보 가져오기
         const response = await fetch(`${this.serverUrl}/get_latest_video?userId=${this.savePath.userId}`);
         
         if (!response.ok) {
           throw new Error('Failed to load video');
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
         }
 
         const data = await response.json();
         if (!data.success) {
-<<<<<<< HEAD
-          throw new Error(data.error || 'Video generation failed');
-=======
           throw new Error(data.error || 'Video loading failed');
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
         }
 
         this.videoUrl = `${this.serverUrl}/output/${this.savePath.userId}/${data.folder}/${data.filename}`;
         await this.waitForVideoLoad(this.videoUrl);
 
       } catch (error) {
-<<<<<<< HEAD
-        console.error('Error generating video:', error);
-        this.errorMessage = `Error generating video: ${error.message}`;
-=======
         console.error('Error loading video:', error);
         this.errorMessage = `Error loading video: ${error.message}`;
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
       } finally {
         this.loadingVideo = false;
       }
     },
-<<<<<<< HEAD
-=======
-
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
     async waitForVideoLoad(videoUrl) {
       return new Promise((resolve, reject) => {
         const video = document.getElementById('outputVideo-1');
@@ -225,18 +167,10 @@ export default {
         video.src = videoUrl;
       });
     },
-<<<<<<< HEAD
-=======
-
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
     downloadVideo(event) {
       const filename = this.videoUrl.split('/').pop();
       event.target.download = filename;
     },
-<<<<<<< HEAD
-=======
-
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
     async generateGraph() {
       if (!this.companyName) {
         alert("메인 키워드를 입력하세요!");
@@ -268,10 +202,6 @@ export default {
         alert("서버와 연결 중 오류 발생!");
       }
     },
-<<<<<<< HEAD
-=======
-
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
     drawGraph() {
       const svg = d3.select("#graphSvg");
       svg.selectAll("*").remove();
@@ -340,10 +270,6 @@ export default {
         this.fitGraphToContainer(g, svg);
       });
     },
-<<<<<<< HEAD
-=======
-
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
     fitGraphToContainer(g, svg) {
       const bbox = g.node().getBBox();
       const width = svg.node().getBoundingClientRect().width;
@@ -353,10 +279,6 @@ export default {
       const translateY = (height - bbox.height * scale) / 2 - bbox.y * scale;
       g.attr("transform", `translate(${translateX},${translateY}) scale(${scale})`);
     },
-<<<<<<< HEAD
-=======
-
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
     async expandNode(event, d) {
       try {
         const response = await fetch("http://127.0.0.1:5001/expand_node", {
@@ -385,15 +307,10 @@ export default {
       }
     },
   },
-<<<<<<< HEAD
-  mounted() {
-    this.generateVideo();
-=======
   async mounted() {
     if (this.$refs.pathSettings) {
       await this.$refs.pathSettings.initializePath();
     }
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
     window.addEventListener('resize', this.drawGraph);
   },
   beforeUnmount() {
@@ -512,24 +429,15 @@ export default {
   display: flex;
   margin-bottom: 5px;
   gap: 10px;
-<<<<<<< HEAD
-  height: 70%; /* 높이를 70%로 설정 */
-=======
   height: 70%;
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
 }
 
 .input-group .form-control {
   flex: 1;
   border-radius: 5px !important;
   border: 1px solid #ced4da;
-<<<<<<< HEAD
-  height: 100%; /* 부모 요소의 높이에 맞춤 */
-  font-size: 0.9rem; /* 글자 크기를 약간 줄임 */
-=======
   height: 100%;
   font-size: 0.9rem;
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
 }
 
 .input-group .btn {
@@ -538,29 +446,16 @@ export default {
   border-radius: 5px !important;
   box-shadow: none;
   margin: 0px;
-<<<<<<< HEAD
-  height: 100%; /* 부모 요소의 높이에 맞춤 */
-  font-size: 0.9rem; /* 글자 크기를 약간 줄임 */
-  padding: 0.25rem 0.5rem; /* 패딩을 줄여 버튼 내부 여백 조정 */
-}
-
-
-=======
   height: 100%;
   font-size: 0.9rem;
   padding: 0.25rem 0.5rem;
 }
 
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
 .input-group .form-control:focus {
   border-color: #5CB494;
   box-shadow: 0 0 0 0.2rem rgba(92, 180, 148, 0.25);
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
 .input-group .btn:hover {
   background-color: #4a9d7c;
   border-color: #4a9d7c;
@@ -588,10 +483,6 @@ export default {
   padding: 10px;
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
 .graph-title,
 .result-title {
   color: #344767;
@@ -616,9 +507,4 @@ export default {
     height: 50vh;
   }
 }
-<<<<<<< HEAD
-
 </style>
-=======
-</style>
->>>>>>> ca357a4926bdf41261a18e9ae4cf966f49dba78b
