@@ -108,7 +108,7 @@ class HunyuanVideoClient:
             "17": {
                 "inputs": {
                     "scheduler": "simple",
-                    "steps": 8,
+                    "steps": 6,
                     "denoise": 1,
                     "model": ["12", 0]
                 },

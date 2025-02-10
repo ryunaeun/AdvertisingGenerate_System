@@ -5,6 +5,7 @@ from flux_s_client import FluxImageClient
 from config import load_config
 from prompt_generator import PromptGenerator
 from datetime import datetime
+from ad_recommender import AdRecommender
 import random
 import os
 import time
@@ -18,6 +19,7 @@ CORS(app)  # CORS 허용 설정 추가
 video_client = HunyuanVideoClient()
 image_client = FluxImageClient()
 prompt_generator = PromptGenerator()
+ad_recommender = AdRecommender()
 
 OUTPUT_DIR = r"D:\ComfyUI_windows_portable\ComfyUI\output"
 
@@ -39,32 +41,104 @@ def prompt_gen():
 
 @app.route('/generate_prompt', methods=['POST'])
 def generate_prompt():
+    """프롬프트 생성 및 광고 추천"""
+    try:
+        # 입력 데이터 검증
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        if not isinstance(data, dict):
+            return jsonify({'error': 'Invalid data format'}), 400
+
+        # 필수 필드 확인
+        required_fields = ['gender', 'ageGroup', 'productCategory', 'userId']  # userId 추가
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return jsonify({'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+
+        try:
+            # 1. 광고 추천 모델 실행
+            recommendations = ad_recommender.predict(data)
+            print(f"Generated recommendations: {recommendations}")  # 디버깅용
+
+            # 2. 추천 정보를 JSON 파일로 저장
+            if recommendations:
+                # 사용자별 디렉토리 생성
+                user_dir = os.path.join(OUTPUT_DIR, data['userId'], 'recommendations')
+                os.makedirs(user_dir, exist_ok=True)
+
+                # 현재 시간을 파일명에 포함
+                timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+                filename = f"recommendation_{timestamp}.json"
+                file_path = os.path.join(user_dir, filename)
+
+                # 저장할 추천 데이터 구성
+                recommendation_data = {
+                    'timestamp': timestamp,
+                    'user_input': {
+                        'gender': data['gender'],
+                        'ageGroup': data['ageGroup'],
+                        'productCategory': data['productCategory']
+                    },
+                    'recommendations': {
+                        'time': recommendations['recommended_time'],
+                        'adtype': recommendations['recommended_adtype']
+                    }
+                }
+
+                # JSON 파일 저장
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    json.dump(recommendation_data, f, ensure_ascii=False, indent=2)
+
+        except Exception as e:
+            print(f"Error in ad recommendation: {str(e)}")
+            recommendations = None
+
+        # 3. GPT 프롬프트 생성
+        try:
+            generated_prompt = prompt_generator.generate(json.dumps(data))
+            print("Generated GPT prompt successfully")  # 디버깅용
+        except Exception as e:
+            print(f"Error in prompt generation: {str(e)}")
+            return jsonify({'error': 'Failed to generate prompt'}), 500
+
+        # 4. 응답 반환
+        response = {
+            'success': True,
+            'generated_prompt': generated_prompt,
+            'recommendations': {
+                'time': recommendations['recommended_time'] if recommendations else None,
+                'adtype': recommendations['recommended_adtype'] if recommendations else None,
+                'formatted_text': ad_recommender.format_recommendation(recommendations) if recommendations else ""
+            }
+        }
+
+        return jsonify(response)
+
+    except Exception as e:
+        print(f"Unexpected error in generate_prompt: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# 광고 추천 결과만 별도로 받을 수 있는 엔드포인트
+@app.route('/get_recommendations', methods=['POST'])
+def get_recommendations():
+    """광고 추천 정보만 반환"""
     try:
         data = request.json
         if not data:
             return jsonify({'error': 'No data provided'}), 400
 
-        # 데이터 구조 검증
-        if not isinstance(data, dict):
-            return jsonify({'error': 'Invalid data format'}), 400
-
-        # Target Settings 데이터 확인
-        required_fields = ['gender', 'ageGroup', 'productCategory', 'seasonEvent', 'adTone']
-        for field in required_fields:
-            if field not in data:
-                print(f"Missing field: {field}")
-
-        # GPT를 통한 프롬프트 생성
-        # prompt_generator.generate는 JSON 문자열을 받도록 되어있음
-        generated_prompt = prompt_generator.generate(json.dumps(data))
-
+        # 광고 추천 모델 실행
+        recommendations = ad_recommender.predict(data)
+        
         return jsonify({
             'success': True,
-            'generated_prompt': generated_prompt
+            'recommendations': recommendations
         })
 
     except Exception as e:
-        print(f"Error generating prompt: {str(e)}")
+        print(f"Error in get_recommendations: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/generate_examples', methods=['POST'])
@@ -400,6 +474,91 @@ def update_target_settings():
     except Exception as e:
         print(f"Error updating settings: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+@app.route('/gallery_check', methods=['GET'])
+def gallery_check():
+    try:
+        user_id = request.args.get('userId', 'KTaivle')
+        base_path = os.path.join(OUTPUT_DIR, user_id, 'videos')
+        
+        if not os.path.exists(base_path):
+            return jsonify({'error': 'Directory not found'}), 404
+            
+        files = []
+        video_files = [f for f in os.listdir(base_path) if f.endswith(('.mp4', '.MP4'))]
+        
+        for video_filename in video_files:
+            file_path = os.path.join(base_path, video_filename)
+            base_name = os.path.splitext(video_filename)[0]
+            
+            # Check for thumbnail with various image extensions
+            thumbnail_path = None
+            for ext in ['.jpg', '.jpeg', '.png', '.JPG', '.JPEG', '.PNG']:
+                potential_thumbnail = os.path.join(base_path, base_name + ext)
+                if os.path.exists(potential_thumbnail):
+                    thumbnail_path = potential_thumbnail
+                    break
+            
+            if os.path.isfile(file_path):
+                # Get file stats
+                stats = os.stat(file_path)
+                
+                # Extract video duration
+                import cv2
+                video = cv2.VideoCapture(file_path)
+                fps = video.get(cv2.CAP_PROP_FPS)
+                frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+                duration = frame_count / fps if fps > 0 else 0
+                video.release()
+                
+                # Format duration
+                minutes = int(duration // 60)
+                seconds = int(duration % 60)
+                duration_str = f"{minutes}:{seconds:02d}"
+
+                # Generate URLs
+                if thumbnail_path:
+                    # Convert thumbnail path to URL format
+                    rel_thumbnail_path = os.path.relpath(thumbnail_path, OUTPUT_DIR)
+                    thumbnail_url = f"/output/{rel_thumbnail_path.replace(os.sep, '/')}"
+                else:
+                    # Fallback to video thumbnail
+                    thumbnail_url = f"/static/default-thumbnail.png"  # You should add a default thumbnail
+
+                # Convert video path to URL format
+                rel_video_path = os.path.relpath(file_path, OUTPUT_DIR)
+                video_url = f"/output/{rel_video_path.replace(os.sep, '/')}"
+                
+                files.append({
+                    'title': base_name,
+                    'image': thumbnail_url,
+                    'video_url': video_url,
+                    'createdAt': datetime.fromtimestamp(stats.st_ctime).strftime('%Y.%m.%d %H:%M:%S'),
+                    'duration': duration_str,
+                    'size': stats.st_size,
+                    'filename': video_filename  # Add original filename
+                })
+        
+        # Sort files by creation date (newest first)
+        files.sort(key=lambda x: x['createdAt'], reverse=True)
+        
+        return jsonify({
+            'success': True,
+            'files': files
+        })
+        
+    except Exception as e:
+        print(f"Error checking gallery: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/download/<path:filename>')
+def download_file(filename):
+    try:
+        # Ensure the file path is within OUTPUT_DIR
+        full_path = os.path.join(OUTPUT_DIR, filename)
+        return send_file(full_path, as_attachment=True)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 404
 
 if __name__ == '__main__':
     config = load_config()

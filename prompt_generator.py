@@ -14,16 +14,30 @@ class PromptGenerator:
         # OpenAI 클라이언트 초기화
         self.client = openai.OpenAI(api_key=self.api_key)
         
-        # 시스템 프롬프트 설정
-        self.system_prompt = """You are an expert at creating detailed prompts for video advertisements. Your task is to generate clear, specific, and creative prompts that will be used to generate video content. Focus on these aspects:
-1. Visual elements and scenes
-2. Style and atmosphere
-3. Color schemes and lighting
-4. Camera movements and transitions
-5. Target audience considerations
-6. Brand tone and message
+        # 수정된 시스템 프롬프트
+        self.system_prompt = """You are an expert marketing strategist specializing in creating video advertisement prompts that resonate with specific target audiences. Your task is to generate prompts that will create videos that effectively engage and appeal to the defined demographic, considering their preferences, behaviors, and cultural context. Focus on:
 
-The prompt should be optimized for AI video generation and maintain consistency with the target audience and marketing goals."""
+1. Target Audience Psychology:
+   - Understanding their interests, preferences, and consumption patterns
+   - Identifying engaging visual elements and storytelling approaches
+   - Considering cultural references and trends that resonate with them
+
+2. Marketing Strategy:
+   - Creating scenes that appeal to the target demographic without necessarily featuring them
+   - Incorporating relevant lifestyle elements and aspirational content
+   - Using appropriate pacing and energy levels for the target age group
+
+3. Visual Style Guide:
+   - Color schemes that appeal to the target demographic
+   - Music and sound design preferences of the audience
+   - Visual effects and transitions that capture their attention
+
+4. Brand Integration:
+   - Seamlessly incorporating products in contexts relevant to the audience
+   - Using language and tone that resonates with the target group
+   - Creating scenarios that demonstrate value proposition for the specific demographic
+
+Remember: The goal is not to show the target demographic in the video, but to create content that naturally attracts and engages them based on their preferences and interests."""
 
     def _load_api_key(self) -> str:
         """API_KEY.txt 파일에서 API 키를 읽어옴"""
@@ -49,38 +63,60 @@ The prompt should be optimized for AI video generation and maintain consistency 
             raise
 
     def _prepare_prompt(self, input_data: str) -> Dict:
-        """입력된 JSON 문자열을 파싱하고 구조화된 프롬프트를 준비"""
+        """개선된 프롬프트 준비 로직"""
         try:
             prompt_data = json.loads(input_data)
             
-            structured_prompt = "Create a video advertisement with the following specifications:\n\n"
+            structured_prompt = "Design a video advertisement concept with the following strategic focus:\n\n"
             
-            # 타겟 정보 추가
-            target_info = []
-            if prompt_data.get('gender'):
-                target_info.append(f"Gender: {prompt_data['gender']}")
-            if prompt_data.get('ageGroup'):
-                target_info.append(f"Age Group: {prompt_data['ageGroup']}")
-            if target_info:
-                structured_prompt += "Target Audience:\n" + "\n".join(target_info) + "\n\n"
+            # 타겟 분석 및 전략 수립
+            if prompt_data.get('gender') or prompt_data.get('ageGroup'):
+                structured_prompt += "Target Audience Analysis:\n"
+                
+                # 연령대별 특성 고려
+                age_group = prompt_data.get('ageGroup', '')
+                gender = prompt_data.get('gender', '')
+                
+                if age_group and gender:
+                    structured_prompt += f"Create content that appeals to {age_group} {gender} audience by considering:\n"
+                    structured_prompt += "- Their typical media consumption habits\n"
+                    structured_prompt += "- Current trends and interests in this demographic\n"
+                    structured_prompt += "- Preferred visual and audio styles\n"
+                    structured_prompt += "- Popular cultural references and themes\n\n"
             
-            # 제품 카테고리 추가
+            # 제품 카테고리 컨텍스트
             if prompt_data.get('productCategory'):
-                structured_prompt += f"Product Category: {prompt_data['productCategory']}\n\n"
+                structured_prompt += f"Product Category Context:\n"
+                structured_prompt += f"Product: {prompt_data['productCategory']}\n"
+                structured_prompt += "Consider:\n"
+                structured_prompt += "- How this demographic typically interacts with this product category\n"
+                structured_prompt += "- Key purchase motivators for this audience\n"
+                structured_prompt += "- Preferred product presentation style\n\n"
             
-            # 시즌/이벤트 정보 추가
+            # 시즌/이벤트 마케팅 전략
             if prompt_data.get('seasonEvent'):
-                structured_prompt += f"Seasonal Context: {prompt_data['seasonEvent']}\n\n"
+                structured_prompt += f"Seasonal/Event Strategy:\n"
+                structured_prompt += f"Context: {prompt_data['seasonEvent']}\n"
+                structured_prompt += "Incorporate:\n"
+                structured_prompt += "- Seasonal elements that resonate with the target audience\n"
+                structured_prompt += "- Event-specific motivations and emotions\n\n"
             
-            # 광고 톤 추가
+            # 광고 톤 및 스타일
             if prompt_data.get('adTone'):
-                structured_prompt += f"Advertisement Tone: {prompt_data['adTone']}\n\n"
+                structured_prompt += f"Creative Direction:\n"
+                structured_prompt += f"Tone: {prompt_data['adTone']}\n"
+                structured_prompt += "Ensure the tone aligns with:\n"
+                structured_prompt += "- Target audience's communication preferences\n"
+                structured_prompt += "- Brand personality and message\n\n"
             
-            # 추가 요구사항 추가
+            # 추가 요구사항
             if prompt_data.get('additionalRequests'):
-                structured_prompt += f"Additional Requirements:\n{prompt_data['additionalRequests']}\n"
+                structured_prompt += f"Additional Strategic Considerations:\n{prompt_data['additionalRequests']}\n\n"
+            
+            structured_prompt += "\nCreate a video concept that naturally attracts this audience through their preferred visual styles, storytelling approaches, and cultural references, without explicitly featuring them in the advertisement."
             
             return structured_prompt
+        
         except json.JSONDecodeError:
             return input_data
 
@@ -89,7 +125,7 @@ The prompt should be optimized for AI video generation and maintain consistency 
         try:
             processed_prompt = self._prepare_prompt(prompt_data)
             
-            # 새로운 OpenAI API 버전으로 호출
+            # OpenAI API 호출
             response = self.client.chat.completions.create(
                 model="gpt-4",
                 messages=[
@@ -103,7 +139,6 @@ The prompt should be optimized for AI video generation and maintain consistency 
                 presence_penalty=0.3
             )
             
-            # 새로운 응답 구조에 맞게 수정
             generated_prompt = response.choices[0].message.content.strip()
             
             # 로그 기록
