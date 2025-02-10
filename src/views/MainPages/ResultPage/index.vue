@@ -32,7 +32,7 @@
                 Your browser does not support the video tag.
               </video>
               <a id="downloadLink-1" class="download-link" v-show="videoUrl" :href="videoUrl" download
-                @click="downloadVideo">Download Video</a>
+                 @click="downloadVideo">Download Video</a>
             </div>
           </div>
           <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
@@ -63,7 +63,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- PathSettings 컴포넌트 (숨김 처리) -->
     <div style="display: none;">
       <PathSettings @path-change="handlePathChange" ref="pathSettings" />
@@ -111,7 +111,7 @@ export default {
       try {
         // 최신 추천 정보 가져오기
         const response = await fetch(`${this.serverUrl}/get_latest_recommendation?userId=${this.savePath.userId}`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to load recommendation');
         }
@@ -133,7 +133,7 @@ export default {
       try {
         // 최신 비디오 정보 가져오기
         const response = await fetch(`${this.serverUrl}/get_latest_video?userId=${this.savePath.userId}`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to load video');
         }
@@ -153,6 +153,7 @@ export default {
         this.loadingVideo = false;
       }
     },
+
     async waitForVideoLoad(videoUrl) {
       return new Promise((resolve, reject) => {
         const video = document.getElementById('outputVideo-1');
@@ -167,10 +168,12 @@ export default {
         video.src = videoUrl;
       });
     },
+
     downloadVideo(event) {
       const filename = this.videoUrl.split('/').pop();
       event.target.download = filename;
     },
+
     async generateGraph() {
       if (!this.companyName) {
         alert("메인 키워드를 입력하세요!");
@@ -202,6 +205,7 @@ export default {
         alert("서버와 연결 중 오류 발생!");
       }
     },
+
     drawGraph() {
       const svg = d3.select("#graphSvg");
       svg.selectAll("*").remove();
@@ -210,58 +214,58 @@ export default {
       const height = svg.node().getBoundingClientRect().height;
 
       const simulation = d3.forceSimulation(this.nodes)
-        .force("link", d3.forceLink(this.links).id(d => d.id).distance(50))
-        .force("charge", d3.forceManyBody().strength(-100))
-        .force("center", d3.forceCenter(width / 2, height / 2));
+          .force("link", d3.forceLink(this.links).id(d => d.id).distance(50))
+          .force("charge", d3.forceManyBody().strength(-100))
+          .force("center", d3.forceCenter(width / 2, height / 2));
 
       const g = svg.append("g");
 
       const link = g.append("g")
-        .selectAll("line")
-        .data(this.links)
-        .enter().append("line")
-        .style("stroke", "#aaa")
-        .style("stroke-width", 1.5);
+          .selectAll("line")
+          .data(this.links)
+          .enter().append("line")
+          .style("stroke", "#aaa")
+          .style("stroke-width", 1.5);
 
       const nodeGroup = g.append("g")
-        .selectAll("g")
-        .data(this.nodes)
-        .enter().append("g")
-        .call(d3.drag()
-          .on("start", (event, d) => {
-            if (!event.active) simulation.alphaTarget(0.3).restart();
-            d.fx = d.x;
-            d.fy = d.y;
-          })
-          .on("drag", (event, d) => {
-            d.fx = event.x;
-            d.fy = event.y;
-          })
-          .on("end", (event, d) => {
-            if (!event.active) simulation.alphaTarget(0);
-            d.fx = null;
-            d.fy = null;
-          })
-        )
-        .on("click", this.expandNode);
+          .selectAll("g")
+          .data(this.nodes)
+          .enter().append("g")
+          .call(d3.drag()
+              .on("start", (event, d) => {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+              })
+              .on("drag", (event, d) => {
+                d.fx = event.x;
+                d.fy = event.y;
+              })
+              .on("end", (event, d) => {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+              })
+          )
+          .on("click", this.expandNode);
 
       nodeGroup.append("circle")
-        .attr("r", 10)
-        .attr("fill", "#6a5acd");
+          .attr("r", 10)
+          .attr("fill", "#6a5acd");
 
       nodeGroup.append("text")
-        .attr("dy", -15)
-        .attr("text-anchor", "middle")
-        .attr("fill", "#333")
-        .style("font-size", "12px")
-        .text(d => d.id);
+          .attr("dy", -15)
+          .attr("text-anchor", "middle")
+          .attr("fill", "#333")
+          .style("font-size", "12px")
+          .text(d => d.id);
 
       simulation.on("tick", () => {
         link
-          .attr("x1", d => d.source.x)
-          .attr("y1", d => d.source.y)
-          .attr("x2", d => d.target.x)
-          .attr("y2", d => d.target.y);
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
 
         nodeGroup.attr("transform", d => `translate(${d.x},${d.y})`);
       });
@@ -270,6 +274,7 @@ export default {
         this.fitGraphToContainer(g, svg);
       });
     },
+
     fitGraphToContainer(g, svg) {
       const bbox = g.node().getBBox();
       const width = svg.node().getBoundingClientRect().width;
@@ -279,6 +284,7 @@ export default {
       const translateY = (height - bbox.height * scale) / 2 - bbox.y * scale;
       g.attr("transform", `translate(${translateX},${translateY}) scale(${scale})`);
     },
+
     async expandNode(event, d) {
       try {
         const response = await fetch("http://127.0.0.1:5001/expand_node", {
