@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg position-sticky z-index-sticky top-0">
     <div class="container px-0">
       <router-link class="navbar-brand" to="/">
-        <img src="../../../../assets/img/logos/garo-logo.png" alt="AdVi Logo" height="45">
+        <img src="../../../../assets/img/logos/garo-logo.png" alt="AdVi Logo" height="30">
       </router-link>
       <div class="collapse navbar-collapse" id="navigation">
         <ul class="navbar-nav me-auto">
@@ -94,7 +94,7 @@ export default {
 
 <style scoped>
 .navbar {
-  padding: 0.5rem 2rem;
+  padding: 0.8rem 2rem;
   height: 60px;
   background-color: white;
   position: sticky;
@@ -103,8 +103,8 @@ export default {
 }
 
 .navbar-brand {
-  font-size: 1.2rem;
-  font-weight: 600;
+  padding-top: 0px;
+  margin-top:-5px;
 }
 
 .nav-link {

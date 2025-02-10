@@ -9,7 +9,9 @@
       <!-- 오른쪽 로그인 폼 섹션 -->
       <div class="col-md-6 login-form-section">
         <div class="login-form-container">
-          <h2 class="welcome-text">Welcome</h2>
+          <router-link  to="/">
+            <img src="../../../assets/img/logos/garo-logo.png" alt="AdVi Logo" height="50" class="btn-brand">
+          </router-link>
           <form @submit.prevent="login" class="login-form">
             <div class="form-group mb-3">
               <input type="email" class="form-control" placeholder="이메일을 입력하세요" v-model="email" />
@@ -102,7 +104,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn custom-confirm-btn" @click="confirmSearch"
+          <button type="button" class="custom-confirm-btn" @click="confirmSearch"
             :disabled="!isVerificationCodeValid">
             인증하기
           </button>
@@ -554,12 +556,11 @@ export default {
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
 }
 
-.welcome-text {
-  color: #40a681;
-  font-size: 24px;
-  font-weight: 600;
+.btn-brand {
   margin-bottom: 2rem;
-  text-align: center;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .form-control {
@@ -662,16 +663,19 @@ export default {
 .input-wrapper {
   position: relative;
   width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .form-control {
-  width: 100%;
-  border: none;
-  border-bottom: 1px solid #e0e0e0;
+  flex: 1; /* 입력창이 가능한 공간을 차지하도록 설정 */
+  border: none !important;
+  border-bottom: 1px solid #e0e0e0 !important; /* 하단 테두리만 표시 */
   padding: 0.5rem 0;
   background: transparent;
   font-size: 0.875rem;
   border-radius: 0;
+  margin-bottom : 0px !important; 
 }
 
 .form-control:focus {
@@ -681,20 +685,21 @@ export default {
 
 .form-control::placeholder {
   color: #999;
-  font-size: 0.875rem;
 }
 
 .btn-action {
-  position: absolute;
-  right: 0;
-  top: -5px;
-  background: none;
-  border: 1px solid #40a681;
-  color: #40a681;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
+  margin-left: 10px; /* 입력창과 버튼 사이 간격 */
+  background: none; /* 배경 제거 */
+  border: 1px solid #40a681; /* 테두리만 표시 */
+  color: #40a681; /* 텍스트 색상 */
+  padding: 0.5rem 1rem;
+  border-radius: 4px; /* 버튼 모서리를 둥글게 처리 */
   font-size: 0.875rem;
   cursor: pointer;
+}
+
+.btn-action:hover {
+  background-color: rgba(64, 166, 129, 0.1); /* 호버 시 약간의 배경색 추가 */
 }
 
 .validation-message {

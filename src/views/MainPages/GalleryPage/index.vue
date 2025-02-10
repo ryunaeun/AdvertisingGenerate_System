@@ -216,7 +216,7 @@ export default {
   },
   data() {
     return {
-      baseUrl: 'http://192.168.219.101:8888', // 실제 서버 URL로 변경하세요
+      baseUrl: 'http://125.181.20.252:8888', // 실제 서버 URL로 변경하세요
       isShareModalOpen: false, // 공유 모달 상태
       currentShareUrl: "", // 공유할 URL
       searchQuery: "",

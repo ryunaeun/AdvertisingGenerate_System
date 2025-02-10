@@ -12,7 +12,7 @@
             v-model="generatedPrompt"
             name="prompt" 
             placeholder="Enter your prompt here..." 
-            rows="6"
+            rows="9"
           >man drinking coffee in cafe bright morning</textarea>
           
           <!-- 프롬프트 생성 페이지로 이동하는 버튼 -->
@@ -39,14 +39,7 @@
           <!-- 비디오 생성 컨트롤 -->
           <div class="form-group video-controls-group">
             <div class="input-row">
-              <label for="videoCount">영상 개수:</label>
               <div class="input-button-wrapper">
-                <select v-model="videoCount" id="videoCount" name="videoCount">
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                </select>
                 <button 
                   id="generateBtn" 
                   @click="generateVideos"
@@ -96,12 +89,14 @@
         </div>
         <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
         
-        <PathSettings @path-change="handlePathChange" />
+        <div class="bottom-controls">
+          <PathSettings @path-change="handlePathChange" />
+          <router-link to="/result" class="confirm-btn">
+            결과 확인
+          </router-link>
+        </div>
       </div>
     </div>
-    <router-link to="/result" class="nav-item" :class="{ 'active': $route.path.includes('/result') }">
-          <h1>확인</h1>
-    </router-link>
   </div>
 </template>
 
@@ -296,7 +291,7 @@ export default {
     downloadVideo(event, index) {
       const filename = this.videoUrls[index].split('/').pop();
       event.target.download = filename;
-    },
+    }
   },
 
   watch: {
@@ -585,18 +580,37 @@ h1 {
 }
 
 
+
+.bottom-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  padding-top: 10px;
+}
+
 .confirm-btn {
-  padding: 12px 24px;
-  background-color: #4CAF50;
+  padding:10px;
+  margin-left: 20px;
+  background-color: #5CB494;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 20px;
+  font-weight: 500;
+  text-decoration: none;
+  height: 43px;
+  width: 200px;
   transition: background-color 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .confirm-btn:hover {
   background-color: #45a049;
+  color: white;
 }
+
 </style>

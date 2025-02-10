@@ -2,7 +2,7 @@
   <header class="header">
     <nav class="navbar">
       <router-link class="navbar-brand" to="/home">
-        <img src="../../../../assets/img/logos/garo-logo.png" alt="AdVi Logo" height="50">
+        <img src="../../../../assets/img/logos/garo-logo.png" alt="AdVi Logo" height="30">
       </router-link>
       <div class="nav-items">
         <router-link to="/home" class="nav-item" :class="{ 'active': $route.path.includes('/home') }">
@@ -242,6 +242,7 @@ export default {
 .navbar {
   height: 80px; /* 헤더의 높이를 고정값으로 설정 */
   padding: 0; /* 패딩 제거 */
+  padding-top: 5px;
 }
 
 .logo-image {
@@ -252,9 +253,7 @@ export default {
 
 .navbar-brand {
   padding-left: 50px;
-  display: flex;
-  align-items: center;
-  height: 100%; /* 부모 요소의 높이에 맞춤 */
+  margin-top: -7px;
 }
 </style>
 

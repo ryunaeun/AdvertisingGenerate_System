@@ -15,21 +15,23 @@
       <h2>광고 타겟을 설정해 주세요!</h2>
       <div class="settings-grid">
         <div v-for="(setting, key) in targetSettings" :key="key" class="setting-item">
-          <label :for="setting.id">{{ setting.label }}:</label>
-          <select 
-            :id="setting.id" 
-            class="setting-select"
-            v-model="selectedSettings[key]"
-            @change="emitSettingsChange"
-          >
-            <option 
-              v-for="option in setting.options" 
-              :key="option.value" 
-              :value="option.value"
+          <div class="input-group">
+            <label :for="setting.id">{{ setting.label }}:</label>
+            <select 
+              :id="setting.id" 
+              class="setting-select"
+              v-model="selectedSettings[key]"
+              @change="emitSettingsChange"
             >
-              {{ option.label }}
-            </option>
-          </select>
+              <option 
+                v-for="option in setting.options" 
+                :key="option.value" 
+                :value="option.value"
+              >
+                {{ option.label }}
+              </option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -165,5 +167,117 @@ export default {
 <style scoped>
 .target-settings-wrapper {
   width: 100%;
+}
+
+.settings-update {
+  margin-bottom: 20px;
+}
+
+.target-settings {
+  margin-top: 20px;
+}
+
+.target-settings h2 {
+  margin-bottom: 20px;
+  color: #344767;
+  font-size: 1.5rem;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.setting-item label {
+  min-width: 80px;
+  text-align: left;
+  margin-bottom: 0;
+  color: #344767;
+  font-weight: 500;
+  flex-shrink: 0; /* 라벨 너비 고정 */
+}
+
+.setting-select {
+  flex: 1;
+  min-width: 0; /* 오버플로우 방지 */
+  padding: 8px 12px;
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  background-color: white;
+  color: #344767;
+  font-size: 14px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.setting-select:hover {
+  border-color: #5CB494;
+}
+
+.setting-select:focus {
+  outline: none;
+  border-color: #5CB494;
+  box-shadow: 0 0 0 2px rgba(92, 180, 148, 0.2);
+}
+
+.update-settings-btn {
+  padding: 8px 16px;
+  background-color: #5CB494;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.update-settings-btn:hover {
+  background-color: #4a9077;
+  transform: translateY(-1px);
+}
+
+.update-settings-btn:active {
+  transform: translateY(1px);
+}
+
+.update-settings-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 반응형 디자인을 위한 미디어 쿼리 */
+@media (max-width: 992px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .setting-item label {
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 576px) {
+  .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .setting-item label {
+    min-width: auto;
+    margin-bottom: 5px;
+  }
+
+  .setting-select {
+    width: 100%;
+  }
 }
 </style>

@@ -6,15 +6,15 @@
       <section class="recent-designs">
         <h2 class="section-title">기존 디자인 불러오기</h2>
         <div class="designs-grid">
-          <div v-for="(design, index) in recentDesigns" 
+          <div v-for="(video, index) in recentVideos" 
                :key="index" 
                class="design-card">
             <div class="design-image">
-              <img :src="design.image" :alt="design.title">
+              <img :src="baseUrl + video.image" :alt="video.title">
             </div>
             <div class="design-content">
-              <h3>{{ design.title }}</h3>
-              <p>{{ design.description }}</p>
+              <h3>{{ video.title }}</h3>
+              <p>{{ formatDate(video.createdAt) }}</p>
             </div>
           </div>
         </div>
@@ -59,7 +59,7 @@
       <div class="help-links">
       <p class="help-text">저희 서비스가 처음이신가요?</p>
       <div class="link-group">
-        <router-link to="/board#chatbot-section" class="help-link">챗봇 바로가기</router-link>
+        <router-link to="/board#my-inquiries-section" class="help-link">문의함 바로가기</router-link>
         <router-link to="/board#faq-section" class="help-link">FAQ 바로가기</router-link>
       </div>
     </div>
@@ -69,6 +69,7 @@
 
 <script>
 import Header from './components/Header.vue'
+import axios from 'axios'
 
 export default {
   name: "HomePage",
@@ -77,19 +78,9 @@ export default {
   },
   data() {
     return {
-      recentDesigns: [
-        {
-          title: "Rover raised $65 mil",
-          description: "Finding temporary housing for your dog",
-          image: "../../../assets/img/examples/testimonial-6-2.jpg"
-        },
-        {
-          title: "MateLabs machine learning",
-          description: "If you've ever wanted to train a machine learning",
-          image: "../../../assets/img/examples/testimonial-6-3.jpg"
-        }
-        // 추가 디자인 카드들...
-      ]
+      baseUrl: 'http://125.181.20.252:8888', // 실제 서버 URL로 변경하세요
+      recentVideos: [],
+      userId: 'KTaivle', // 실제 사용자 ID로 변경하세요
     }
   },
   methods: {
@@ -107,6 +98,30 @@ export default {
       // 새 탭에서 Flask 서버의 비디오 생성 페이지 열기
       this.$router.push('/txt2vid-generator');
     },
+    async fetchRecentVideos() {
+      try {
+        const response = await axios.get(`${this.baseUrl}/gallery_check`, {
+          params: { userId: this.userId }
+        });
+        
+        if (response.data.success) {
+          this.recentVideos = response.data.files
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 4);
+        } else {
+          console.error('Failed to fetch recent videos:', response.data.error);
+        }
+      } catch (error) {
+        console.error('Error fetching recent videos:', error);
+      }
+    },
+    formatDate(dateString) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString('ko-KR', options);
+    }
+  },
+  mounted() {
+    this.fetchRecentVideos();
   }
 }
 </script>
@@ -225,10 +240,6 @@ export default {
   font-size: 0.875rem;
   color: #67748e;
   line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .designs-grid {

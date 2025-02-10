@@ -1,148 +1,130 @@
 <template>
   <div class="video-settings">
-    <h3 class="settings-toggle" @click="toggleSettings">
-      해상도 및 프레임 설정 
-      <span class="current-settings">
-        {{ displayResolution }}×{{ frameLength }}f
-        <span v-if="enableUpscale" class="upscale-indicator">(Upscaled)</span>
-      </span>
-      <span class="toggle-icon" :class="{ 'rotated': showSettings }">▼</span>
-    </h3>
+    <div class="settings-header" @click="toggleSettings">
+      <h3>해상도 및 프레임 설정</h3>
+      <div class="settings-info">
+        <span class="resolution-text">{{ displayResolution }}×{{ frameLength }}f</span>
+        <span v-if="enableUpscale" class="upscale-badge">(Upscaled)</span>
+        <span class="toggle-icon" :class="{ 'is-open': showSettings }">▼</span>
+      </div>
+    </div>
     
-    <div class="settings-content" v-show="showSettings">
-      <div class="form-group resolution-group">
-        <div class="orientation-and-upscale-group">
-          <div class="radio-settings">
-            <!-- Aspect Ratio -->
-            <div class="aspect-ratio-group">
-              <label class="section-label">해상도 비율:</label>
-              <div class="aspect-ratio-buttons">
-                <button 
-                  v-for="ratio in aspectRatios"
-                  :key="ratio"
-                  type="button" 
-                  class="aspect-ratio-btn" 
-                  :class="{ active: selectedAspectRatio === ratio }"
-                  @click="setAspectRatio(ratio)"
-                >{{ ratio }}</button>
-              </div>
-            </div>
-
-            <!-- Orientation -->
-            <div class="orientation-group">
-              <label class="section-label">영상 종횡비:</label>
-              <div class="orientation-buttons">
-                <button 
-                  v-for="orient in orientations"
-                  :key="orient.value"
-                  type="button" 
-                  class="orientation-btn" 
-                  :class="{ active: orientation === orient.value }"
-                  @click="setOrientation(orient.value)"
-                >{{ orient.label }}</button>
-              </div>
-            </div>
-            
-            <!-- Upscale Settings -->
-            <div class="upscale-settings">
-              <label class="section-label">업스케일 설정:</label>
-              <div class="upscale-info">
-                <button 
-                  type="button" 
-                  class="upscale-btn"
-                  :class="{ active: enableUpscale }"
-                  @click="toggleUpscale"
-                >{{ enableUpscale ? 'ON' : 'OFF' }}</button>
-                <span id="targetResolution">{{ targetResolution }}</span>
-              </div>
+    <div v-show="showSettings" class="settings-container">
+      <div class="settings-layout">
+        <!-- Left side - Controls -->
+        <div class="controls-section">
+          <div class="aspect-ratio-section">
+            <label>해상도 비율:</label>
+            <div class="button-group">
+              <button 
+                v-for="ratio in aspectRatios"
+                :key="ratio"
+                :class="{ active: selectedAspectRatio === ratio }"
+                @click="setAspectRatio(ratio)"
+              >{{ ratio }}</button>
             </div>
           </div>
-          
-          <div class="vertical-divider"></div>
 
-          <!-- Dimension Controls -->
-          <div class="dimension-controls">
-            <!-- Width/Size Control -->
-            <div class="dimension-group">
-              <div class="dimension-label">
-                <label :for="selectedAspectRatio === '1:1' ? 'sizeSlider' : 'widthSlider'">
-                  {{ selectedAspectRatio === '1:1' ? 'Size:' : '가로:' }}
-                </label>
-                <span>Max: {{ currentLimits.width }}px</span>
-              </div>
-              <div class="slider-container">
-                <input 
-                  type="range" 
-                  :id="selectedAspectRatio === '1:1' ? 'sizeSlider' : 'widthSlider'"
-                  v-model.number="width"
-                  :min="64" 
-                  :max="currentLimits.width" 
-                  step="16"
-                  class="slider"
-                  @input="updateDimensions('width')"
-                >
-                <input 
-                  type="number" 
-                  v-model.number="width"
-                  :min="64" 
-                  step="16"
-                  @input="updateDimensions('width')"
-                >
-              </div>
+          <div class="orientation-section">
+            <label>영상 종횡비:</label>
+            <div class="button-group">
+              <button 
+                v-for="orient in orientations"
+                :key="orient.value"
+                :class="{ active: orientation === orient.value }"
+                @click="setOrientation(orient.value)"
+              >{{ orient.label }}</button>
             </div>
-            
-            <!-- Height Control -->
-            <div class="dimension-group" v-show="selectedAspectRatio !== '1:1'">
-              <div class="dimension-label">
-                <label for="heightSlider">세로:</label>
-                <span>Max: {{ currentLimits.height }}px</span>
-              </div>
-              <div class="slider-container">
-                <input 
-                  type="range" 
-                  id="heightSlider"
-                  v-model.number="height"
-                  :min="64" 
-                  :max="currentLimits.height" 
-                  step="16"
-                  class="slider"
-                  @input="updateDimensions('height')"
-                >
-                <input 
-                  type="number" 
-                  v-model.number="height"
-                  :min="64" 
-                  step="16"
-                  @input="updateDimensions('height')"
-                >
-              </div>
+          </div>
+
+          <div class="upscale-section">
+            <label>업스케일:</label>
+            <div class="upscale-controls">
+              <button 
+                :class="{ active: enableUpscale }"
+                @click="toggleUpscale"
+              >{{ enableUpscale ? 'ON' : 'OFF' }}</button>
+              <span class="target-resolution">{{ enableUpscale ? targetResolution : `${width}×${height}` }}</span>
             </div>
-            
-            <!-- Frame Length Control -->
-            <div class="dimension-group frame-length-group">
-              <div class="dimension-label">
-                <label for="frameLengthSlider">프레임:</label>
-                <span>Max: 129</span>
-              </div>
-              <div class="slider-container">
-                <input 
-                  type="range" 
-                  id="frameLengthSlider"
-                  v-model.number="frameLength"
-                  min="1" 
-                  max="129" 
-                  step="4"
-                  class="slider"
-                  @input="updateFrameLength"
-                >
-                <input 
-                  type="number" 
-                  v-model.number="frameLength"
-                  min="1"
-                  max="129"
-                  @input="updateFrameLength"
-                >
-              </div>
+          </div>
+        </div>
+
+        <!-- Vertical Divider -->
+        <div class="vertical-divider"></div>
+
+        <!-- Right side - Sliders -->
+        <div class="slider-section">
+          <div class="slider-group">
+            <div class="slider-header">
+              <label>{{ selectedAspectRatio === '1:1' ? 'Size:' : '가로:' }}</label>
+              <span>Max: {{ currentLimits.width }}px</span>
+            </div>
+            <div class="slider-controls">
+              <input 
+                type="range" 
+                v-model.number="width"
+                :min="64" 
+                :max="currentLimits.width" 
+                step="16"
+                @input="updateDimensions('width')"
+              >
+              <input 
+                type="number" 
+                v-model.number="width"
+                :min="64" 
+                :max="currentLimits.width"
+                step="16"
+                @input="updateDimensions('width')"
+              >
+            </div>
+          </div>
+
+          <div v-show="selectedAspectRatio !== '1:1'" class="slider-group">
+            <div class="slider-header">
+              <label>세로:</label>
+              <span>Max: {{ currentLimits.height }}px</span>
+            </div>
+            <div class="slider-controls">
+              <input 
+                type="range" 
+                v-model.number="height"
+                :min="64" 
+                :max="currentLimits.height" 
+                step="16"
+                @input="updateDimensions('height')"
+              >
+              <input 
+                type="number" 
+                v-model.number="height"
+                :min="64" 
+                :max="currentLimits.height"
+                step="16"
+                @input="updateDimensions('height')"
+              >
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <label>프레임:</label>
+              <span>Max: 129</span>
+            </div>
+            <div class="slider-controls">
+              <input 
+                type="range" 
+                v-model.number="frameLength"
+                :min="1" 
+                :max="129" 
+                step="4"
+                @input="updateFrameLength"
+              >
+              <input 
+                type="number" 
+                v-model.number="frameLength"
+                :min="1" 
+                :max="129"
+                @input="updateFrameLength"
+              >
             </div>
           </div>
         </div>
@@ -169,15 +151,15 @@ const RESOLUTION_LIMITS = {
 
 export default {
   name: 'VideoSettings',
-
+  
   data() {
     return {
       showSettings: false,
       aspectRatios: ['16:9', '4:3', '1:1'],
       selectedAspectRatio: '16:9',
       orientations: [
-        { value: 'landscape', label: '가로 영상' },
-        { value: 'portrait', label: '세로 영상' }
+        { value: 'landscape', label: '가로' },
+        { value: 'portrait', label: '세로' }
       ],
       orientation: 'landscape',
       width: 848,
@@ -203,22 +185,13 @@ export default {
         case '1:1':
           return '1440×1440';
         default:
-          return this.orientation === 'landscape' ? '1920×1080' : '1080×1920';
+          return '-';
       }
     },
 
     displayResolution() {
       if (this.enableUpscale) {
-        switch(this.selectedAspectRatio) {
-          case '16:9':
-            return this.orientation === 'landscape' ? '1920×1080' : '1080×1920';
-          case '4:3':
-            return this.orientation === 'landscape' ? '1600×1200' : '1200×1600';
-          case '1:1':
-            return '1440×1440';
-          default:
-            return this.orientation === 'landscape' ? '1920×1080' : '1080×1920';
-        }
+        return this.targetResolution.split(',')[0];
       }
       return `${this.width}×${this.height}`;
     }
@@ -253,20 +226,12 @@ export default {
         this.width = limits.default_width;
         this.height = limits.default_width;
       } else if (isOrientationChange) {
-        // Swap width/height when orientation changes
         const previousWidth = this.width;
         const previousHeight = this.height;
 
-        let newWidth, newHeight;
-        if (this.orientation === 'landscape') {
-          newWidth = Math.min(previousHeight, limits.width);
-          newHeight = Math.min(previousWidth, limits.height);
-        } else {
-          newWidth = Math.min(previousHeight, limits.width);
-          newHeight = Math.min(previousWidth, limits.height);
-        }
+        let newWidth = Math.min(previousHeight, limits.width);
+        let newHeight = Math.min(previousWidth, limits.height);
 
-        // Adjust to multiples of 16
         this.width = Math.min(Math.round(newWidth / 16) * 16, limits.width);
         this.height = Math.min(Math.round(newHeight / 16) * 16, limits.height);
       } else {
@@ -298,7 +263,6 @@ export default {
           }
         }
 
-        // Apply limits
         this.width = Math.min(this.width, this.currentLimits.width);
         this.height = Math.min(this.height, this.currentLimits.height);
       }
@@ -307,7 +271,6 @@ export default {
     },
 
     updateFrameLength() {
-      // Adjust to valid frame length (1 + multiples of 4)
       this.frameLength = Math.floor((this.frameLength - 1) / 4) * 4 + 1;
       if (this.frameLength < 1) this.frameLength = 1;
       if (this.frameLength > 129) this.frameLength = 129;
@@ -328,7 +291,6 @@ export default {
   },
 
   mounted() {
-    // 초기 설정값 emit
     this.updateResolutionLimits();
     this.emitSettings();
   }
@@ -337,240 +299,194 @@ export default {
 
 <style scoped>
 .video-settings {
-  margin: 20px 0;
   width: 100%;
-}
-
-.settings-toggle {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background-color: var(--background-primary);
+  background: var(--background-primary);
   border-radius: 8px;
-  cursor: pointer;
-  user-select: none;
-  color: var(--text-primary);
-  margin: 0;
-  transition: background-color 0.2s ease;
-  font-size: 16px;
+  overflow: hidden;
 }
 
-.settings-toggle:hover {
-  background-color: var(--accent-primary);
-  color: white;
-}
-
-.current-settings {
-  margin-left: auto;
-  font-size: 14px;
-  color: var(--accent-primary);
-  font-weight: normal;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.upscale-indicator {
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-style: italic;
-}
-
-.toggle-icon {
-  margin-left: 8px;
-  transition: transform 0.3s ease;
-  font-size: 14px;
-}
-
-.toggle-icon.rotated {
-  transform: rotate(-180deg);
-}
-
-.settings-content {
-  margin-top: 10px;
-  transition: all 0.3s ease;
-}
-
-.form-group.resolution-group {
-  background-color: var(--background-primary);
-  border-radius: 8px;
-  padding: 20px;
-  margin: 0;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.orientation-and-upscale-group {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 15px;
-}
-
-.radio-settings {
-  flex: 0 0 auto;
-  min-width: 200px;
-}
-
-.section-label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--text-primary);
-  font-weight: bold;
-}
-
-/* Aspect Ratio Buttons */
-.aspect-ratio-buttons {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 15px;
-}
-
-.aspect-ratio-btn {
-  padding: 8px 12px;
-  background-color: var(--input-background);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  cursor: pointer;
-  color: var(--text-primary);
-  transition: all 0.2s ease;
-}
-
-/* Orientation Buttons */
-.orientation-buttons {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 15px;
-}
-
-.orientation-btn {
-  flex: 1;
-  padding: 8px 12px;
-  background-color: var(--input-background);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  cursor: pointer;
-  color: var(--text-primary);
-  transition: all 0.2s ease;
-}
-
-/* Upscale Button */
-.upscale-settings {
-  margin-top: 15px;
-}
-
-.upscale-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.upscale-btn {
-  padding: 8px 16px;
-  background-color: var(--input-background);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  cursor: pointer;
-  color: var(--text-primary);
-  transition: all 0.2s ease;
-}
-
-#targetResolution {
-  color: var(--accent-primary);
-  font-weight: bold;
-}
-
-/* Active State for Buttons */
-.active {
-  background-color: var(--accent-primary) !important;
-  border-color: var(--accent-primary) !important;
-  color: white !important;
-}
-
-/* Divider */
-.vertical-divider {
-  width: 1px;
-  align-self: stretch;
-  background-color: var(--border-color);
-  margin: 0 10px;
-}
-
-/* Dimension Controls */
-.dimension-controls {
-  flex: 1;
-  min-width: 0;
-}
-
-.dimension-group {
-  margin-bottom: 15px;
-}
-
-.dimension-label {
+.settings-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  padding: 15px 20px;
+  cursor: pointer;
+  background: var(--background-primary);
+  border-bottom: 1px solid var(--border-color);
 }
 
-.slider-container {
+.settings-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.settings-info {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+}
+
+.resolution-text {
+  color: var(--accent-primary);
+  font-weight: 500;
+}
+
+.upscale-badge {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+.toggle-icon.is-open {
+  transform: rotate(180deg);
+}
+
+.settings-container {
+  padding: 20px;
+  background: var(--background-secondary);
+}
+
+.settings-layout {
+  display: flex;
+  gap: 20px;
+}
+
+.controls-section {
+  flex: 0 0 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.vertical-divider {
+  width: 1px;
+  background-color: var(--border-color);
+  margin: 0 6px;
+}
+
+.slider-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Button Styles */
+.button-group {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+button {
+  flex: 1;
+  padding: 4px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--background-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+button:hover {
+  background: var(--background-secondary);
+}
+
+button.active {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}
+
+/* Upscale Controls */
+.upscale-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.upscale-controls button {
+  width: 80px;
+  flex: none;
+}
+
+.target-resolution {
+  color: var(--accent-primary);
+  font-weight: 500;
+  font-size: 14px;
 }
 
 /* Slider Styles */
-.slider {
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.slider-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+input[type="range"] {
   flex: 1;
-  height: 8px;
+  height: 4px;
   -webkit-appearance: none;
-  background: var(--input-border);
-  border-radius: 4px;
+  background: var(--border-color);
+  border-radius: 2px;
   outline: none;
 }
 
-.slider::-webkit-slider-thumb {
+input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 16px;
   height: 16px;
-  background: var(--accent-primary);
   border-radius: 50%;
-  cursor: pointer;
-}
-
-.slider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
   background: var(--accent-primary);
-  border-radius: 50%;
   cursor: pointer;
   border: none;
 }
 
-/* Number Input Styles */
-.slider-container input[type="number"] {
-  width: 70px;
-  text-align: center;
-  padding: 6px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background-color: var(--input-background);
-  color: var(--text-primary);
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  cursor: pointer;
+  border: none;
 }
 
-/* Hover Effects */
-.aspect-ratio-btn:hover,
-.orientation-btn:hover,
-.upscale-btn:hover {
-  background-color: var(--background-secondary);
+input[type="number"] {
+  width: 80px;
+  padding: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--background-primary);
+  color: var(--text-primary);
+  text-align: center;
 }
 
 /* Responsive Styles */
-@media (max-width: 1200px) {
-  .orientation-and-upscale-group {
+@media (max-width: 768px) {
+  .settings-layout {
     flex-direction: column;
   }
 
-  .radio-settings {
+  .controls-section {
+    flex: none;
     width: 100%;
   }
 
@@ -578,21 +494,37 @@ export default {
     display: none;
   }
 
-  .dimension-controls {
+  .slider-section {
     width: 100%;
   }
-}
 
-@media (max-width: 768px) {
-  .aspect-ratio-buttons,
-  .orientation-buttons {
+  .slider-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  input[type="number"] {
+    width: 100%;
+  }
+
+  /* 모바일에서 버튼 그룹 스타일 조정 */
+  .button-group {
     flex-wrap: wrap;
   }
 
-  .aspect-ratio-btn,
-  .orientation-btn {
-    flex: 1;
-    min-width: 60px;
+  .button-group button {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 100px;
   }
-}
-</style>
+
+  /* 모바일에서 업스케일 컨트롤 조정 */
+  .upscale-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .upscale-controls button {
+    width: 100%;
+  }
+}</style>
