@@ -78,6 +78,8 @@ export default {
         await apiClient.post("/logout");
         sessionStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("subPath");
         alert("로그아웃 성공");
         this.$router.push("/login");
       } catch (error) {
@@ -94,6 +96,8 @@ export default {
         await apiClient.post("/logout");
         sessionStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("subPath");
         alert("로그아웃 성공");
         this.$router.push("/login");
       } catch (error) {
