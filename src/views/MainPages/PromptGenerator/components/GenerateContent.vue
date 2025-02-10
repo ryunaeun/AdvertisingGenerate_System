@@ -1,6 +1,6 @@
 <template>
   <div class="generate-content">
-    <!-- 이미지 프리뷰 영역을 상단으로 이동 -->
+    <!-- 이미지 프리뷰 영역 -->
     <div class="image-preview-area">
       <img 
         v-for="(image, index) in previewImages" 
@@ -10,6 +10,20 @@
         :style="{ display: image ? 'block' : 'none' }"
       >
       <div class="loading" :style="{ display: isLoading ? 'block' : 'none' }"></div>
+    </div>
+
+    <!-- 광고 추천 정보 섹션 -->
+    <div class="recommendations-section">
+      <div class="recommendation-card">
+        <div class="recommendation-item">
+          <span class="recommendation-label">최적 시간대: </span>
+          <span class="recommendation-value">{{ recommendations ? recommendations.time : '미생성' }}</span>
+        </div>
+        <div class="recommendation-item">
+          <span class="recommendation-label">추천 광고 유형: </span>
+          <span class="recommendation-value">{{ recommendations ? recommendations.adtype : '미생성' }}</span>
+        </div>
+      </div>
     </div>
 
     <!-- 프롬프트 입력 및 결과 영역 -->
@@ -62,12 +76,24 @@ export default {
   data() {
     return {
       promptContent: '',
+      recommendations: null,
       isLoading: false,
-      previewImages: ['', '', '', '']  // 4개의 이미지 슬롯
+      previewImages: ['', '', '', '']
     }
   },
 
   methods: {
+    // 외부에서 프롬프트 내용과 추천 정보를 설정할 수 있는 메서드
+    setPromptContent(content, recommendations = null) {
+      this.promptContent = content;
+      this.recommendations = recommendations;
+    },
+
+    handleVideoGeneration() {
+      sessionStorage.setItem('videoPrompt', this.promptContent);
+      this.$router.push('/txt2vid-generator');
+    },
+
     async generateExampleImages() {
       if (!this.promptContent) {
         alert('프롬프트를 먼저 생성해주세요.');
@@ -75,7 +101,6 @@ export default {
       }
 
       this.isLoading = true;
-      // 이미지 초기화
       this.previewImages = ['', '', '', ''];
 
       try {
@@ -98,7 +123,6 @@ export default {
         const data = await response.json();
         
         if (data.success && data.image_paths) {
-          // 이미지 경로를 전체 URL로 변환하여 설정
           this.previewImages = data.image_paths.map(path => 
             `${this.serverUrl}/output/${path}`
           );
@@ -111,37 +135,56 @@ export default {
       } finally {
         this.isLoading = false;
       }
-    },
-
-    handleVideoGeneration() {
-      // 비디오 생성 페이지로 이동하기 전에 현재 프롬프트 저장
-      sessionStorage.setItem('videoPrompt', this.promptContent);
-      // Vue Router를 사용해 페이지 이동
-      this.$router.push('/txt2vid-generator');
-    },
-
-    // 외부에서 프롬프트 내용을 설정할 수 있는 메서드
-    setPromptContent(content) {
-      console.log('Setting prompt content:', content); // 디버깅용 로그
-      this.promptContent = content;
     }
-  },
-  mounted() {
-    // sessionStorage에서 전달된 프롬프트 확인
-    const videoPrompt = sessionStorage.getItem('videoPrompt');
-    console.log('GenerateContent mounted - video prompt:', videoPrompt); // 디버깅용 로그
-    if (videoPrompt) {
-      console.log('Setting prompt content in GenerateContent'); // 디버깅용 로그
-      this.promptContent = videoPrompt; // 직접 설정
-      sessionStorage.removeItem('videoPrompt');
-    }
-  },
+  }
 }
 </script>
 
 <style scoped>
 .generate-content {
   width: 100%;
+}
+
+/* 추천 정보 스타일 */
+.recommendations-section {
+  margin: 10px 0;  /* 20px에서 10px로 수정 */
+}
+
+.recommendation-card {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 10px;  /* 20px에서 10px로 수정 */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.recommendation-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.recommendation-label {
+  font-size: 16px;
+  color: #6c757d;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.recommendation-value {
+  font-size: 16px;
+  color: #5CB494;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.recommendation-value:empty::before,
+.recommendation-value:contains('미생성') {
+  color: #adb5bd;
+  font-style: italic;
 }
 
 .image-preview-area {

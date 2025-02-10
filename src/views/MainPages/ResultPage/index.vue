@@ -2,52 +2,52 @@
   <div class="container py-7 preview-container">
     <Header />
 
-    <!-- 광고 노출 방법 모델 영역 -->
-    <div class="text-center mb-7">
-      <p style="color: #344767; font-size: 1.25rem; font-weight: bold;">최적 노출 시간대는 20:00로 도출되었습니다.</p>
-      <p style="color: #344767; font-size: 1.25rem; font-weight: bold;">효과 극대화를 위해 배너 광고를 추천드립니다.</p>
-    </div>
+    <div class="content-layout">
+      <div class="left-column">
+        <!-- 광고 노출 방법 모델 영역 -->
+        <div class="text-center mb-5">
+          <p style="color: #344767; font-size: 1.25rem; font-weight: bold; margin-bottom: 3px;">최적 노출 시간대는 20:00로 도출되었습니다.</p>
+          <p style="color: #344767; font-size: 1.25rem; font-weight: bold; margin-bottom: 3px;">효과 극대화를 위해 배너 광고를 추천드립니다.</p>
+        </div>
 
-    <!-- 비디오 출력 영역 -->
-    <div>
-      <div class="videos-grid single" id="videosGrid">
-        <div class="video-cell">
-          <div class="loading" id="loading-1" v-show="loadingVideo"></div>
-          <video id="outputVideo-1" class="output-video" v-show="videoUrl" controls autoplay loop muted>
-            <source :src="videoUrl" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-          <a id="downloadLink-1" class="download-link" v-show="videoUrl" :href="videoUrl" download
-            @click="downloadVideo">Download Video</a>
+        <!-- 비디오 출력 영역 -->
+        <div class="video-container">
+          <div class="videos-grid single" id="videosGrid">
+            <div class="video-cell">
+              <div class="loading" id="loading-1" v-show="loadingVideo"></div>
+              <video id="outputVideo-1" class="output-video" v-show="videoUrl" controls autoplay loop muted>
+                <source :src="videoUrl" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              <a id="downloadLink-1" class="download-link" v-show="videoUrl" :href="videoUrl" download
+                @click="downloadVideo">Download Video</a>
+            </div>
+          </div>
+          <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
         </div>
       </div>
-      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-    </div>
 
-    <!-- 광고 키워드 그래프 영역 -->
-    <div class="text-center mb-5">
-      <p style="color: #344767; font-size: 1.25rem; font-weight: bold;">관련 키워드 분석</p>
-    </div>
-
-    <div class="content-layout d-flex flex-wrap">
-      <div class="analysis-section flex-grow-1 d-flex flex-column">
-        <div class="graph-container mb-4">
-          <h3 class="graph-title">연관 키워드 그래프</h3>
-          <div class="input-group mb-3">
-            <input type="text" placeholder="메인 키워드 입력" v-model="companyName" class="form-control" />
-            <button class="btn btn-primary" @click="generateGraph">
-              그래프 생성
-            </button>
+      <div class="right-column">
+        <!-- 광고 키워드 그래프 영역 -->
+        <div class="analysis-section">
+          <div class="graph-container mb-3">
+            <h3 class="graph-title">관련 키워드 분석</h3>
+            <div class="input-group">
+              <input type="text" placeholder="메인 키워드 입력" v-model="companyName" class="form-control" />
+              <button class="btn btn-primary" @click="generateGraph">
+                그래프 생성
+              </button>
+            </div>
+            <div class="graph-wrapper">
+              <svg id="graphSvg" width="100%" height="100%"></svg>
+            </div>
           </div>
-          <div class="graph-wrapper">
-            <svg id="graphSvg" width="100%" height="500"></svg>
-          </div>
-        </div>
 
-        <div class="result-container">
-          <h3 class="result-title">분석 결과</h3>
-          <p v-if="analysisResult">{{ analysisResult }}</p>
-          <p v-else class="text-muted">분석 결과가 없습니다.</p>
+          <div class="result-container">
+            <h3 class="result-title">분석 결과</h3>
+            <p v-if="analysisResult">{{ analysisResult }}</p>
+            <p v-else class="text-muted">분석 결과가 없습니다.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -172,27 +172,28 @@ export default {
         alert("서버와 연결 중 오류 발생!");
       }
     },
-
     drawGraph() {
       const svg = d3.select("#graphSvg");
       svg.selectAll("*").remove();
 
       const width = svg.node().getBoundingClientRect().width;
-      const height = +svg.attr("height");
+      const height = svg.node().getBoundingClientRect().height;
 
       const simulation = d3.forceSimulation(this.nodes)
-        .force("link", d3.forceLink(this.links).id(d => d.id).distance(100))
-        .force("charge", d3.forceManyBody().strength(-200))
+        .force("link", d3.forceLink(this.links).id(d => d.id).distance(50))
+        .force("charge", d3.forceManyBody().strength(-100))
         .force("center", d3.forceCenter(width / 2, height / 2));
 
-      const link = svg.append("g")
+      const g = svg.append("g");
+
+      const link = g.append("g")
         .selectAll("line")
         .data(this.links)
         .enter().append("line")
         .style("stroke", "#aaa")
         .style("stroke-width", 1.5);
 
-      const nodeGroup = svg.append("g")
+      const nodeGroup = g.append("g")
         .selectAll("g")
         .data(this.nodes)
         .enter().append("g")
@@ -234,8 +235,20 @@ export default {
 
         nodeGroup.attr("transform", d => `translate(${d.x},${d.y})`);
       });
-    },
 
+      simulation.on("end", () => {
+        this.fitGraphToContainer(g, svg);
+      });
+    },
+    fitGraphToContainer(g, svg) {
+      const bbox = g.node().getBBox();
+      const width = svg.node().getBoundingClientRect().width;
+      const height = svg.node().getBoundingClientRect().height;
+      const scale = Math.min(width / bbox.width, height / bbox.height, 1) * 0.9;
+      const translateX = (width - bbox.width * scale) / 2 - bbox.x * scale;
+      const translateY = (height - bbox.height * scale) / 2 - bbox.y * scale;
+      g.attr("transform", `translate(${translateX},${translateY}) scale(${scale})`);
+    },
     async expandNode(event, d) {
       try {
         const response = await fetch("http://127.0.0.1:5001/expand_node", {
@@ -263,10 +276,13 @@ export default {
         alert(`확장 실패: ${error.message}`);
       }
     },
-
   },
   mounted() {
     this.generateVideo();
+    window.addEventListener('resize', this.drawGraph);
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.drawGraph);
   }
 }
 </script>
@@ -277,22 +293,39 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 4px var(--shadow-color);
   padding: 20px;
-  margin-bottom: 20px;
-  margin-top: 100px
+  margin-top: 2rem;
+}
+
+.content-layout {
+  display: flex;
+  gap: 20px;
+}
+
+.left-column {
+  flex: 0 0 55%;
+  width: 60%;
+}
+
+.right-column {
+  flex: 0 0 40%;
+  width: 40%;
+}
+
+.video-container,
+.analysis-section {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .videos-grid {
-  display: grid;
-  gap: 20px;
-  width: 100%;
-  margin-bottom: 8rem;
-}
-
-.videos-grid.single {
-  grid-template-columns: 1fr;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .video-cell {
+  flex-grow: 1;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -301,7 +334,8 @@ export default {
   background-color: var(--background-primary);
   border-radius: 8px;
   overflow: hidden;
-  aspect-ratio: 16/9;
+  width: 85%;
+  margin: 0 auto;
 }
 
 .video-cell .loading {
@@ -342,18 +376,10 @@ export default {
   background-color: var(--error-background, #fff3f3);
 }
 
-.content-layout {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.analysis-section {
-  flex: 1;
-  min-width: 300px;
-}
-
 .graph-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
   background: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -369,19 +395,17 @@ export default {
 
 .input-group {
   display: flex;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   gap: 10px;
+  height: 70%; /* 높이를 70%로 설정 */
 }
 
 .input-group .form-control {
   flex: 1;
   border-radius: 5px !important;
   border: 1px solid #ced4da;
-}
-
-.input-group .form-control:focus {
-  border-color: #5CB494;
-  box-shadow: 0 0 0 0.2rem rgba(92, 180, 148, 0.25);
+  height: 100%; /* 부모 요소의 높이에 맞춤 */
+  font-size: 0.9rem; /* 글자 크기를 약간 줄임 */
 }
 
 .input-group .btn {
@@ -390,8 +414,17 @@ export default {
   border-radius: 5px !important;
   box-shadow: none;
   margin: 0px;
-  font-size: 1rem;
+  height: 100%; /* 부모 요소의 높이에 맞춤 */
+  font-size: 0.9rem; /* 글자 크기를 약간 줄임 */
+  padding: 0.25rem 0.5rem; /* 패딩을 줄여 버튼 내부 여백 조정 */
 }
+
+
+.input-group .form-control:focus {
+  border-color: #5CB494;
+  box-shadow: 0 0 0 0.2rem rgba(92, 180, 148, 0.25);
+}
+
 
 .input-group .btn:hover {
   background-color: #4a9d7c;
@@ -399,9 +432,13 @@ export default {
 }
 
 .graph-wrapper {
+  flex-grow: 1;
   width: 100%;
-  height: 500px;
+  height: 300px;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #graphSvg {
@@ -416,6 +453,7 @@ export default {
   padding: 10px;
 }
 
+
 .graph-title,
 .result-title {
   color: #344767;
@@ -423,4 +461,22 @@ export default {
   font-weight: bold;
   margin-bottom: 10px;
 }
+
+@media (max-width: 768px) {
+  .content-layout {
+    flex-direction: column;
+  }
+
+  .left-column,
+  .right-column {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+
+  .video-cell,
+  .graph-container {
+    height: 50vh;
+  }
+}
+
 </style>

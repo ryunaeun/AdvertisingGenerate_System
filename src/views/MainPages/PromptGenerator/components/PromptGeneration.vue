@@ -31,6 +31,10 @@ export default {
     targetSettings: {
       type: Object,
       required: true
+    },
+    userId: {  // userId prop 추가
+      type: String,
+      required: true
     }
   },
 
@@ -50,6 +54,7 @@ export default {
       try {
         // 프롬프트 생성 요청 데이터 준비
         const requestData = {
+          userId: this.userId,  // userId 추가
           gender: this.targetSettings.gender || '',
           ageGroup: this.targetSettings.ageGroup || '',
           productCategory: this.targetSettings.productCategory || '',
@@ -78,7 +83,7 @@ export default {
 
         if (data.success && data.generated_prompt) {
           // 생성된 프롬프트를 부모 컴포넌트에 전달
-          this.$emit('prompt-generated', data.generated_prompt);
+          this.$emit('prompt-generated', data.generated_prompt, data.recommendations);
           
           // 자동으로 예시 이미지 생성 시작
           this.$emit('start-image-generation');
