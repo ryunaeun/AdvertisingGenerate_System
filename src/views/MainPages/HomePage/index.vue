@@ -6,9 +6,7 @@
       <section class="recent-designs">
         <h2 class="section-title">기존 디자인 불러오기</h2>
         <div class="designs-grid">
-          <div v-for="(video, index) in recentVideos" 
-               :key="index" 
-               class="design-card">
+          <div v-for="(video, index) in recentVideos" :key="index" class="design-card">
             <div class="design-image">
               <img :src="baseUrl + video.image" :alt="video.title">
             </div>
@@ -30,7 +28,7 @@
             <h3>맞춤 광고 만들기</h3>
             <p>상품 정보부터 타겟 광고 설정까지<br>모든 기능을 한번에 사용하여 광고를 만들어 보세요.</p>
           </div>
-          
+
           <div class="option-card" @click="goToTxt2VidGenerator">
             <div class="icon">
               <span class="material-icons-round">edit_note</span>
@@ -38,7 +36,7 @@
             <h3>프롬프트로 광고 만들기</h3>
             <p>자신만의 광고 스토리로<br>광고를 만들어 보세요.</p>
           </div>
-          
+
           <div class="option-card">
             <div class="icon">
               <span class="material-icons-round">image</span>
@@ -46,23 +44,25 @@
             <h3>이미지로 광고 만들기</h3>
             <p>자신의 상품을 통해 나만의<br>광고를 만들어 보세요.</p>
           </div>
-          
+
           <div class="option-card">
-            <div class="icon">
-              <span class="material-icons-round">style</span>
-            </div>
-            <h3>광고 스토리 만들기</h3>
-            <p>몇 가지 키워드를 통해<br>나만의 광고 스토리를 만들어 보세요.</p>
+            <router-link to="/analysis" class="option-link">
+              <div class="icon">
+                <span class="material-icons-round">style</span>
+              </div>
+              <h3>관련 키워드 보기</h3>
+              <p>기업 분석 마인드맵을 확인하고<br>광고 상품의 최신 검색 키워드를 발굴해보세요.</p>
+            </router-link>
           </div>
         </div>
       </section>
       <div class="help-links">
-      <p class="help-text">저희 서비스가 처음이신가요?</p>
-      <div class="link-group">
-        <router-link to="/board#my-inquiries-section" class="help-link">문의함 바로가기</router-link>
-        <router-link to="/board#faq-section" class="help-link">FAQ 바로가기</router-link>
+        <p class="help-text">저희 서비스가 처음이신가요?</p>
+        <div class="link-group">
+          <router-link to="/board#my-inquiries-section" class="help-link">문의함 바로가기</router-link>
+          <router-link to="/board#faq-section" class="help-link">FAQ 바로가기</router-link>
+        </div>
       </div>
-    </div>
     </div>
   </div>
 </template>
@@ -103,7 +103,7 @@ export default {
         const response = await axios.get(`${this.baseUrl}/gallery_check`, {
           params: { userId: this.userId }
         });
-        
+
         if (response.data.success) {
           this.recentVideos = response.data.files
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
