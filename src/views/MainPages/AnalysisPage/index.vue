@@ -9,7 +9,7 @@
           <div class="input-group">
             <input type="text" placeholder="메인 키워드 입력" v-model="companyName" class="form-control" />
             <button class="btn btn-primary" @click="generateGraph">
-              그래프 생성
+              키워드 보기
             </button>
           </div>
           <div class="graph-wrapper">

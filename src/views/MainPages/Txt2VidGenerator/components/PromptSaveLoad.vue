@@ -511,11 +511,11 @@
  }
  
  .save-prompt-btn {
-  background-color: #8A2BE2;
+  background-color: #5CA8B4 !important;
  }
  
  .load-prompt-btn {
-  background-color: #FF69B4;
+  background-color: #B4D4C5 !important;
  }
  
  h2, h3 {

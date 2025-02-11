@@ -121,7 +121,7 @@ export default {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #f8f9fa;
+  background-color: #fff;
   border-bottom: 1px solid #ddd;
   z-index: 1000;
 }

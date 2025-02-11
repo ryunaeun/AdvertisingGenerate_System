@@ -1180,8 +1180,8 @@
 }
 
 .cancel-button {
-  background: #ddd;
-  color: #333;
+  background: #ddd !important;
+  color: #333 !important;
 }
 
 .cancel-button:hover {
@@ -1412,5 +1412,7 @@
         background-color: #1558c1;
         transform: translateY(-3px);
     }
+
+    
   </style>
   
