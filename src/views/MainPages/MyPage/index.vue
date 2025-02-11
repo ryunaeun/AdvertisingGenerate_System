@@ -668,13 +668,7 @@
     margin-top: 2rem;
   }
   /* 가로 배치 */
-.horizontal-info {
-  display: flex;
-  justify-content: space-between; /* 가로로 간격 조절 */
-  width: 25%; /* 가로로 넓이 꽉 채우기 */
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
+
 
 .horizontal-info p {
   font-size: 0.9rem;
@@ -1180,8 +1174,8 @@
 }
 
 .cancel-button {
-  background: #ddd !important;
-  color: #333 !important;
+  background: #ddd;
+  color: #333;
 }
 
 .cancel-button:hover {
@@ -1412,7 +1406,133 @@
         background-color: #1558c1;
         transform: translateY(-3px);
     }
+    /* 전체 레이아웃 설정 */
+.mypage {
+  width: 80%;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #333;
+}
 
-    
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #ddd;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  cursor: pointer;
+  font-size: 16px;
+  border: none;
+  background: none;
+  font-weight: 500;
+}
+
+.tab-item.active {
+  color: #007aff;
+  border-bottom: 2px solid #007aff;
+}
+
+.divider {
+  margin: 20px 0;
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+/* 기본 정보 카드 스타일 */
+.info-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.info-text p {
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.nickname-section {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.edit-icon {
+  margin-left: 10px;
+  cursor: pointer;
+  font-size: 20px;
+  color: #007aff;
+}
+
+.password-change-button {
+  background: none;
+  border: none;
+  color: #007aff;
+  cursor: pointer;
+}
+
+.horizontal-info {
+  display: flex;
+  justify-content: space-between; /* 가로로 간격 조절 */
+  width: 40%; /* 가로로 넓이 꽉 채우기 */
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  width: 100%;
+  max-width: 600px;
+}
+.field label {
+  white-space: nowrap; /* 줄바꿈 방지 */
+  min-width: 150px; /* 라벨 길이 조정 */
+}
+
+.info-value {
+  font-size: 14px;
+  color: #555;
+}
+
+/* 버튼 스타일 */
+.delete-account-btn {
+  display: block;
+  width: 100%;
+  background: #ff3b30;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  border-radius: 5px;
+  margin-top: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
   </style>
   

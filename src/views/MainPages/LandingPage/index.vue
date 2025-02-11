@@ -22,7 +22,7 @@ onMounted(() => {
           <div class="hero-content">
             <h1 class="hero-title display-4 fw-bold animate fade-in">
               광고의 모든 것<br />
-              여기에서 쉽고 빠르게
+              <span class="highlight-text2">ADVi</span>와 함께 새로운 일상을 설계하세요.
             </h1>
             <button 
               class="btn btn-primary mt-3 animate fade-in"
@@ -679,5 +679,9 @@ input:checked + .slider::before {
 .highlight-text {
   color: #5CB494;
 }
+.highlight-text2 {
+  color: #0b664a;
+}
+
 
 </style>
