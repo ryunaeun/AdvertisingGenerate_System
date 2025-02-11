@@ -226,7 +226,7 @@ export default {
       selectedPeriod: "all",
       selectedPeriodLabel: "전체 기간",
       galleryItems: [],
-      userId: "", // 빈 값으로 초기화
+      userId: "",
       periodOptions: [
         { value: "all", label: "전체 기간" },
         { value: "today", label: "오늘" },
@@ -237,12 +237,6 @@ export default {
       loading: false,
       error: null,
     };
-  },
-  mounted() {
-    const storedUser = JSON.parse(localStorage.getItem("user")); // 또는 sessionStorage
-    if (storedUser && storedUser.email) {
-      this.userId = storedUser.email; // userId를 email로 변경
-    }
   },
   computed: {
   filteredAndSortedItems() {
@@ -304,7 +298,10 @@ export default {
     async fetchGalleryItems() {
       this.loading = true;
       this.error = null;
+
+      console.log("이건 url " + this.baseUrl + '/gallery_check')
       try {
+        console.log("이건 ID야" + this.userId)
         const response = await axios.get(`${this.baseUrl}/gallery_check`, {
           params: { userId: this.userId }
         });
@@ -375,6 +372,8 @@ export default {
     }
   },
   mounted() {
+    this.userId = localStorage.getItem("userId") || ""; // localStorage에서 userId 가져오기
+    console.log("설정된 userId:", this.userId); // 콘솔에서 확인
     this.fetchGalleryItems();
     // 드롭다운 외부 클릭 이벤트 리스너 추가
     document.addEventListener('click', this.handleClickOutside);
