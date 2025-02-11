@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +39,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
+
+@CrossOrigin(origins = "http://localhost:3000")
 
 @RestController
 @RequiredArgsConstructor
@@ -160,7 +163,8 @@ public class AdminNoticeController {
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
     })
 
-    @DeleteMapping("/{order}")
+    @DeleteMapping("/{order}/delete")  // 📌 DELETE 엔드포인트 변경
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteNotice(@PathVariable("order") int noticeOrder) {
         Optional<Notice> noticeOptional = noticeRepository.findAllByOrderByNoticeOrder()
                 .stream()

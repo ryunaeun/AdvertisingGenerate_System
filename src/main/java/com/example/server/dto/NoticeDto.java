@@ -53,5 +53,10 @@ public class NoticeDto {
             private String title;
             private String content;
         }
+        @Getter
+        @Setter
+        public static class DeleteRequest {
+            private Integer noticeOrder; // 삭제 대상의 order 값
+        }
     }
 }

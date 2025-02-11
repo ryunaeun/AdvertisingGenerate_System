@@ -57,5 +57,10 @@ public class BoardDto {
             @NotBlank(message = "내용은 필수입니다.")
             private String content;
         }
+        @Getter
+        @Setter
+        public static class DeleteRequest {
+            private int boardOrder; // 삭제할 사용자의 이메일
+        }
     }
 }
