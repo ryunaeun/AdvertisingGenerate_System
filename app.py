@@ -9,6 +9,8 @@ from ad_recommender import AdRecommender
 from ltxv_client import LTXVClient
 from werkzeug.utils import secure_filename
 from PIL import Image 
+from openai import OpenAI
+from dotenv import load_dotenv
 import asyncio
 import random
 import os
@@ -28,6 +30,8 @@ ltxv_client = LTXVClient()
 BASE_UPLOAD_FOLDER = r"D:\ComfyUI_windows_portable\ComfyUI\input"
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 OUTPUT_DIR = r"D:\ComfyUI_windows_portable\ComfyUI\output"
+load_dotenv()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @app.route('/')
 def index():
@@ -777,6 +781,150 @@ def generate_ltxv():
     except Exception as e:
         print(f"Error in generate_ltxv: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+def generate_graph_data(company_name):
+    """GPT-4를 사용하여 기업 키워드 그래프 데이터 생성"""
+    prompt = f"""
+    회사 "{company_name}"의 연관 키워드를 분석하세요.
+
+    - 중심 노드는 "{company_name}".
+    - 주요 키워드 5개 생성.
+    - 각 키워드에 대해 2개의 세부 키워드 추가.
+    - JSON 형식:
+    {{
+      "central_node": "{company_name}",
+      "primary_keywords": [
+        {{
+          "keyword": "핵심 키워드1",
+          "sub_keywords": ["서브 키워드1", "서브 키워드2"]
+        }},
+        ...
+      ]
+    }}
+    추가 설명 없이 JSON만 반환.
+    """
+    try:
+        print("OpenAI API 호출 시작")
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        print("OpenAI API 호출 성공")
+        return json.loads(response.choices[0].message.content.strip())
+    except Exception as e:
+        print(f"오류 발생: {str(e)}")
+        return {"error": "GPT 응답 오류", "details": str(e)}
+
+@app.route("/generate_graph", methods=["POST"])
+def generate_graph():
+    """기업 키워드 그래프 생성 API"""
+    data = request.json
+    company_name = data.get("company_name")
+
+    if not company_name:
+        return jsonify({"error": "회사 이름이 필요합니다."}), 400
+
+    graph_data = generate_graph_data(company_name)
+
+    if "error" in graph_data:
+        return jsonify(graph_data), 500
+
+    nodes = [{"id": graph_data["central_node"], "group": 1}]
+    links = []
+
+    for primary_keyword in graph_data["primary_keywords"]:
+        nodes.append({"id": primary_keyword["keyword"], "group": 2})
+        links.append({"source": graph_data["central_node"], "target": primary_keyword["keyword"]})
+
+        for sub_keyword in primary_keyword["sub_keywords"]:
+            nodes.append({"id": sub_keyword, "group": 3})
+            links.append({"source": primary_keyword["keyword"], "target": sub_keyword})
+
+    return jsonify({"nodes": nodes, "links": links})
+
+@app.route("/expand_node", methods=["POST"])
+def expand_node():
+    """노드 확장 API"""
+    data = request.json
+    parent_node = data.get("parent_node")
+
+    if not parent_node:
+        return jsonify({"error": "부모 노드 이름이 필요합니다."}), 400
+
+    prompt = f"""
+    "{parent_node}"의 하위 개념 2개를 JSON으로 반환하세요.
+    반드시 다음 형식을 준수해야 합니다:
+    {{
+      "nodes": [
+        {{ "id": "하위노드1", "group": 3 }},
+        {{ "id": "하위노드2", "group": 3 }}
+      ],
+      "links": [
+        {{ "source": "{parent_node}", "target": "하위노드1" }},
+        {{ "source": "{parent_node}", "target": "하위노드2" }}
+      ]
+    }}
+    응답은 JSON 형식만 출력하고 다른 설명은 포함하지 마세요.
+    """
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        result = json.loads(response.choices[0].message.content.strip())
+        
+        # 응답 구조 검증
+        if 'nodes' not in result or 'links' not in result:
+            raise ValueError("GPT 응답 형식 오류 - nodes/links 필드 누락")
+        if not isinstance(result['nodes'], list) or not isinstance(result['links'], list):
+            raise ValueError("GPT 응답 형식 오류 - nodes/links가 배열이 아님")
+        
+        return jsonify(result)
+    except json.JSONDecodeError as e:
+        return jsonify({"error": "JSON 파싱 오류", "details": str(e)}), 500
+    except ValueError as e:
+        return jsonify({"error": "응답 형식 오류", "details": str(e)}), 500
+    except Exception as e:
+        return jsonify({"error": "GPT 응답 오류", "details": str(e)}), 500
+
+@app.route('/delete_prompt', methods=['DELETE'])
+def delete_prompt():
+    try:
+        user_id = request.args.get('userId')
+        file_name = request.args.get('fileName')
+
+        if not all([user_id, file_name]):
+            return jsonify({'error': 'Missing required parameters'}), 400
+
+        file_path = os.path.join(OUTPUT_DIR, user_id, 'Prompt', file_name)
+        
+        if not os.path.exists(file_path):
+            return jsonify({'error': 'File not found'}), 404
+
+        # 파일 삭제
+        os.remove(file_path)
+        
+        # 업데이트된 파일 목록 가져오기
+        prompt_dir = os.path.join(OUTPUT_DIR, user_id, 'Prompt')
+        files = [f for f in os.listdir(prompt_dir) if f.endswith('.txt')]
+        files.sort(reverse=True)  # 최신 순으로 정렬
+
+        return jsonify({
+            'success': True,
+            'message': 'File deleted successfully',
+            'files': files
+        })
+
+    except Exception as e:
+        print(f"Error deleting prompt: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     config = load_config()
     app.run(debug=True, host='0.0.0.0', port=8888)
