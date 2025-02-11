@@ -1,7 +1,7 @@
 <template>
   <div class="home-page">
     <Header />
-
+    <PathSettings @path-change="handlePathChange" />
     <div class="container">
       <section class="recent-designs">
         <h2 class="section-title">기존 디자인 불러오기</h2>
@@ -69,21 +69,27 @@
 
 <script>
 import Header from './components/Header.vue'
+import PathSettings from './components/PathSettings.vue'
 import axios from 'axios'
 
 export default {
   name: "HomePage",
   components: {
-    Header
+    Header,
+    PathSettings
   },
   data() {
     return {
-      baseUrl: 'http://125.181.20.252:8888', // 실제 서버 URL로 변경하세요
+      baseUrl: 'http://125.181.20.252:8888',
       recentVideos: [],
-      userId: 'KTaivle', // 실제 사용자 ID로 변경하세요
+      userId: '', // userId를 빈 문자열로 초기화
     }
   },
   methods: {
+    handlePathChange(pathData) {
+      this.userId = pathData.userId;
+      this.fetchRecentVideos();
+    },
     scrollToSection(sectionId) {
       const element = document.getElementById(sectionId);
       if (element) {
@@ -120,8 +126,9 @@ export default {
       return new Date(dateString).toLocaleDateString('ko-KR', options);
     }
   },
-  mounted() {
-    this.fetchRecentVideos();
+  created() {
+    // PathSettings 컴포넌트가 자동으로 초기화하고 handlePathChange를 호출할 것이므로
+    // 여기서는 별도의 초기화가 필요하지 않습니다
   }
 }
 </script>

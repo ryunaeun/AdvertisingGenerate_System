@@ -43,7 +43,14 @@
         @click="handleVideoGeneration"
         :disabled="!promptContent || isLoading"
       >
-        비디오 생성 페이지
+        프롬프트로 광고 생성
+      </button>
+      <button 
+        class="img-to-video-btn"
+        @click="handleImgVideoGeneration"
+        :disabled="!promptContent || isLoading"
+      >
+        이미지로 광고 생성
       </button>
       <button 
         class="example-image-btn"
@@ -93,7 +100,10 @@ export default {
       sessionStorage.setItem('videoPrompt', this.promptContent);
       this.$router.push('/txt2vid-generator');
     },
-
+    handleImgVideoGeneration() {
+      sessionStorage.setItem('videoPrompt', this.promptContent);
+      this.$router.push('/img2vid-generator');
+    },
     async generateExampleImages() {
       if (!this.promptContent) {
         alert('프롬프트를 먼저 생성해주세요.');
@@ -230,6 +240,10 @@ export default {
   border: 1px solid var(--input-border);
   border-radius: 4px;
   resize: vertical;
+}
+
+.img-to-video-btn {
+  background-color: #4a6cf7;  /* 구분을 위해 다른 색상 사용 */
 }
 
 .button-group {

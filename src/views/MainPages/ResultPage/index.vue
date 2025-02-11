@@ -7,10 +7,10 @@
         <!-- 광고 노출 방법 모델 영역 -->
         <div class="text-center mb-5" v-if="recommendationData">
           <p style="color: #344767; font-size: 1.25rem; font-weight: bold; margin-bottom: 3px;">
-            최적 노출 시간대는 {{ recommendationData.recommendations.time }}로 도출되었습니다.
+            최적 노출 시간대는 <span style="color: #5CB494;">{{ recommendationData.recommendations.time }}</span>로 도출되었습니다.
           </p>
           <p style="color: #344767; font-size: 1.25rem; font-weight: bold; margin-bottom: 3px;">
-            효과 극대화를 위해 {{ recommendationData.recommendations.adtype }}를 추천드립니다.
+            효과 극대화를 위해 <span style="color: #5CB494;">{{ recommendationData.recommendations.adtype }}</span>를 추천드립니다.
           </p>
         </div>
         <div class="text-center mb-5" v-else>
@@ -32,7 +32,7 @@
                 Your browser does not support the video tag.
               </video>
               <a id="downloadLink-1" class="download-link" v-show="videoUrl" :href="videoUrl" download
-                 @click="downloadVideo">Download Video</a>
+                @click="downloadVideo">Download Video</a>
             </div>
           </div>
           <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
@@ -214,58 +214,58 @@ export default {
       const height = svg.node().getBoundingClientRect().height;
 
       const simulation = d3.forceSimulation(this.nodes)
-          .force("link", d3.forceLink(this.links).id(d => d.id).distance(50))
-          .force("charge", d3.forceManyBody().strength(-100))
-          .force("center", d3.forceCenter(width / 2, height / 2));
+        .force("link", d3.forceLink(this.links).id(d => d.id).distance(50))
+        .force("charge", d3.forceManyBody().strength(-100))
+        .force("center", d3.forceCenter(width / 2, height / 2));
 
       const g = svg.append("g");
 
       const link = g.append("g")
-          .selectAll("line")
-          .data(this.links)
-          .enter().append("line")
-          .style("stroke", "#aaa")
-          .style("stroke-width", 1.5);
+        .selectAll("line")
+        .data(this.links)
+        .enter().append("line")
+        .style("stroke", "#aaa")
+        .style("stroke-width", 1.5);
 
       const nodeGroup = g.append("g")
-          .selectAll("g")
-          .data(this.nodes)
-          .enter().append("g")
-          .call(d3.drag()
-              .on("start", (event, d) => {
-                if (!event.active) simulation.alphaTarget(0.3).restart();
-                d.fx = d.x;
-                d.fy = d.y;
-              })
-              .on("drag", (event, d) => {
-                d.fx = event.x;
-                d.fy = event.y;
-              })
-              .on("end", (event, d) => {
-                if (!event.active) simulation.alphaTarget(0);
-                d.fx = null;
-                d.fy = null;
-              })
-          )
-          .on("click", this.expandNode);
+        .selectAll("g")
+        .data(this.nodes)
+        .enter().append("g")
+        .call(d3.drag()
+          .on("start", (event, d) => {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+          })
+          .on("drag", (event, d) => {
+            d.fx = event.x;
+            d.fy = event.y;
+          })
+          .on("end", (event, d) => {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+          })
+        )
+        .on("click", this.expandNode);
 
       nodeGroup.append("circle")
-          .attr("r", 10)
-          .attr("fill", "#6a5acd");
+        .attr("r", 10)
+        .attr("fill", "#6a5acd");
 
       nodeGroup.append("text")
-          .attr("dy", -15)
-          .attr("text-anchor", "middle")
-          .attr("fill", "#333")
-          .style("font-size", "12px")
-          .text(d => d.id);
+        .attr("dy", -15)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#333")
+        .style("font-size", "12px")
+        .text(d => d.id);
 
       simulation.on("tick", () => {
         link
-            .attr("x1", d => d.source.x)
-            .attr("y1", d => d.source.y)
-            .attr("x2", d => d.target.x)
-            .attr("y2", d => d.target.y);
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
 
         nodeGroup.attr("transform", d => `translate(${d.x},${d.y})`);
       });
