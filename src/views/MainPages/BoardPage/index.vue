@@ -457,6 +457,7 @@ async viewInquiryDetails(question) {
 },
 
     async deleteQuestion(questionId) {
+      console.log(questionId)
       if (confirm('정말로 삭제하시겠습니까?')) {
         try {
           await apiClient.delete(`/users/myboard/${questionId}`, {
@@ -464,7 +465,6 @@ async viewInquiryDetails(question) {
               'Authorization': `Bearer ${sessionStorage.getItem("accessToken")}`
             }
           });
-          
           alert('문의가 삭제되었습니다.');
           this.fetchMyInquiries();
         } catch (error) {

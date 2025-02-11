@@ -70,6 +70,7 @@
 
 <script>
 import axios from "axios";
+import apiClient from "../../../../api/axiosClient";
 
 export default {
   name: "UserManagement",
@@ -92,8 +93,8 @@ export default {
     async fetchUsers() {
       try {
         const accessToken = sessionStorage.getItem("accessToken");
-        const response = await axios.get(
-          "http://aivle-advi.com:8080/api/admin/users",
+        const response = await apiClient.get(
+          "/admin/users",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -127,8 +128,8 @@ export default {
     async saveUserChanges() {
       try {
         const accessToken = sessionStorage.getItem("accessToken");
-        await axios.post(
-          "http://aivle-advi.com:8080/api/admin/users/update",
+        await apiClient.post(
+          "/admin/users/update",
           this.editData,
           {
             headers: {
@@ -150,8 +151,8 @@ export default {
 
       try {
         const accessToken = sessionStorage.getItem("accessToken");
-        await axios.post(
-          "http://aivle-advi.com:8080/api/admin/users/delete",
+        await apiClient.post(
+          "/admin/users/delete",
           { email },
           {
             headers: {

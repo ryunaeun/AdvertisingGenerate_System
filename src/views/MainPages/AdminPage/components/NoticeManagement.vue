@@ -36,7 +36,7 @@
         </thead>
         <tbody>
           <tr v-for="notice in notices" :key="notice.noticeId">
-            <td>{{ notice.noticeId }}</td>
+            <td>{{ notice.noticeOrder }}</td>
             <td>{{ notice.title }}</td>
             <td>{{ notice.content }}</td>
             <td>{{ formatDate(notice.createdAt) }}</td>
@@ -44,7 +44,7 @@
               <button class="edit-btn" @click="openEditModal(notice)">
                 Edit
               </button>
-              <button class="delete-btn" @click="deleteNotice(notice.noticeId)">
+              <button class="delete-btn" @click="deleteNotice(notice.noticeOrder)">
                 Delete
               </button>
             </td>
@@ -81,6 +81,7 @@
 
 <script>
 import axios from "axios";
+import apiClient from "../../../../api/axiosClient";
 
 export default {
   name: "NoticeManagement",
@@ -94,6 +95,7 @@ export default {
       isEditModalOpen: false,
       editNotice: {
         noticeId: null,
+        noticeOrder: null,
         title: "",
         content: "",
       },
@@ -104,8 +106,8 @@ export default {
     async fetchNotices() {
       try {
         const accessToken = sessionStorage.getItem("accessToken");
-        const response = await axios.get(
-          "http://aivle-advi.com:8080/api/admin/notice",
+        const response = await apiClient.get(
+          "/admin/notice",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -130,8 +132,8 @@ export default {
 
       try {
         const accessToken = sessionStorage.getItem("accessToken");
-        await axios.post(
-          "http://aivle-advi.com:8080/api/admin/notice/write",
+        await apiClient.post(
+          "/admin/notice/write",
           {
             title: this.newNotice.title,
             content: this.newNotice.content,
@@ -155,13 +157,14 @@ export default {
     },
 
     // 공지사항 삭제 기능 추가
-    async deleteNotice(noticeId) {
+    async deleteNotice(noticeOrder) {
       if (!confirm("Are you sure you want to delete this notice?")) return;
 
       try {
         const accessToken = sessionStorage.getItem("accessToken");
-        await axios.delete(
-          `http://aivle-advi.com:8080/api/admin/notice/${noticeId}`,
+        console.log(noticeOrder);
+        await apiClient.delete(
+          `/admin/notice/${noticeOrder}/delete`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -172,7 +175,7 @@ export default {
 
         alert("Notice successfully deleted!");
         this.notices = this.notices.filter(
-          (notice) => notice.noticeId !== noticeId
+          (notice) => notice.noticeOrder !== noticeOrder
         );
       } catch (error) {
         console.error("Failed to delete notice:", error);
@@ -195,8 +198,8 @@ export default {
 
       try {
         const accessToken = sessionStorage.getItem("accessToken");
-        await axios.post(
-          `http://aivle-advi.com:8080/api/admin/notice/${this.editNotice.noticeId}/update`,
+        await apiClient.post(
+          `/admin/notice/${this.editNotice.noticeOrder}/update`,
           {
             title: this.editNotice.title,
             content: this.editNotice.content,
