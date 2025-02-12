@@ -325,8 +325,8 @@ export default {
       ],
       galleryImages: [
         { id: 1, url: "/video/gallery1.gif", alt: "GIF 이미지 1" },
-        { id: 2, url: "/video/gallery1.gif", alt: "GIF 이미지 2" },
-        { id: 3, url: "/video/gallery1.gif", alt: "GIF 이미지 3" },
+        { id: 2, url: "/video/gallery2.gif", alt: "GIF 이미지 2" },
+        { id: 3, url: "/video/gallery3.gif", alt: "GIF 이미지 3" },
       ],
     };
   },
@@ -649,6 +649,11 @@ input:checked + .slider::before {
   background-color: #218838;  /* 호버 시 어두운 초록색 */
 }
 
+.gallery-section {
+  padding: 4rem 2rem;
+  background-color: #f9f9f9;
+  min-height: 150vh; /* 섹션 높이를 늘려줍니다. */
+}
 .gallery-container {
   display: flex; /* 아이템을 가로로 정렬 */
   flex-wrap: wrap; /* 아이템이 화면에 맞게 줄바꿈되도록 설정 */
@@ -659,7 +664,6 @@ input:checked + .slider::before {
 
 .gallery-item {
   width: 25%; /* 각 아이템의 고정 너비 설정 */
-  height: 25%; /* 각 아이템의 고정 높이 설정 */
   overflow: hidden; /* 이미지가 넘어가지 않도록 설정 */
   border-radius: 8px; /* 아이템에 부드러운 모서리 추가 */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 추가 */
