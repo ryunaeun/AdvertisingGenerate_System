@@ -85,41 +85,15 @@
       </div>
 
       <div class="preview-container">
-        <!-- 비디오 출력 영역 -->
-        <div class="videos-grid" :class="gridClass" id="videosGrid">
-          <div 
-            v-for="index in videoCount" 
-            :key="index"
-            class="video-cell"
-            :style="{ display: index <= videoCount ? 'flex' : 'none' }"
-          >
-            <div 
-              class="loading" 
-              :id="`loading-${index}`"
-              v-show="loadingVideos[index-1]"
-            ></div>
-            <video 
-              :id="`outputVideo-${index}`"
-              class="output-video" 
-              v-show="videoUrls[index-1]"
-              controls 
-              autoplay 
-              loop 
-              muted
-            >
-              <source :src="videoUrls[index-1]" type="video/mp4">
-              Your browser does not support the video tag.
-            </video>
-            <a 
-              :id="`downloadLink-${index}`"
-              class="download-link" 
-              v-show="videoUrls[index-1]"
-              :href="videoUrls[index-1]" 
-              download
-              @click="downloadVideo($event, index-1)"
-            >Download Video</a>
-          </div>
-        </div>
+        <!-- VideoOutput 컴포넌트로 교체 -->
+        <VideoOutput
+          :video-count="videoCount"
+          :video-urls="videoUrls"
+          :loading-videos="loadingVideos"
+          @video-loaded="handleVideoLoaded"
+          @video-error="handleVideoError"
+        />
+        
         <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
         
         <div class="bottom-controls">
@@ -140,6 +114,7 @@ import Header from "../HomePage/components/Header.vue";
 import PathSettings from './components/PathSettings.vue'
 import PromptSaveLoad from './components/PromptSaveLoad.vue'
 import VideoSettings from './components/VideoSettings.vue'
+import VideoOutput from './components/VideoOutput.vue'
 
 export default {
   name: 'Img2VidGenerator',
@@ -148,7 +123,8 @@ export default {
     Header,
     PathSettings,
     PromptSaveLoad,
-    VideoSettings
+    VideoSettings,
+    VideoOutput
   },
   
   data() {
@@ -273,6 +249,17 @@ export default {
       this.videoSettings = settings;
     },
 
+    handleVideoLoaded(index) {
+      console.log(`Video ${index + 1} loaded successfully`);
+      this.loadingVideos[index] = false;
+    },
+
+    handleVideoError(index) {
+      console.error(`Failed to load video ${index + 1}`);
+      this.loadingVideos[index] = false;
+      this.errorMessage = `Failed to load video ${index + 1}`;
+    },
+
     async generateVideos() {
       if (!this.selectedImage) {
         this.errorMessage = '이미지를 선택해주세요';
@@ -340,10 +327,7 @@ export default {
         }
 
         const videoUrl = `${this.currentServerUrl}/output/${this.savePath.userId}/${data.folder}/${data.filename}`;
-        await this.waitForVideoLoad(videoUrl, index);
-        
         this.videoUrls[index] = videoUrl;
-        this.loadingVideos[index] = false;
 
       } catch (error) {
         console.error(`Error generating video ${index + 1}:`, error);
@@ -351,26 +335,6 @@ export default {
         this.loadingVideos[index] = false;
         throw error;
       }
-    },
-
-    async waitForVideoLoad(videoUrl, index) {
-      return new Promise((resolve, reject) => {
-        const video = document.getElementById(`outputVideo-${index + 1}`);
-        if (!video) {
-          reject(new Error('Video element not found'));
-          return;
-        }
-
-        video.onloadeddata = () => resolve();
-        video.onerror = () => reject(new Error('Failed to load video'));
-
-        video.src = videoUrl;
-      });
-    },
-
-    downloadVideo(event, index) {
-      const filename = this.videoUrls[index].split('/').pop();
-      event.target.download = filename;
     }
   },
 
@@ -402,6 +366,41 @@ export default {
 @import '@/assets/css/common_styles.css';
 @import '@/assets/css/video_gen_styles.css';
 @import '@/assets/css/prompt_save_load.css';
+
+/* 기본 레이아웃 스타일 */
+.prompt-generator {
+  min-height: 100vh;
+}
+
+.main-container {
+  padding-top: 90px;
+  display: flex;
+  gap: 20px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.prompt-gen-container {
+  flex: 0 0 38%;
+  background-color: var(--background-secondary);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  padding: 20px;
+  height: fit-content;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+/* 미리보기 컨테이너 */
+.preview-container {
+  flex: 1;
+  background-color: var(--background-secondary);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
 
 /* 이미지 업로드 관련 스타일 */
 .image-upload-section {
@@ -454,35 +453,12 @@ export default {
   font-size: 48px;
 }
 
-.prompt-generator {
-  min-height: 100vh;
-}
-
-.main-container {
-  padding-top: 90px;
-  display: flex;
-  gap: 20px;
-  max-width: 1600px;
-  margin: 0 auto;
-}
-
-.prompt-gen-container {
-  flex: 0 0 38%;  /* 너비 고정 */
-  background-color: var(--background-secondary);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px var(--shadow-color);
-  padding: 20px;
-  height: fit-content;  /* 내용물에 맞게 높이 조절 */
-  max-height: calc(100vh - 120px);  /* 최대 높이 제한 */
-  overflow-y: auto;  /* 내용이 넘칠 경우 스크롤 */
-}
-
+/* 폼 그룹 스타일 */
 .form-group {
-  margin-bottom: 20px;  /* 컴포넌트 간 여백 */
+  margin-bottom: 20px;
   width: 100%;
 }
 
-/* 프롬프트 관련 스타일 */
 .form-group label {
   display: block;
   margin-bottom: 8px;
@@ -503,11 +479,11 @@ export default {
   min-height: 100px;
 }
 
-/* 프롬프트 생성 버튼 */
+/* 버튼 스타일 */
 .prompt-gen-btn {
   width: 100%;
   padding: 10px 20px;
-  background-color: #3498db;  /* 기본 파란색 */
+  background-color: #3498db;
   color: white;
   border: none;
   border-radius: 4px;
@@ -517,7 +493,7 @@ export default {
 }
 
 .prompt-gen-btn:hover {
-  background-color: #2980b9;  /* hover시 진한 파란색으로 변경 */
+  background-color: #2980b9;
   opacity: 0.9;
   transform: translateY(-1px);
 }
@@ -526,12 +502,7 @@ export default {
   transform: translateY(1px);
 }
 
-/* 프롬프트 저장/불러오기 버튼과 비디오 설정 사이 여백 */
-.prompt-actions {
-  margin-bottom: 30px;  /* 여백 증가 */
-}
-
-/* 비디오 컨트롤 그룹 스타일 */
+/* 비디오 컨트롤 스타일 */
 .video-controls-group {
   margin-top: 20px;
   margin-bottom: 15px;
@@ -550,18 +521,6 @@ export default {
   align-items: center;
   gap: 10px;
   min-width: 0;
-}
-
-#videoCount {
-  flex: 0 0 auto;
-  width: 4rem;
-  min-width: 0;
-  padding: 8px;
-  text-align: center;
-  background-color: var(--input-background);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
 }
 
 #generateBtn {
@@ -583,82 +542,6 @@ export default {
 #generateBtn:disabled {
   background-color: var(--accent-disabled);
   cursor: not-allowed;
-}
-
-/* 미리보기 컨테이너 */
-.preview-container {
-  flex: 1;  /* 남은 공간 차지 */
-  background-color: var(--background-secondary);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px var(--shadow-color);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-/* 비디오 그리드 스타일 */
-.videos-grid {
-  display: grid;
-  gap: 20px;
-  width: 100%;
-  flex: 1;
-  min-height: 400px;
-}
-
-.videos-grid.single {
-  grid-template-columns: 1fr;
-}
-
-.videos-grid.horizontal-split {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.videos-grid.grid-four {
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-}
-
-/* 비디오 셀 스타일 */
-.video-cell {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--background-primary);
-  border-radius: 8px;
-  overflow: hidden;
-  aspect-ratio: 16/9;
-}
-
-.video-cell .loading {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.video-cell .output-video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.download-link {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: var(--background-secondary);
-  padding: 5px 10px;
-  border-radius: 4px;
-  z-index: 1;
-  color: var(--accent-primary);
-  text-decoration: none;
-}
-
-.download-link:hover {
-  text-decoration: underline;
 }
 
 /* 에러 메시지 스타일 */
@@ -726,19 +609,9 @@ h1 {
   .preview-container {
     min-height: 400px;
   }
-
-  .videos-grid.horizontal-split {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(2, 1fr);
-  }
 }
 
 @media (max-width: 768px) {
-  .video-cell {
-    aspect-ratio: auto;
-    min-height: 200px;
-  }
-  
   .image-preview {
     height: 150px;
   }

@@ -3,7 +3,7 @@
     <div class="settings-header" @click="toggleSettings">
       <h3>해상도 및 프레임 설정</h3>
       <div class="settings-info">
-        <span class="resolution-text">최대 해상도: {{ width }} × 프레임 길이: {{ frameLength }}f</span>
+        <span class="resolution-text">해상도: {{ width }} × 프레임 길이: {{ frameLength }}f</span>
         <span class="toggle-icon" :class="{ 'is-open': showSettings }">▼</span>
       </div>
     </div>

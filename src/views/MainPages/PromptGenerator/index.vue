@@ -17,6 +17,8 @@
             :user-id="savePath.userId"
             @prompt-generated="handlePromptGenerated"
             @start-image-generation="handleStartImageGeneration"
+            @generation-start="handleGenerationStart"
+            @generation-complete="handleGenerationComplete"
             ref="promptGeneration"
           />
         </div>
@@ -26,6 +28,7 @@
         <GenerateContent 
           :server-url="currentServerUrl"
           :save-path="savePath"
+          :is-generating-prompt="isGeneratingPrompt"
           ref="generateContent"
         />
         
@@ -79,11 +82,21 @@ export default {
         fullPath: 'KTaivle\\examples'
       },
       generatedPrompt: '',
-      isLoading: false
+      isGeneratingPrompt: false
     }
   },
 
   methods: {
+    handleGenerationStart() {
+      console.log('Prompt generation started'); // 디버깅용 로그
+      this.isGeneratingPrompt = true;
+    },
+
+    handleGenerationComplete() {
+      console.log('Prompt generation completed'); // 디버깅용 로그
+      this.isGeneratingPrompt = false;
+    },
+
     async findAvailableServer() {
       for (const url of this.serverUrls) {
         try {
@@ -110,7 +123,7 @@ export default {
 
     handleSettingsChange(settings) {
       this.currentSettings = settings;
-      console.log('Updated settings:', settings);
+      console.log('Settings updated:', settings);
     },
 
     handlePromptLoaded(content) {
@@ -150,6 +163,7 @@ export default {
   async mounted() {
     try {
       await this.findAvailableServer();
+      
       // sessionStorage에서 전달된 프롬프트 확인
       const videoPrompt = sessionStorage.getItem('videoPrompt');
       console.log('Checking for video prompt in mounted:', videoPrompt); // 디버깅용 로그

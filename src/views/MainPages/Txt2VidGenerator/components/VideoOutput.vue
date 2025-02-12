@@ -6,13 +6,16 @@
       class="video-cell"
       :class="{ 'active': index < videoCount }"
     >
-      <!-- 로딩 스피너 -->
+      <!-- 로딩 스피너와 메시지 -->
       <div 
         v-if="isLoading(index)"
         class="loading-spinner"
       >
         <div class="spinner"></div>
-        <span class="loading-text">Generating video...</span>
+        <div class="loading-message">
+          <p class="time-notice">영상 생성에는 5분 이상 소요될 수 있습니다</p>
+          <p class="status-text">Generating video...</p>
+        </div>
       </div>
 
       <!-- 비디오 플레이어 -->
@@ -127,7 +130,6 @@ export default {
   grid-template-rows: repeat(2, 1fr);
 }
 
-/* 비디오 셀 */
 .video-cell {
   position: relative;
   background-color: var(--background-primary);
@@ -144,7 +146,7 @@ export default {
   justify-content: center;
 }
 
-/* 로딩 스피너 */
+/* 수정된 로딩 스피너 스타일 */
 .loading-spinner {
   position: absolute;
   top: 0;
@@ -158,6 +160,7 @@ export default {
   background-color: rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(2px);
   z-index: 10;
+  padding: 20px;
 }
 
 .spinner {
@@ -167,6 +170,23 @@ export default {
   border-top: 4px solid var(--accent-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+.loading-message {
+  text-align: center;
+}
+
+.time-notice {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.status-text {
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 @keyframes spin {
@@ -174,14 +194,7 @@ export default {
   100% { transform: rotate(360deg); }
 }
 
-.loading-text {
-  margin-top: 16px;
-  color: var(--text-primary);
-  font-size: 14px;
-  font-weight: 500;
-}
-
-/* 비디오 플레이어 */
+/* 나머지 스타일 유지 */
 .output-video {
   width: 100%;
   height: 100%;
@@ -189,7 +202,6 @@ export default {
   background-color: black;
 }
 
-/* 다운로드 링크 */
 .download-link {
   position: absolute;
   bottom: 10px;
@@ -209,7 +221,6 @@ export default {
   color: white;
 }
 
-/* 반응형 디자인 */
 @media (max-width: 1200px) {
   .videos-grid.horizontal-split {
     grid-template-columns: 1fr;
@@ -220,6 +231,14 @@ export default {
 @media (max-width: 768px) {
   .video-cell {
     min-height: 200px;
+  }
+  
+  .time-notice {
+    font-size: 14px;
+  }
+  
+  .status-text {
+    font-size: 12px;
   }
 }
 </style>

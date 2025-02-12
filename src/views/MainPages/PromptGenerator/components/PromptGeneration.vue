@@ -32,7 +32,7 @@ export default {
       type: Object,
       required: true
     },
-    userId: {  // userId prop 추가
+    userId: {
       type: String,
       required: true
     }
@@ -49,12 +49,14 @@ export default {
     async generatePrompt() {
       if (this.isGenerating) return;
       
+      // 생성 시작 상태 설정 및 이벤트 발생
       this.isGenerating = true;
+      this.$emit('generation-start');
       
       try {
         // 프롬프트 생성 요청 데이터 준비
         const requestData = {
-          userId: this.userId,  // userId 추가
+          userId: this.userId,
           gender: this.targetSettings.gender || '',
           ageGroup: this.targetSettings.ageGroup || '',
           productCategory: this.targetSettings.productCategory || '',
@@ -85,7 +87,7 @@ export default {
           // 생성된 프롬프트를 부모 컴포넌트에 전달
           this.$emit('prompt-generated', data.generated_prompt, data.recommendations);
           
-          // 자동으로 예시 이미지 생성 시작
+          // 이미지 생성 시작 알림
           this.$emit('start-image-generation');
         } else {
           throw new Error(data.error || '프롬프트 생성 실패');
@@ -94,7 +96,9 @@ export default {
         console.error('프롬프트 생성 오류:', error);
         alert('프롬프트 생성 중 오류 발생: ' + error.message);
       } finally {
+        // 생성 완료 상태 설정 및 이벤트 발생
         this.isGenerating = false;
+        this.$emit('generation-complete');
       }
     },
 
@@ -136,6 +140,10 @@ export default {
 .generate-prompt-btn:hover:not(:disabled) {
   opacity: 0.9;
   transform: translateY(-1px);
+}
+
+.generate-prompt-btn:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .generate-prompt-btn:disabled {

@@ -52,41 +52,15 @@
       </div>
 
       <div class="preview-container">
-        <!-- 비디오 출력 영역 -->
-        <div class="videos-grid" :class="gridClass" id="videosGrid">
-          <div 
-            v-for="index in videoCount" 
-            :key="index"
-            class="video-cell"
-            :style="{ display: index <= videoCount ? 'flex' : 'none' }"
-          >
-            <div 
-              class="loading" 
-              :id="`loading-${index}`"
-              v-show="loadingVideos[index-1]"
-            ></div>
-            <video 
-              :id="`outputVideo-${index}`"
-              class="output-video" 
-              v-show="videoUrls[index-1]"
-              controls 
-              autoplay 
-              loop 
-              muted
-            >
-              <source :src="videoUrls[index-1]" type="video/mp4">
-              Your browser does not support the video tag.
-            </video>
-            <a 
-              :id="`downloadLink-${index}`"
-              class="download-link" 
-              v-show="videoUrls[index-1]"
-              :href="videoUrls[index-1]" 
-              download
-              @click="downloadVideo($event, index-1)"
-            >Download Video</a>
-          </div>
-        </div>
+        <!-- VideoOutput 컴포넌트 사용 -->
+        <VideoOutput
+          :video-count="videoCount"
+          :video-urls="videoUrls"
+          :loading-videos="loadingVideos"
+          @video-loaded="handleVideoLoaded"
+          @video-error="handleVideoError"
+        />
+        
         <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
         
         <div class="bottom-controls">
@@ -105,6 +79,7 @@ import Header from "../HomePage/components/Header.vue";
 import PathSettings from './components/PathSettings.vue'
 import PromptSaveLoad from './components/PromptSaveLoad.vue'
 import VideoSettings from './components/VideoSettings.vue'
+import VideoOutput from './components/VideoOutput.vue'
 
 export default {
   name: 'Txt2VidGenerator',
@@ -113,7 +88,8 @@ export default {
     Header,
     PathSettings,
     PromptSaveLoad,
-    VideoSettings
+    VideoSettings,
+    VideoOutput
   },
   
   data() {
@@ -135,18 +111,6 @@ export default {
       loadingVideos: [],
       isLoading: false,
       errorMessage: ''
-    }
-  },
-
-  computed: {
-    gridClass() {
-      switch(Number(this.videoCount)) {
-        case 1: return 'single';
-        case 2: return 'horizontal-split';
-        case 3:
-        case 4: return 'grid-four';
-        default: return 'single';
-      }
     }
   },
 
@@ -176,10 +140,8 @@ export default {
     },
 
     goToPromptGenerator() {
-      // 현재 프롬프트를 sessionStorage에 저장
-      console.log('Saving prompt:', this.generatedPrompt); // 로그 추가
+      console.log('Saving prompt:', this.generatedPrompt);
       sessionStorage.setItem('videoPrompt', this.generatedPrompt);
-      // 프롬프트 생성 페이지로 이동
       this.$router.push('/prompt-generator');
     },
 
@@ -196,6 +158,17 @@ export default {
     handleVideoSettingsChange(settings) {
       this.videoSettings = settings;
       console.log('Video settings updated:', settings);
+    },
+
+    handleVideoLoaded(index) {
+      console.log(`Video ${index + 1} loaded successfully`);
+      this.loadingVideos[index] = false;
+    },
+
+    handleVideoError(index) {
+      console.error(`Failed to load video ${index + 1}`);
+      this.loadingVideos[index] = false;
+      this.errorMessage = `Failed to load video ${index + 1}`;
     },
 
     async generateVideos() {
@@ -258,12 +231,7 @@ export default {
         }
 
         const videoUrl = `${this.currentServerUrl}/output/${this.savePath.userId}/${data.folder}/${data.filename}`;
-        
-        // 비디오 로드 확인
-        await this.waitForVideoLoad(videoUrl, index);
-        
         this.videoUrls[index] = videoUrl;
-        this.loadingVideos[index] = false;
 
       } catch (error) {
         console.error(`Error generating video ${index + 1}:`, error);
@@ -271,26 +239,6 @@ export default {
         this.loadingVideos[index] = false;
         throw error;
       }
-    },
-
-    async waitForVideoLoad(videoUrl, index) {
-      return new Promise((resolve, reject) => {
-        const video = document.getElementById(`outputVideo-${index + 1}`);
-        if (!video) {
-          reject(new Error('Video element not found'));
-          return;
-        }
-
-        video.onloadeddata = () => resolve();
-        video.onerror = () => reject(new Error('Failed to load video'));
-
-        video.src = videoUrl;
-      });
-    },
-
-    downloadVideo(event, index) {
-      const filename = this.videoUrls[index].split('/').pop();
-      event.target.download = filename;
     }
   },
 
@@ -321,7 +269,7 @@ export default {
 </script>
 
 <style>
-/* 기존 CSS 파일들 import */
+/* 기존 스타일 유지 */
 @import '@/assets/css/common_styles.css';
 @import '@/assets/css/video_gen_styles.css';
 @import '@/assets/css/prompt_save_load.css';
@@ -339,14 +287,24 @@ export default {
 }
 
 .prompt-gen-container {
-  flex: 0 0 38%;  /* 너비 고정 */
+  flex: 0 0 38%;
   background-color: var(--background-secondary);
   border-radius: 8px;
   box-shadow: 0 2px 4px var(--shadow-color);
   padding: 20px;
-  height: fit-content;  /* 내용물에 맞게 높이 조절 */
-  max-height: calc(100vh - 120px);  /* 최대 높이 제한 */
-  overflow-y: auto;  /* 내용이 넘칠 경우 스크롤 */
+  height: fit-content;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.preview-container {
+  flex: 1;
+  background-color: var(--background-secondary);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group {

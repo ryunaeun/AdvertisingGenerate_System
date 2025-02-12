@@ -9,7 +9,15 @@
         class="preview-image"
         :style="{ display: image ? 'block' : 'none' }"
       >
-      <div class="loading" :style="{ display: isLoading ? 'block' : 'none' }"></div>
+      <!-- 로딩 오버레이 -->
+      <div class="loading-overlay" v-if="showLoadingOverlay">
+        <div class="loading-content">
+          <div class="loading-spinner"></div>
+          <p class="loading-message">
+            {{ loadingMessage }}
+          </p>
+        </div>
+      </div>
     </div>
 
     <!-- 광고 추천 정보 섹션 -->
@@ -29,11 +37,13 @@
     <!-- 프롬프트 입력 및 결과 영역 -->
     <div class="form-group">
       <label for="generatedPrompt">생성된 프롬프트:</label>
-      <textarea 
-        id="generatedPrompt" 
-        v-model="promptContent"
-        placeholder="Generated prompt will appear here..."
-      ></textarea>
+      <div class="prompt-input-wrapper">
+        <textarea 
+          id="generatedPrompt" 
+          v-model="promptContent"
+          placeholder="Generated prompt will appear here..."
+        ></textarea>
+      </div>
     </div>
 
     <!-- 버튼 영역 -->
@@ -41,21 +51,21 @@
       <button 
         class="prompt-to-video-btn"
         @click="handleVideoGeneration"
-        :disabled="!promptContent || isLoading"
+        :disabled="!promptContent || isLoading || isGeneratingPrompt"
       >
         프롬프트로 광고 생성
       </button>
       <button 
         class="img-to-video-btn"
         @click="handleImgVideoGeneration"
-        :disabled="!promptContent || isLoading"
+        :disabled="!promptContent || isLoading || isGeneratingPrompt"
       >
         이미지로 광고 생성
       </button>
       <button 
         class="example-image-btn"
         @click="generateExampleImages"
-        :disabled="!promptContent || isLoading"
+        :disabled="!promptContent || isLoading || isGeneratingPrompt"
       >
         예시 이미지 생성
       </button>
@@ -77,6 +87,10 @@ export default {
       validator: (value) => {
         return value.hasOwnProperty('userId') && value.hasOwnProperty('subPath');
       }
+    },
+    isGeneratingPrompt: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -89,8 +103,19 @@ export default {
     }
   },
 
+  computed: {
+    loadingMessage() {
+      return this.isGeneratingPrompt 
+        ? 'AI가 요청을 분석하여 프롬프트를 생성하는 중입니다'
+        : 'AI가 예시 이미지를 생성하는 중입니다';
+    },
+    
+    showLoadingOverlay() {
+      return this.isLoading || this.isGeneratingPrompt;
+    }
+  },
+
   methods: {
-    // 외부에서 프롬프트 내용과 추천 정보를 설정할 수 있는 메서드
     setPromptContent(content, recommendations = null) {
       this.promptContent = content;
       this.recommendations = recommendations;
@@ -100,10 +125,12 @@ export default {
       sessionStorage.setItem('videoPrompt', this.promptContent);
       this.$router.push('/txt2vid-generator');
     },
+
     handleImgVideoGeneration() {
       sessionStorage.setItem('videoPrompt', this.promptContent);
       this.$router.push('/img2vid-generator');
     },
+
     async generateExampleImages() {
       if (!this.promptContent) {
         alert('프롬프트를 먼저 생성해주세요.');
@@ -155,16 +182,83 @@ export default {
   width: 100%;
 }
 
+.image-preview-area {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+  min-height: 200px;
+  background-color: var(--background-primary);
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.preview-image {
+  flex: 1;
+  max-width: 23%;
+  height: 200px;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+/* 로딩 오버레이 스타일 */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  z-index: 100;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(92, 180, 148, 0.2);
+  border-top: 4px solid #5CB494;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-message {
+  color: #344767;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  margin: 0;
+  padding: 0 20px;
+  white-space: nowrap;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* 추천 정보 스타일 */
 .recommendations-section {
-  margin: 10px 0;  /* 20px에서 10px로 수정 */
+  margin: 10px 0;
 }
 
 .recommendation-card {
   background-color: #f8f9fa;
   border: 1px solid #e9ecef;
   border-radius: 8px;
-  padding: 10px;  /* 20px에서 10px로 수정 */
+  padding: 10px;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -191,39 +285,6 @@ export default {
   margin-left: 4px;
 }
 
-.recommendation-value:empty::before,
-.recommendation-value:contains('미생성') {
-  color: #adb5bd;
-  font-style: italic;
-}
-
-.image-preview-area {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 20px;
-  min-height: 200px;
-  background-color: var(--background-primary);
-  border-radius: 4px;
-  padding: 10px;
-}
-
-.preview-image {
-  flex: 1;
-  max-width: 23%;
-  height: 200px;
-  border-radius: 4px;
-  object-fit: contain;
-}
-
-.loading {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
 .form-group {
   margin-bottom: 15px;
 }
@@ -231,19 +292,22 @@ export default {
 .form-group label {
   display: block;
   margin-bottom: 5px;
+  font-weight: 500;
 }
 
-.form-group textarea {
+.prompt-input-wrapper {
+  position: relative;
+}
+
+textarea {
   width: 100%;
-  min-height: 250px;
+  min-height: 150px;
   padding: 12px;
   border: 1px solid var(--input-border);
   border-radius: 4px;
   resize: vertical;
-}
-
-.img-to-video-btn {
-  background-color: #4a6cf7;  /* 구분을 위해 다른 색상 사용 */
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .button-group {
@@ -260,10 +324,27 @@ export default {
   cursor: pointer;
   color: white;
   transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.prompt-to-video-btn {
+  background-color: var(--accent-primary);
+}
+
+.img-to-video-btn {
+  background-color: #4a6cf7;
+}
+
+.example-image-btn {
+  background-color: #3498db;
 }
 
 .button-group button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.button-group button:hover:not(:disabled) {
+  opacity: 0.9;
 }
 </style>
