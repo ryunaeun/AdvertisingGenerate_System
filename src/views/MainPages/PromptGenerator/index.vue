@@ -1,4 +1,4 @@
-txt2<template>
+<template>
   <div class="prompt-generator">
     <Header />
     <div class="main-container">
@@ -14,6 +14,7 @@ txt2<template>
           <PromptGeneration
             :server-url="currentServerUrl"
             :target-settings="currentSettings"
+            :user-id="savePath.userId"
             @prompt-generated="handlePromptGenerated"
             @start-image-generation="handleStartImageGeneration"
             @generation-start="handleGenerationStart"
@@ -136,13 +137,18 @@ export default {
     handlePathChange(pathData) {
       this.savePath = pathData;
       console.log('Save path updated:', this.savePath);
+      
+      // PathSettings에서 변경된 userId를 PromptGeneration 컴포넌트에 반영
+      if (this.$refs.promptGeneration) {
+        this.$refs.promptGeneration.$props.userId = pathData.userId;
+      }
     },
 
-    handlePromptGenerated(prompt) {
+    handlePromptGenerated(prompt, recommendations) {
       this.generatedPrompt = prompt;
-      // GenerateContent 컴포넌트의 프롬프트 내용 업데이트
+      // GenerateContent 컴포넌트의 프롬프트 내용과 추천 정보 업데이트
       if (this.$refs.generateContent) {
-        this.$refs.generateContent.setPromptContent(prompt);
+        this.$refs.generateContent.setPromptContent(prompt, recommendations);
       }
     },
 
