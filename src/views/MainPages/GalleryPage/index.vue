@@ -216,17 +216,17 @@ export default {
   },
   data() {
     return {
-      baseUrl: 'http://125.181.20.252:8888', // 실제 서버 URL로 변경하세요
-      isShareModalOpen: false, // 공유 모달 상태
-      currentShareUrl: "", // 공유할 URL
+      baseUrl: "http://125.181.20.252:8888",
+      isShareModalOpen: false,
+      currentShareUrl: "",
       searchQuery: "",
-      dateSortOrder: "desc", // 초기 정렬 순서: 최신순
-      sizeSortOrder: null, // 초기 크기 정렬 순서: 정렬안함
+      dateSortOrder: "desc",
+      sizeSortOrder: null,
       isPeriodDropdownOpen: false,
-      selectedPeriod: "all", // 선택된 기간 (필터링 로직에서 사용)
-      selectedPeriodLabel: "전체 기간", // 선택된 기간의 이름 (UI에 표시됨)
+      selectedPeriod: "all",
+      selectedPeriodLabel: "전체 기간",
       galleryItems: [],
-      userId: 'KTaivle',
+      userId: "",
       periodOptions: [
         { value: "all", label: "전체 기간" },
         { value: "today", label: "오늘" },
@@ -235,12 +235,10 @@ export default {
         { value: "year", label: "최근 1년" },
       ],
       loading: false,
-      error: null
-    
+      error: null,
     };
   },
   computed: {
-  // 필터링 및 정렬된 데이터
   filteredAndSortedItems() {
     const filtered = this.galleryItems.filter((item) => {
       const itemDate = new Date(item.createdAt);
@@ -300,7 +298,10 @@ export default {
     async fetchGalleryItems() {
       this.loading = true;
       this.error = null;
+
+      console.log("이건 url " + this.baseUrl + '/gallery_check')
       try {
+        console.log("이건 ID야" + this.userId)
         const response = await axios.get(`${this.baseUrl}/gallery_check`, {
           params: { userId: this.userId }
         });
@@ -371,6 +372,8 @@ export default {
     }
   },
   mounted() {
+    this.userId = localStorage.getItem("userId") || ""; // localStorage에서 userId 가져오기
+    console.log("설정된 userId:", this.userId); // 콘솔에서 확인
     this.fetchGalleryItems();
     // 드롭다운 외부 클릭 이벤트 리스너 추가
     document.addEventListener('click', this.handleClickOutside);

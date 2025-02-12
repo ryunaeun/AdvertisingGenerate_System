@@ -17,7 +17,7 @@
       </thead>
       <tbody>
         <tr v-for="post in posts" :key="post.boardId">
-          <td>{{ post.boardId }}</td>
+          <td>{{ post.boardOrder }}</td>
           <td>{{ post.title }}</td>
           <td>{{ post.email }}</td>
           <td>{{ formatDate(post.createdAt) }}</td>
@@ -27,7 +27,7 @@
             <button class="view-reply-btn" @click="openReplyModal(post)">
               Reply
             </button>
-            <button class="delete-btn" @click="deletePost(post.boardId)">
+            <button class="delete-btn" @click="deletePost(post.boardOrder)">
               Delete
             </button>
           </td>
@@ -66,6 +66,7 @@
 
 <script>
 import axios from "axios";
+import apiClient from "../../../../api/axiosClient";
 
 export default {
   name: "PostManagement",
@@ -84,8 +85,8 @@ export default {
     async fetchAllPosts() {
       try {
         const accessToken = sessionStorage.getItem("accessToken");
-        const response = await axios.get(
-          "http://aivle-advi.com:8080/api/admin/users/board",
+        const response = await apiClient.get(
+          "/admin/users/board",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -99,6 +100,7 @@ export default {
 
         this.posts = response.data.content.map((post) => ({
           boardId: post.boardId,
+          boardOrder:post.boardOrder,
           title: post.title,
           email: post.email,
           content: post.content, // 문의 내용 포함
@@ -128,8 +130,8 @@ export default {
       try {
         const accessToken = sessionStorage.getItem("accessToken");
 
-        const response = await axios.post(
-          "http://aivle-advi.com:8080/api/admin/users/board/reply",
+        const response = await apiClient.post(
+          "/admin/users/board/reply",
           {
             boardId: this.selectedPost.boardId,
             email: this.selectedPost.email,
@@ -160,9 +162,11 @@ export default {
 
       try {
         const accessToken = sessionStorage.getItem("accessToken");
-
-        const response = await axios.delete(
-          `http://aivle-advi.com:8080/api/admin/users/board/${boardId}`,
+        console.log(boardId);
+        console.log(
+            "Authorization: Bearer " + sessionStorage.getItem("accessToken"));
+        const response = await apiClient.delete(
+          `/admin/users/board/${boardId}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
